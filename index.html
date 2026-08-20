@@ -857,7 +857,23 @@ const ALLOWED_GRAPH_GROUPS = [
 ];
 
 function isAllowedGraphGroup(group) {
-    return ALLOWED_GRAPH_GROUPS.includes(group);
+    if (!group) return false;
+
+    const normalized = String(group)
+        .replace(/^F_MB_/, "")
+        .replace(/^F_MB\s+/i, "")
+        .replace(/_/g, " ")
+        .trim()
+        .toUpperCase();
+
+    return ALLOWED_GRAPH_GROUPS.some(name => {
+        const allowed = name
+            .replace(/_/g, " ")
+            .trim()
+            .toUpperCase();
+
+        return normalized === allowed;
+    });
 }
 
 function getAllowedGraphGroups(groups) {
