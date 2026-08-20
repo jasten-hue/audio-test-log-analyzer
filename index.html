@@ -4,7 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Audio Log Analyzer</title>
+<title>AUDIO TEST LOG ANALYZER</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.2.0/dist/chartjs-plugin-zoom.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
 <style>
 
@@ -12,363 +16,641 @@
     box-sizing: border-box;
 }
 
+:root {
+    --blue: #2563eb;
+    --red: #dc2626;
+    --green: #16a34a;
+    --bg: #f3f6fa;
+    --card: #ffffff;
+    --border: #dfe5ec;
+    --text: #1f2937;
+    --muted: #64748b;
+}
+
 body {
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
-    background: #f4f6f8;
-    color: #202124;
+    background: var(--bg);
+    color: var(--text);
 }
-
-/* =========================
-   HEADER
-========================= */
 
 header {
-    background: #1f2937;
-    color: white;
-    padding: 18px 25px;
-}
-
-header h1 {
-    margin: 0;
-    font-size: 22px;
-}
-
-header p {
-    margin: 5px 0 0;
-    color: #cbd5e1;
-    font-size: 13px;
-}
-
-/* =========================
-   MODEL SELECTION
-========================= */
-
-.model-selection {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    padding: 20px;
-    flex-wrap: wrap;
-}
-
-.model-btn {
-    border: none;
-    padding: 12px 35px;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 8px;
-    cursor: pointer;
-    background: #e5e7eb;
-    color: #374151;
-}
-
-.model-btn:hover {
-    background: #d1d5db;
-}
-
-.model-btn.active {
-    background: #2563eb;
-    color: white;
-}
-
-/* =========================
-   MAIN LAYOUT
-========================= */
-
-.container {
-    display: none;
-    grid-template-columns: 340px 1fr;
-    height: calc(100vh - 90px);
-    gap: 0;
-}
-
-/* =========================
-   LEFT PANEL
-========================= */
-
-.sidebar {
+    height: 68px;
     background: white;
-    border-right: 1px solid #d1d5db;
-    padding: 15px;
-    overflow-y: auto;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
 }
 
-.sidebar h3 {
-    margin-top: 0;
+.header-title h1 {
+    margin: 0;
+    font-size: 21px;
 }
 
-.upload-area {
-    border: 2px dashed #9ca3af;
-    border-radius: 10px;
-    padding: 25px 15px;
-    text-align: center;
-    background: #f9fafb;
+.header-title p {
+    margin: 5px 0 0;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.upload-button {
+    border: 1px solid var(--border);
+    background: white;
+    border-radius: 7px;
+    padding: 10px 16px;
     cursor: pointer;
-    transition: 0.2s;
-    margin-bottom: 12px;
+    font-weight: bold;
 }
 
-.upload-area:hover,
-.upload-area.dragover {
-    border-color: #2563eb;
+#fileInput {
+    display: none;
+}
+
+#startScreen {
+    min-height: calc(100vh - 68px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+}
+
+.upload-card {
+    width: 520px;
+    max-width: 100%;
+    background: white;
+    border: 2px dashed #b9c4d0;
+    border-radius: 14px;
+    padding: 40px 30px 55px;
+    text-align: center;
+    transition: .2s;
+}
+
+.upload-card.dragover {
+    border-color: var(--blue);
     background: #eff6ff;
 }
 
-.upload-icon {
-    font-size: 30px;
-    margin-bottom: 8px;
+.upload-card h2 {
+    margin: 0 0 10px;
 }
 
-.upload-text {
-    font-weight: bold;
+.upload-card p {
+    color: var(--muted);
     font-size: 14px;
 }
 
-.upload-subtext {
-    color: #6b7280;
-    margin: 6px 0;
-    font-size: 12px;
+.model-section {
+    margin: 24px 0 18px;
+    text-align: left;
 }
 
-.browse-btn {
-    background: #2563eb;
-    color: white;
-    border: none;
-    padding: 8px 18px;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.browse-btn:hover {
-    background: #1d4ed8;
-}
-
-.upload-info {
-    margin-top: 10px;
-    font-size: 11px;
-    color: #6b7280;
-}
-
-textarea {
-    width: 100%;
-    height: 150px;
-    resize: vertical;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    padding: 10px;
-    font-family: monospace;
-    font-size: 11px;
-}
-
-.analyze-btn {
-    width: 100%;
-    margin-top: 8px;
-    background: #16a34a;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 6px;
+.model-label {
+    display: block;
+    font-size: 10px;
     font-weight: bold;
-    cursor: pointer;
+    color: var(--muted);
+    margin-bottom: 7px;
 }
 
-.analyze-btn:hover {
-    background: #15803d;
-}
-
-/* =========================
-   FILTER
-========================= */
-
-.filter-row {
-    display: flex;
-    gap: 5px;
-    margin: 12px 0;
-}
-
-.filter-btn {
-    flex: 1;
-    border: none;
-    padding: 7px;
-    border-radius: 5px;
-    cursor: pointer;
-    background: #e5e7eb;
-    font-size: 12px;
-}
-
-.filter-btn.active {
-    background: #2563eb;
-    color: white;
-}
-
-#searchSN {
+.model-select {
     width: 100%;
-    padding: 9px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    margin-bottom: 10px;
+    padding: 11px 12px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: white;
+    font-weight: bold;
+    font-size: 13px;
+    outline: none;
 }
 
-/* =========================
-   SN LIST
-========================= */
-
-.sn-list {
-    border-top: 1px solid #e5e7eb;
-}
-
-.sn-item {
-    padding: 10px;
-    border-bottom: 1px solid #e5e7eb;
+.upload-main-button {
+    margin-top: 15px;
+    padding: 12px 22px;
+    border: none;
+    border-radius: 7px;
+    background: var(--blue);
+    color: white;
     cursor: pointer;
+    font-weight: bold;
 }
 
-.sn-item:hover {
-    background: #f3f4f6;
+.drop-text {
+    margin-top: 14px;
+    font-size: 11px;
+    color: var(--muted);
 }
 
-.sn-item.active {
-    background: #dbeafe;
+/* APP */
+
+#app {
+    display: none;
+    height: calc(100vh - 68px);
 }
 
-.sn-title {
+.app-layout {
+    display: grid;
+    grid-template-columns: 440px 1fr;
+    height: 100%;
+}
+
+/* SIDEBAR */
+
+.sidebar {
+    background: white;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.sidebar-header {
+    padding: 15px;
+    border-bottom: 1px solid var(--border);
+}
+
+.sidebar-title-row {
     display: flex;
     justify-content: space-between;
-    font-weight: bold;
-    font-size: 13px;
-}
-
-.good {
-    color: #16a34a;
-}
-
-.ng {
-    color: #dc2626;
-}
-
-.sn-info {
-    margin-top: 4px;
-    font-size: 11px;
-    color: #6b7280;
-}
-
-/* =========================
-   MAIN CONTENT
-========================= */
-
-.main {
-    overflow-y: auto;
-    padding: 20px;
-}
-
-.welcome {
-    display: flex;
-    justify-content: center;
     align-items: center;
-    height: 100%;
-    color: #6b7280;
-    font-size: 18px;
 }
 
-.unit-details {
-    background: white;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 15px;
-    border: 1px solid #e5e7eb;
-}
-
-.details-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 10px;
-    font-size: 13px;
-}
-
-.detail-box {
-    background: #f9fafb;
-    padding: 10px;
-    border-radius: 6px;
-}
-
-.detail-label {
-    font-size: 11px;
-    color: #6b7280;
-}
-
-.detail-value {
-    margin-top: 4px;
+.sidebar-title {
+    font-size: 15px;
     font-weight: bold;
 }
 
-/* =========================
-   GRAPHS
-========================= */
-
-.graph-section {
-    background: white;
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
-    margin-bottom: 15px;
-    padding: 15px;
+.total-count {
+    font-size: 11px;
+    color: var(--muted);
 }
 
-.graph-title {
-    margin: 0 0 10px;
+.filter-label {
+    display: block;
+    margin-top: 12px;
+    margin-bottom: 6px;
+    font-size: 9px;
+    font-weight: bold;
+    color: var(--muted);
+}
+
+.station-select {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: white;
+}
+
+.status-filters {
+    display: flex;
+    gap: 6px;
+}
+
+.status-filter {
+    flex: 1;
+    border: 1px solid var(--border);
+    background: #f8fafc;
+    padding: 8px 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.status-filter.active {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: white;
+}
+
+.search-box textarea {
+    width: 100%;
+    min-height: 75px;
+    resize: vertical;
+    padding: 9px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 11px;
+    outline: none;
+}
+
+/* SN TABLE */
+
+.sn-table-header,
+.sn-row {
+    display: grid;
+    grid-template-columns: 28px 1.2fr 1fr 62px 1.2fr 18px;
+    gap: 4px;
+    align-items: center;
+}
+
+.sn-table-header {
+    padding: 10px 8px;
+    font-size: 8px;
+    color: var(--muted);
+    font-weight: bold;
+    border-bottom: 1px solid var(--border);
+    background: #f8fafc;
+}
+
+.sn-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.sn-row {
+    min-height: 58px;
+    padding: 7px 8px;
+    border-bottom: 1px solid #edf0f3;
+    font-size: 9px;
+    cursor: pointer;
+}
+
+.sn-row:hover {
+    background: #f8fafc;
+}
+
+.sn-row.selected {
+    background: #eaf2ff;
+    box-shadow: inset 3px 0 0 var(--blue);
+}
+
+.sn-number {
+    color: var(--muted);
+}
+
+.sn-pcba {
+    font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sn-station {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #475569;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 5px 6px;
+    border-radius: 4px;
+    font-size: 8px;
+    font-weight: bold;
+    color: white;
+}
+
+.status-pass {
+    background: var(--green);
+}
+
+.status-ng {
+    background: var(--red);
+}
+
+.ng-details {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #475569;
+}
+
+.arrow {
+    color: var(--blue);
     font-size: 16px;
 }
 
-.graph-wrapper {
-    width: 100%;
-    height: 380px;
-    position: relative;
+/* MAIN */
+
+.content {
+    overflow-y: auto;
+    padding: 14px 18px 25px;
 }
 
-canvas {
-    width: 100% !important;
-    height: 100% !important;
+.view-mode-section {
+    display: flex;
+    gap: 7px;
+    margin-bottom: 12px;
 }
 
-/* =========================
-   STATION SUMMARY
-========================= */
+.view-mode-button {
+    border: 1px solid var(--border);
+    background: white;
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.view-mode-button.active {
+    background: var(--blue);
+    color: white;
+    border-color: var(--blue);
+}
+
+/* INFO BAR */
+
+.info-bar {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    display: flex;
+    align-items: stretch;
+    margin-bottom: 12px;
+    overflow: hidden;
+    flex-wrap: wrap;
+}
+
+.info-item {
+    padding: 15px 18px;
+    min-width: 145px;
+    border-right: 1px solid #e9edf2;
+}
+
+.info-label {
+    font-size: 9px;
+    color: var(--muted);
+    font-weight: bold;
+    margin-bottom: 7px;
+}
+
+.info-value {
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.result-pass {
+    color: var(--green);
+}
+
+.result-ng {
+    color: var(--red);
+}
+
+.ng-summary {
+    flex: 1;
+    padding: 14px 18px;
+}
+
+.ng-summary-title {
+    font-size: 9px;
+    color: var(--muted);
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.ng-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.ng-pill {
+    background: #f8fafc;
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-size: 9px;
+}
+
+.ng-pill span {
+    color: var(--red);
+    font-weight: bold;
+    margin-left: 4px;
+}
+
+/* STATION SUMMARY */
 
 .station-summary {
     background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 15px;
-    margin-top: 20px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 16px;
+    margin-bottom: 12px;
 }
 
-.station-header {
+.station-summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.station-summary-title {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.station-summary-subtitle {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 4px;
+}
+
+.summary-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.summary-stat {
+    min-width: 100px;
+    background: #f8fafc;
+    border-radius: 6px;
+    padding: 11px;
+}
+
+.summary-stat-label {
+    font-size: 8px;
+    color: var(--muted);
+    font-weight: bold;
+}
+
+.summary-stat-value {
     font-size: 18px;
     font-weight: bold;
+    margin-top: 5px;
+}
+
+.summary-good {
+    color: var(--green);
+}
+
+.summary-ng {
+    color: var(--red);
+}
+
+.test-ng-summary {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.test-ng-item {
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-size: 10px;
+    background: white;
+}
+
+.test-ng-item b {
+    color: var(--red);
+    margin-left: 5px;
+}
+
+/* TEST FILTER */
+
+.test-filter-section {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.test-filter-title {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: bold;
+    margin-bottom: 9px;
+}
+
+.test-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.test-tab {
+    border: 1px solid var(--border);
+    background: #f1f5f9;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.test-tab.active {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: white;
+}
+
+/* GRAPHS */
+
+.graphs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.graph-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 14px;
+    min-height: 350px;
+}
+
+.graph-card.expanded {
+    grid-column: 1 / -1;
+    min-height: calc(100vh - 310px);
+}
+
+.graph-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
     margin-bottom: 10px;
 }
 
-.station-block {
-    margin-top: 15px;
-    border-top: 1px solid #e5e7eb;
-    padding-top: 15px;
+.graph-title {
+    font-size: 13px;
+    font-weight: bold;
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
+.graph-controls {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
 
-@media(max-width:900px) {
+.graph-zoom-btn,
+.graph-reset-btn {
+    border: 1px solid var(--border);
+    background: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    height: 28px;
+}
 
-    .container {
-        grid-template-columns: 1fr;
+.graph-zoom-btn {
+    width: 30px;
+    font-size: 16px;
+}
+
+.graph-reset-btn {
+    padding: 0 10px;
+    font-size: 10px;
+}
+
+.graph-zoom-btn:hover,
+.graph-reset-btn:hover {
+    background: #f1f5f9;
+}
+
+.canvas-wrapper {
+    height: 290px;
+    position: relative;
+}
+
+.graph-card.expanded .canvas-wrapper {
+    height: calc(100vh - 390px);
+    min-height: 450px;
+}
+
+.no-graph {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 70px;
+    text-align: center;
+    color: var(--muted);
+}
+
+@media (max-width: 1150px) {
+    .app-layout {
+        grid-template-columns: 390px 1fr;
+    }
+}
+
+@media (max-width: 850px) {
+
+    #app {
         height: auto;
     }
 
+    .app-layout {
+        grid-template-columns: 1fr;
+    }
+
     .sidebar {
+        height: 600px;
         border-right: none;
-        border-bottom: 1px solid #d1d5db;
-        max-height: 500px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .graphs {
+        grid-template-columns: 1fr;
     }
 
 }
@@ -379,790 +661,1183 @@ canvas {
 <body>
 
 <header>
-    <h1>AUDIO LOG ANALYZER</h1>
-    <p>XUA4 · BLA4 · 2RS4</p>
+
+<div class="header-title">
+    <h1>AUDIO TEST LOG ANALYZER</h1>
+    <p>Audio SPC CSV • Station Comparison • Unit & Station Summary</p>
+</div>
+
+<label class="upload-button">
+    ⇧ Upload New CSV
+    <input type="file" id="fileInput" accept=".csv">
+</label>
+
 </header>
 
-<div class="model-selection">
+<div id="startScreen">
 
-    <button class="model-btn"
-            onclick="selectModel('XUA4',this)">
-        XUA4
+<div class="upload-card" id="dropZone">
+
+    <h2>Upload Audio SPC CSV</h2>
+
+    <p>
+        Select the product model, then upload or drag your Audio SPC CSV.
+    </p>
+
+    <div class="model-section">
+
+        <label class="model-label">
+            PRODUCT MODEL
+        </label>
+
+        <select id="modelSelect" class="model-select">
+            <option value="">-- SELECT PRODUCT --</option>
+            <option value="2RS4">2RS4</option>
+            <option value="BLA4">BLA4</option>
+            <option value="XUA4">XUA4</option>
+        </select>
+
+    </div>
+
+    <button
+        class="upload-main-button"
+        onclick="openFileBrowser()">
+
+        Browse CSV File
+
     </button>
 
-    <button class="model-btn"
-            onclick="selectModel('BLA4',this)">
-        BLA4
-    </button>
-
-    <button class="model-btn"
-            onclick="selectModel('2RS4',this)">
-        2RS4
-    </button>
+    <div class="drop-text">
+        or drag & drop CSV file here
+    </div>
 
 </div>
 
-<div class="container" id="appContainer">
+</div>
 
-    <!-- ================= LEFT ================= -->
+<div id="app">
 
-    <div class="sidebar">
+<div class="app-layout">
 
-        <h3>Audio Log Input</h3>
+<aside class="sidebar">
 
-        <!-- FILE INPUT -->
-        <div class="upload-area" id="dropZone">
+<div class="sidebar-header">
 
-            <div class="upload-icon">📁</div>
+    <div class="sidebar-title-row">
 
-            <div class="upload-text">
-                Drag & Drop Audio Log File
-            </div>
-
-            <div class="upload-subtext">
-                or
-            </div>
-
-            <button class="browse-btn"
-                type="button"
-                id="browseBtn">
-                Browse File
-            </button>
-
-            <input
-                type="file"
-                id="fileInput"
-                accept=".txt,.csv,.log"
-                hidden
-            >
-
-            <div class="upload-info">
-                Supported: TXT, CSV, LOG
-            </div>
-
+        <div class="sidebar-title">
+            ▌ ALL SN / DUT LIST
         </div>
 
-        <textarea
-            id="logInput"
-            placeholder="Paste Audio Logs Here..."
-        ></textarea>
+        <div class="total-count" id="totalCount">
+            Total: 0
+        </div>
 
-        <button class="analyze-btn"
-            onclick="analyzeLogs()">
-            ANALYZE LOGS
+    </div>
+
+    <label class="filter-label">
+        STATION IP
+    </label>
+
+    <select id="stationFilter" class="station-select"></select>
+
+    <label class="filter-label">
+        STATUS
+    </label>
+
+    <div class="status-filters">
+
+        <button class="status-filter active" data-status="ALL">
+            ALL
         </button>
 
-        <hr>
+        <button class="status-filter" data-status="PASS">
+            GOOD
+        </button>
 
-        <h3>Search Units</h3>
-
-        <input
-            type="text"
-            id="searchSN"
-            placeholder="Search multiple SN..."
-            oninput="renderSNList()"
-        >
-
-        <div class="filter-row">
-
-            <button
-                class="filter-btn active"
-                onclick="setFilter('ALL',this)">
-                ALL
-            </button>
-
-            <button
-                class="filter-btn"
-                onclick="setFilter('GOOD',this)">
-                GOOD
-            </button>
-
-            <button
-                class="filter-btn"
-                onclick="setFilter('NG',this)">
-                NG
-            </button>
-
-        </div>
-
-        <div class="sn-list"
-            id="snList">
-        </div>
+        <button class="status-filter" data-status="NG">
+            NG
+        </button>
 
     </div>
 
-    <!-- ================= RIGHT ================= -->
+    <label class="filter-label">
+        SEARCH SN / PCBA
+    </label>
 
-    <div class="main"
-        id="mainContent">
+    <div class="search-box">
 
-        <div class="welcome">
-            Select XUA4, BLA4, or 2RS4 and load Audio Logs.
-        </div>
+        <textarea
+            id="searchInput"
+            placeholder="Paste one or multiple SN here...
+
+Comma, space, semicolon or new line supported"></textarea>
 
     </div>
 
 </div>
 
+<div class="sn-table-header">
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+    <div>#</div>
+    <div>PCBA / SN</div>
+    <div>STATION IP</div>
+    <div>STATUS</div>
+    <div>NG DETAILS</div>
+    <div></div>
+
+</div>
+
+<div class="sn-list" id="snList"></div>
+
+</aside>
+
+<main class="content">
+
+<div class="view-mode-section">
+
+<button class="view-mode-button active" data-view="UNIT">
+    UNIT VIEW
+</button>
+
+<button class="view-mode-button" data-view="STATION">
+    STATION SUMMARY
+</button>
+
+</div>
+
+<div id="unitView"></div>
+
+<div id="stationView" style="display:none;"></div>
+
+</main>
+
+</div>
+</div>
 
 <script>
 
-/* =====================================================
+/* =========================================================
    GLOBAL VARIABLES
-===================================================== */
+========================================================= */
 
-let selectedModel = null;
+let csvData = [];
+let headers = [];
 
-let currentFilter = "ALL";
+let lowerRow = null;
+let upperRow = null;
 
-let parsedUnits = [];
+let dutRows = [];
+let filteredRows = [];
 
-let activeSN = null;
+let selectedDutIndex = 0;
 
+let activeTest = "ALL";
+let activeStatus = "ALL";
+let activeStation = "ALL";
+let activeView = "UNIT";
+
+let stationColumn = -1;
 let charts = [];
 
+let selectedModel = "";
 
-/* =====================================================
-   SPECIFICATIONS
-===================================================== */
 
-const SPECS = {
+/* =========================================================
+   MASTER SPECIFICATION DATA
+========================================================= */
 
-XUA4: {
+const MODEL_SPECS = {
 
-    speakerFR: {
-        lower: {},
-        upper: {}
-    },
+    "2RS4": `
+Hz,Spk_FR_LL,Spk_FR_UL,Spk_RB_UL,Spk_THD_UL,Mic_FR_LL,Mic_FR_UL,Mic_Seal_LL,Mic_Seal_UL,Mic_THD_UL
+100,62.69,74.69,,,-42.59,-32.59,10,,
+106,63.70,75.70,,,-42.57,-32.57,,,
+112,64.59,76.59,,,-42.53,-32.53,,,
+118,65.41,77.41,,,-42.54,-32.54,,,
+125,66.44,78.44,,,-42.51,-32.51,,,
+132,67.29,79.29,,,-42.46,-32.46,,,
+140,68.16,80.16,,,-42.46,-32.46,,,
+150,69.47,81.47,,,-42.44,-32.44,,,
+160,70.77,82.77,,,-42.42,-32.42,,,
+170,71.87,83.87,,,-42.38,-32.38,,,
+180,72.91,84.91,,,-42.33,-32.33,,,
+190,74.07,86.07,,,-42.35,-32.35,,,
+200,75.20,87.20,,,-42.34,-32.34,25,,
+212,76.57,88.57,,,-42.33,-32.33,,,
+224,77.91,89.91,,,-42.32,-32.32,20,,
+236,79.24,91.24,,,-42.31,-32.31,,,
+250,80.63,92.63,,,-42.30,-32.30,25,,
+265,82.09,94.09,,,-42.26,-32.26,,,
+280,83.49,95.49,,,-42.30,-32.30,,,
+300,85.33,97.33,1.2,,-42.31,-32.31,,,2
+315,86.65,98.65,,,-42.30,-32.30,,,
+335,88.49,100.49,,,-42.29,-32.29,,,
+355,90.03,102.03,,,-42.27,-32.27,,,
+375,91.40,103.40,,,-42.23,-32.23,,,
+400,93.20,105.20,,40,-42.19,-32.19,,,1
+425,94.84,106.84,,,-42.18,-32.18,,,
+450,96.27,108.27,,,-42.20,-32.20,,,
+475,97.44,109.44,,,-42.19,-32.19,,,
+500,98.44,110.44,,,-42.19,-32.19,,,
+530,99.31,111.31,,,-42.18,-32.18,,,
+560,99.85,111.85,,,-42.18,-32.18,,,
+600,100.27,112.27,,,-42.16,-32.16,,,
+630,100.24,112.24,,,-42.13,-32.13,,,
+670,99.83,111.83,,,-42.11,-32.11,,,
+700,,,0.7,10,,,,,
+710,98.89,110.89,,,-41.93,-31.93,,,
+750,97.71,109.71,,,-41.73,-31.73,,,
+800,96.28,108.28,,,-41.74,-31.74,,,
+850,95.28,107.28,,,-42.65,-32.65,,,
+900,94.60,106.60,,,-43.37,-33.37,,,
+950,93.70,105.70,,,-42.80,-32.80,,,
+1000,93.60,105.60,,10,-42.52,-32.52,,80,
+1060,94.47,106.47,,,-42.11,-32.11,,,
+1120,95.42,107.42,,,-42.15,-32.15,,,
+1180,96.68,108.68,,,-42.29,-32.29,,,
+1250,96.66,109.66,,,-42.46,-32.46,,,
+1320,96.64,108.64,,,-42.64,-32.64,,,
+1400,96.37,108.37,,,-42.73,-32.73,,,
+1500,97.11,109.11,,,-42.65,-32.65,,,
+1600,97.28,109.28,,,-42.41,-32.41,,,
+1700,97.33,109.33,,,-42.01,-32.01,,,
+1800,97.81,109.81,,,-41.74,-31.74,,,
+1900,98.73,110.73,,,-41.62,-31.62,,,
+2000,99.39,111.39,,,-42.59,-30.59,,80,
+2120,99.57,111.57,,,-42.17,-30.17,,,
+2240,99.83,112.83,,,-41.77,-29.77,,,
+2360,100.35,112.35,,,-41.21,-29.21,,,
+2500,99.43,111.43,,,-41.23,-29.23,,1
+2650,100.69,112.69,,,-41.63,-29.63,,,2.5
+2800,101.88,113.88,,,-41.94,-29.94,,,2.5
+3000,103.28,115.28,,,-44.17,-32.17,,,1
+3150,104.13,116.13,,,-43.37,-31.37,,,
+3350,107.02,119.02,,,-42.78,-30.78,,,
+3550,110.08,122.08,,,-44.77,-32.77,,,
+3750,112.25,124.25,,,-43.54,-31.54,,,
+4000,113.56,125.56,,,-43.32,-31.32,,,
+4250,113.64,125.64,,,-46.10,-34.10,,,
+4500,114.61,126.61,,,-47.78,-35.78,,,
+4750,113.32,126.32,,,-48.31,-34.31,,,
+5000,111.07,123.07,,,-44.69,-31.69,,,
+5300,108.31,121.31,,,-41.40,-29.40,,,
+5600,103.76,115.76,,,-41.37,-29.37,,,
+6000,99.52,111.52,,,-42.28,-30.28,,,
+6300,96.31,109.31,,,-40.57,-28.57,,,
+6700,91.12,104.12,,,-39.43,-27.43,,,
+7100,89.46,101.46,,,-40.66,-28.66,,,
+7500,88.04,101.04,,,-41.06,-29.06,,,
+8000,84.93,96.93,,,-39.00,-27.00,,,
+8500,80.97,92.97,,,-38.07,-26.07,,,
+9000,78.65,91.65,,,-39.04,-27.04,,,
+9500,74.39,87.39,,,-39.54,-27.54,,,
+10000,72.14,86.14,0.7,10,-39.17,-27.17,,,1
+`,
 
-    speakerRB: [
-        { hz: 300, limit: 1.2 },
-        { hz: 10000, limit: 0.7 }
-    ],
-
-    speakerTHD: [
-        { hz: 400, limit: 40 },
-        { hz: 10000, limit: 10 }
-    ],
-
-    micFR: {
-        lower: {},
-        upper: {}
-    },
-
-    micTHD: [
-        { from: 100, to: 2500, limit: 1 },
-        { from: 2500, to: 6300, limit: 1.5 },
-        { from: 6300, to: 8000, limit: 1 }
-    ],
-
-    micSeal: {
-        lower: 25,
-        upper: 100
-    }
-
-},
-
-BLA4: {
-
-    speakerFR: {
-        deviation: 4.5
-    },
-
-    speakerTHD: [
-        { hz: 400, limit: 40 },
-        { hz: 10000, limit: 10 }
-    ],
-
-    speakerRB: [
-        { hz: 300, limit: 1.2 },
-        { hz: 10000, limit: 0.7 }
-    ],
-
-    micFR: {
-        deviation: 4.5
-    },
-
-    micTHD: [
-        { from: 100, to: 2500, limit: 1 },
-        { from: 2500, to: 6300, limit: 1.5 },
-        { from: 6300, to: 8000, limit: 1 }
-    ],
-
-    micSeal: {
-        lower: 25,
-        upper: 100
-    }
-
-},
-
-"2RS4": {
-
-speakerFR: {
-lower: {
-100:62.69,106:63.70,112:64.59,118:65.41,125:66.44,
-132:67.29,140:68.16,150:69.47,160:70.77,170:71.87,
-180:72.91,190:74.07,200:75.20,212:76.57,224:77.91,
-236:79.24,250:80.63,265:82.09,280:83.49,300:85.33,
-315:86.65,335:88.49,355:90.03,375:91.40,400:93.20,
-425:94.84,450:96.27,475:97.44,500:98.44,530:99.31,
-560:99.85,600:100.27,630:100.24,670:99.83,710:98.89,
-750:97.71,800:96.28,850:95.28,900:94.60,950:93.70,
-1000:93.60,1060:94.47,1120:95.42,1180:96.68,
-1250:96.66,1320:96.64,1400:96.37,1500:97.11,
-1600:97.28,1700:97.33,1800:97.81,1900:98.73,
-2000:99.39,2120:99.57,2240:99.83,2360:100.35,
-2500:99.43,2650:100.69,2800:101.88,3000:103.28,
-3150:104.13,3350:107.02,3550:110.08,3750:112.25,
-4000:113.56,4250:113.64,4500:114.61,4750:113.32,
-5000:111.07,5300:108.31,5600:103.76,6000:99.52,
-6300:96.31,6700:91.12,7100:89.46,7500:88.04,
-8000:84.93,8500:80.97,9000:78.65,9500:74.39,
-10000:72.14
-},
-
-upper: {
-100:74.69,106:75.70,112:76.59,118:77.41,125:78.44,
-132:79.29,140:80.16,150:81.47,160:82.77,170:83.87,
-180:84.91,190:86.07,200:87.20,212:88.57,224:89.91,
-236:91.24,250:92.63,265:94.09,280:95.49,300:97.33,
-315:98.65,335:100.49,355:102.03,375:103.40,
-400:105.20,425:106.84,450:108.27,475:109.27,
-500:110.44,530:111.31,560:111.85,600:112.27,
-630:112.24,670:111.83,710:110.89,750:109.71,
-800:108.28,850:107.28,900:106.60,950:105.70,
-1000:105.60,1060:106.47,1120:107.42,1180:108.68,
-1250:109.66,1320:108.64,1400:108.37,1500:109.11,
-1600:109.28,1700:109.33,1800:109.81,1900:110.73,
-2000:111.39,2120:111.57,2240:112.83,2360:112.35,
-2500:111.43,2650:112.69,2800:113.88,3000:115.28,
-3150:116.13,3350:119.02,3550:122.08,3750:124.25,
-4000:125.56,4250:125.64,4500:126.61,4750:126.32,
-5000:123.07,5300:121.31,5600:115.76,6000:111.52,
-6300:109.31,6700:104.12,7100:101.46,7500:101.04,
-8000:96.93,8500:92.97,9000:91.65,9500:87.39,
-10000:86.14
-}
-},
-
-speakerRB: [
-{hz:300,limit:1.2},
-{hz:10000,limit:0.7}
-],
-
-speakerTHD: [
-{hz:400,limit:40},
-{hz:10000,limit:10}
-],
-
-micFR: {
-
-lower: {
-100:-42.59,106:-42.57,112:-42.53,118:-42.54,
-125:-42.51,132:-42.46,140:-42.46,150:-42.44,
-160:-42.42,170:-42.38,180:-42.33,190:-42.35,
-200:-42.34,212:-42.33,224:-42.32,236:-42.31,
-250:-42.30,265:-42.26,280:-42.30,300:-42.31,
-315:-42.30,335:-42.29,355:-42.27,375:-42.23,
-400:-42.19,425:-42.18,450:-42.20,475:-42.19,
-500:-42.19,530:-42.18,560:-42.18,600:-42.16,
-630:-42.13,670:-42.11,710:-41.93,750:-41.73,
-800:-41.74,850:-42.65,900:-43.37,950:-42.80,
-1000:-42.52,1060:-42.11,1120:-42.15,1180:-42.29,
-1250:-42.46,1320:-42.64,1400:-42.73,1500:-42.65,
-1600:-42.41,1700:-42.01,1800:-41.74,1900:-41.62,
-2000:-42.59,2120:-42.17,2240:-41.77,2360:-41.21,
-2500:-41.23,2650:-41.63,2800:-41.94,3000:-44.17,
-3150:-43.37,3350:-42.78,3550:-44.77,3750:-43.54,
-4000:-43.32,4250:-46.10,4500:-47.78,4750:-48.31,
-5000:-44.69,5300:-41.40,5600:-41.37,6000:-42.28,
-6300:-40.57,6700:-39.43,7100:-40.66,7500:-41.06,
-8000:-39.00,8500:-38.07,9000:-39.04,9500:-39.54,
-10000:-39.17
-},
-
-upper: {
-100:-32.59,106:-32.57,112:-32.53,118:-32.54,
-125:-32.51,132:-32.46,140:-32.46,150:-32.44,
-160:-32.42,170:-32.38,180:-32.33,190:-32.35,
-200:-32.34,212:-32.33,224:-32.32,236:-32.31,
-250:-32.30,265:-32.26,280:-32.30,300:-32.31,
-315:-32.30,335:-32.29,355:-32.27,375:-32.23,
-400:-32.19,425:-32.18,450:-32.20,475:-32.19,
-500:-32.19,530:-32.18,560:-32.18,600:-32.16,
-630:-32.13,670:-32.11,710:-31.93,750:-31.73,
-800:-31.74,850:-32.65,900:-33.37,950:-32.80,
-1000:-32.52,1060:-32.11,1120:-32.15,1180:-32.29,
-1250:-32.46,1320:-32.64,1400:-32.73,1500:-32.65,
-1600:-32.41,1700:-32.01,1800:-31.74,1900:-31.62,
-2000:-30.59,2120:-30.17,2240:-29.77,2360:-29.21,
-2500:-29.23,2650:-29.63,2800:-29.94,3000:-32.17,
-3150:-31.37,3350:-30.78,3550:-32.77,3750:-31.54,
-4000:-31.32,4250:-34.10,4500:-35.78,4750:-34.31,
-5000:-31.69,5300:-29.40,5600:-29.37,6000:-30.28,
-6300:-28.57,6700:-27.43,7100:-28.66,7500:-29.06,
-8000:-27.00,8500:-26.07,9000:-27.04,9500:-27.54,
-10000:-27.17
-}
-
-},
-
-micSeal: {
-lower:25,
-upper:80
-},
-
-micTHD: [
-{hz:400,limit:1},
-{hz:2500,limit:1},
-{hz:2650,limit:2.5},
-{hz:2800,limit:2.5},
-{hz:3000,limit:1},
-{hz:10000,limit:1}
-]
-
-}
-
+    "XUA4": `
+Hz,Spk_FR_LL,Spk_FR_UL,Spk_RB_UL,Spk_THD_UL,Mic_FR_LL,Mic_FR_UL,Mic_Seal_LL,Mic_Seal_UL,Mic_THD_UL
+100,70.41,80.41,,,-40,-34,,,
+106,71.39,81.39,,,-39.99,-33.99,,,
+112,72.30,82.30,,,-39.99,-33.99,,,
+118,73.18,83.18,,,-39.97,-33.97,,,
+125,74.17,84.17,,,-39.96,-33.96,,,
+132,75.11,85.11,,,-39.94,-33.94,,,
+140,76.12,86.12,,,-39.92,-33.92,,,
+150,77.31,87.31,,,-39.88,-33.88,,,
+160,78.43,88.43,,,-39.85,-33.85,,,
+170,79.52,89.52,,,-39.81,-33.81,,,
+180,80.55,90.55,,,-39.77,-33.77,,,
+190,81.57,91.57,,,-39.72,-33.72,,,
+200,82.53,92.53,1.2,60,-39.67,-33.67,25,,2
+212,83.60,93.60,,,-39.64,-33.64,,,
+224,84.62,94.62,,,-39.61,-33.61,,,
+236,85.59,95.59,,,-39.61,-33.61,,,
+250,86.65,96.65,,,-39.59,-33.59,,,
+265,87.73,97.73,,,-39.57,-33.57,,,
+280,88.77,98.77,,,-39.56,-33.56,,,
+300,90.10,100.10,1.2,,-39.53,-33.53,,,2
+315,91.07,101.07,,,-39.51,-33.51,,,
+335,92.34,102.34,,,-39.51,-33.51,,,
+355,93.57,103.57,,,-39.53,-33.53,,,
+375,94.75,104.75,,,-39.56,-33.56,,,
+400,96.19,106.19,,40,-39.50,-33.50,,,1
+425,97.64,107.64,,,-39.48,-33.48,,,
+450,99.07,109.07,,,-39.46,-33.46,,,
+475,100.48,110.48,,,-39.45,-33.45,,,
+500,101.85,111.85,,,-39.45,-33.45,,,
+530,103.42,113.42,,,-39.45,-33.45,,,
+560,104.93,114.93,,,-39.47,-33.47,,,
+600,106.74,116.74,,,-39.55,-33.55,,,
+630,107.93,117.93,,,-39.65,-33.65,,,
+670,109.27,119.27,,,-39.73,-33.73,,,
+700,,,0.7,,-39.73,-33.73,,,
+710,110.20,120.20,,10,-39.84,-33.84,,,
+750,110.63,120.63,,,-39.92,-33.92,,,
+800,110.55,120.55,,,-39.91,-33.91,,,
+850,110.23,120.23,,,-39.82,-33.82,,,
+900,110.09,120.09,,,-39.75,-33.75,,,
+950,109.83,119.83,,,-39.73,-33.73,,,
+1000,109.29,119.29,,,-39.67,-33.67,,80,
+1060,108.63,118.63,,,-39.70,-33.70,,,
+1120,107.68,117.68,,,-39.68,-33.68,,,
+1180,106.35,116.35,,,-39.52,-33.52,,,
+1250,105.34,115.34,,,-39.30,-33.30,,,
+1320,104.90,114.90,,,-39.29,-33.29,,,
+1400,104.29,114.29,,,-39.76,-33.76,,,
+1500,103.10,113.10,,,-40.50,-34.50,,,
+1600,102.50,112.50,,,-39.62,-33.62,,,
+1700,101.55,111.55,,,-39.60,-33.60,,,
+1800,101.41,111.41,,,-39.68,-33.68,,,
+1900,101.69,111.69,,,-39.74,-33.74,,,
+2000,101.51,111.51,,,-39.95,-33.95,,80,
+2120,101.19,111.19,,,-41.88,-31.88,,,
+2240,102.00,112.00,,,-41.57,-31.57,,,
+2360,101.51,111.51,,,-41.43,-31.43,,,
+2500,102.00,112.00,,,-41.92,-31.92,,1
+2650,103.32,113.32,,,-41.88,-32.88,,,2.5
+2800,104.86,114.86,,,-42.93,-32.93,,,2.5
+3000,108.21,118.21,,,-42.27,-32.27,,,1
+3150,106.84,116.84,,,-42.90,-32.29,,,
+3350,105.09,115.09,,,-42.07,-32.07,,,
+3550,105.78,115.78,,,-42.05,-32.05,,,
+3750,108.63,118.63,,,-42.98,-32.98,,,
+4000,109.52,119.52,,,-41.15,-31.15,,,
+4250,108.47,120.47,,,-42.20,-30.20,,,
+4500,108.42,120.42,,,-42.35,-30.35,,,
+4750,109.27,121.27,,,-42.12,-30.12,,,
+5000,109.63,121.63,,,-41.16,-29.16,,,
+5300,112.16,124.16,,,-41.48,-29.48,,,
+5600,115.00,127.00,,,-41.11,-29.11,,,
+6000,118.54,130.54,,,-41.17,-29.17,,,
+6300,120.33,132.33,,,-40.79,-28.79,,,
+6700,119.34,131.34,,,-39.65,-29.00,,,
+7100,117.13,132.13,,,-41.00,-29.00,,,
+7500,113.15,128.15,,,-41.00,-29.00,,,
+8000,106.87,121.87,,,-41.00,-29.00,,,
+8500,101.11,116.11,,,-41.01,-26.01,,,
+9000,99.46,114.46,,,-40.83,-25.83,,,
+9500,102.19,117.19,,,-40.54,-25.54,,,
+10000,98.81,113.81,0.7,10,-40.05,-25.05,25,,1
+`
 };
 
 
-/* =====================================================
-   MODEL SELECT
-===================================================== */
+let parsedModelSpecs = {};
 
-function selectModel(model, button) {
 
-    selectedModel = model;
+/* =========================================================
+   PARSE MASTER SPEC
+========================================================= */
 
-    document.querySelectorAll(".model-btn")
-        .forEach(btn => btn.classList.remove("active"));
+function initializeModelSpecs() {
 
-    button.classList.add("active");
+    ["2RS4", "XUA4"].forEach(model => {
 
-    document.getElementById("appContainer")
-        .style.display = "grid";
+        const lines =
+            MODEL_SPECS[model]
+            .trim()
+            .split("\n");
 
-}
+        const spec = {};
 
+        lines.slice(1).forEach(line => {
 
-/* =====================================================
-   FILE BROWSE + DRAG DROP
-===================================================== */
+            const parts =
+                line
+                .trim()
+                .split(",");
 
-const dropZone = document.getElementById("dropZone");
-const fileInput = document.getElementById("fileInput");
-const browseBtn = document.getElementById("browseBtn");
+            const hz =
+                Number(parts[0]);
 
-browseBtn.addEventListener("click", function(e) {
+            spec[hz] = {
 
-    e.stopPropagation();
+                spkFRLL: toNumber(parts[1]),
+                spkFRUL: toNumber(parts[2]),
+                spkRBUL: toNumber(parts[3]),
+                spkTHDUL: toNumber(parts[4]),
+                micFRLL: toNumber(parts[5]),
+                micFRUL: toNumber(parts[6]),
+                micSealLL: toNumber(parts[7]),
+                micSealUL: toNumber(parts[8]),
+                micTHDUL: toNumber(parts[9])
 
-    fileInput.click();
-
-});
-
-dropZone.addEventListener("click", function() {
-
-    fileInput.click();
-
-});
-
-fileInput.addEventListener("change", function() {
-
-    if (fileInput.files.length > 0) {
-
-        loadFile(fileInput.files[0]);
-
-    }
-
-});
-
-dropZone.addEventListener("dragover", function(e) {
-
-    e.preventDefault();
-
-    dropZone.classList.add("dragover");
-
-});
-
-dropZone.addEventListener("dragleave", function() {
-
-    dropZone.classList.remove("dragover");
-
-});
-
-dropZone.addEventListener("drop", function(e) {
-
-    e.preventDefault();
-
-    dropZone.classList.remove("dragover");
-
-    if (e.dataTransfer.files.length > 0) {
-
-        loadFile(e.dataTransfer.files[0]);
-
-    }
-
-});
-
-
-function loadFile(file) {
-
-    const reader = new FileReader();
-
-    reader.onload = function(e) {
-
-        document.getElementById("logInput").value =
-            e.target.result;
-
-    };
-
-    reader.readAsText(file);
-
-}
-
-
-/* =====================================================
-   ANALYZE
-===================================================== */
-
-function analyzeLogs() {
-
-    if (!selectedModel) {
-
-        alert("Please select XUA4, BLA4, or 2RS4 first.");
-
-        return;
-
-    }
-
-    const raw =
-        document.getElementById("logInput").value;
-
-    if (!raw.trim()) {
-
-        alert("Please paste or load an Audio Log.");
-
-        return;
-
-    }
-
-    parsedUnits =
-        parseAudioLogs(raw);
-
-    renderSNList();
-
-}
-
-
-/* =====================================================
-   LOG PARSER
-===================================================== */
-
-function parseAudioLogs(raw) {
-
-    /*
-    Flexible parser.
-
-    This searches for Serial Number,
-    StationIP and measurement values.
-
-    Adjust REGEX patterns here if your
-    actual production log format changes.
-    */
-
-    const units = [];
-
-    const blocks =
-        raw.split(/(?=SN\s*[:=]|Serial\s*Number\s*[:=])/i);
-
-    blocks.forEach((block, index) => {
-
-        if (!block.trim())
-            return;
-
-        let snMatch =
-            block.match(
-                /(?:SN|Serial\s*Number)\s*[:=]\s*([^\s,\r\n]+)/i
-            );
-
-        let sn =
-            snMatch
-            ? snMatch[1]
-            : "UNKNOWN_" + (index + 1);
-
-        let stationMatch =
-            block.match(
-                /StationIP\s*[:=]\s*([^\s,\r\n]+)/i
-            );
-
-        if (!stationMatch) {
-
-            stationMatch =
-                block.match(
-                    /Station\s*IP\s*[:=]\s*([^\s,\r\n]+)/i
-                );
-
-        }
-
-        let stationIP =
-            stationMatch
-            ? stationMatch[1]
-            : "UNKNOWN";
-
-        const measurements =
-            extractMeasurements(block);
-
-        const evaluation =
-            evaluateUnit(measurements);
-
-        units.push({
-
-            sn: sn,
-
-            stationIP: stationIP,
-
-            status: evaluation.status,
-
-            ngTypes: evaluation.ngTypes,
-
-            measurements: measurements,
-
-            raw: block
+            };
 
         });
 
+        parsedModelSpecs[model] = spec;
+
     });
 
-    return units;
+}
+
+initializeModelSpecs();
+
+
+/* =========================================================
+   FILE UPLOAD
+========================================================= */
+
+document
+.getElementById("fileInput")
+.addEventListener("change", handleFile);
+
+
+function openFileBrowser() {
+
+    selectedModel =
+        document
+        .getElementById("modelSelect")
+        .value;
+
+    if (!selectedModel) {
+
+        alert(
+            "Please select a product model first."
+        );
+
+        return;
+
+    }
+
+    document
+    .getElementById("fileInput")
+    .click();
 
 }
 
 
-/* =====================================================
-   EXTRACT MEASUREMENTS
-===================================================== */
+function handleFile(event) {
 
-function extractMeasurements(block) {
+    const file =
+        event.target.files[0];
 
-    const data = {
+    if (!file) return;
 
-        speakerFR: [],
-        speakerRB: [],
-        speakerTHD: [],
-        micFR: [],
-        micTHD: [],
-        micSeal: []
+    loadCSVFile(file);
+
+}
+
+
+/* =========================================================
+   DRAG AND DROP
+========================================================= */
+
+const dropZone =
+    document.getElementById("dropZone");
+
+
+dropZone.addEventListener(
+    "dragover",
+    function(event) {
+
+        event.preventDefault();
+
+        dropZone
+        .classList
+        .add("dragover");
+
+    }
+);
+
+
+dropZone.addEventListener(
+    "dragleave",
+    function() {
+
+        dropZone
+        .classList
+        .remove("dragover");
+
+    }
+);
+
+
+dropZone.addEventListener(
+    "drop",
+    function(event) {
+
+        event.preventDefault();
+
+        dropZone
+        .classList
+        .remove("dragover");
+
+        selectedModel =
+            document
+            .getElementById("modelSelect")
+            .value;
+
+        if (!selectedModel) {
+
+            alert(
+                "Please select a product model first."
+            );
+
+            return;
+
+        }
+
+        const file =
+            event.dataTransfer.files[0];
+
+        if (!file) return;
+
+        if (
+            !file.name
+            .toLowerCase()
+            .endsWith(".csv")
+        ) {
+
+            alert(
+                "Please drop a CSV file."
+            );
+
+            return;
+
+        }
+
+        loadCSVFile(file);
+
+    }
+);
+
+
+function loadCSVFile(file) {
+
+    selectedModel =
+        document
+        .getElementById("modelSelect")
+        .value;
+
+    if (!selectedModel) {
+
+        alert(
+            "Please select a product model first."
+        );
+
+        return;
+
+    }
+
+    Papa.parse(file, {
+
+        header: false,
+
+        skipEmptyLines: true,
+
+        complete: function(results) {
+
+            csvData =
+                results.data;
+
+            processCSV();
+
+        }
+
+    });
+
+}
+
+
+/* =========================================================
+   PROCESS CSV
+========================================================= */
+
+function processCSV() {
+
+    if (csvData.length < 3) {
+
+        alert("Invalid CSV.");
+
+        return;
+
+    }
+
+    headers =
+        csvData[0];
+
+    lowerRow =
+        findRow("Lower");
+
+    upperRow =
+        findRow("Upper");
+
+    stationColumn =
+        headers.findIndex(
+            header =>
+                String(header || "")
+                .trim()
+                .toLowerCase()
+                === "stationip"
+        );
+
+    if (stationColumn === -1) {
+
+        alert(
+            "StationIP column was not found."
+        );
+
+        return;
+
+    }
+
+    dutRows =
+        csvData
+        .slice(1)
+        .filter(row => {
+
+            const first =
+                String(row[0] || "")
+                .trim()
+                .toLowerCase();
+
+            if (!first) return false;
+
+            const excluded = [
+                "lower",
+                "upper",
+                "min",
+                "max",
+                "mean",
+                "sigma",
+                "cpl",
+                "cpu",
+                "cpk"
+            ];
+
+            return !excluded.includes(first);
+
+        });
+
+    dutRows.forEach(row => {
+
+        row._analysis =
+            analyzeDUT(row);
+
+    });
+
+    populateStationFilter();
+
+    applyFilters();
+
+    document
+    .getElementById("startScreen")
+    .style.display = "none";
+
+    document
+    .getElementById("app")
+    .style.display = "block";
+
+    if (dutRows.length > 0) {
+
+        selectDUT(0);
+
+    }
+
+}
+
+
+/* =========================================================
+   FIND LOWER / UPPER ROW
+========================================================= */
+
+function findRow(name) {
+
+    return csvData.find(
+        row =>
+            String(row[0] || "")
+            .trim()
+            .toLowerCase()
+            === name.toLowerCase()
+    );
+
+}
+
+
+/* =========================================================
+   ANALYZE DUT
+========================================================= */
+
+function analyzeDUT(row) {
+
+    const groups =
+        detectMeasurementGroups(row);
+
+    const summary = {};
+
+    let totalNG = 0;
+
+    Object.keys(groups)
+    .forEach(group => {
+
+        let ngCount = 0;
+
+        groups[group]
+        .forEach(item => {
+
+            if (isNG(item)) {
+
+                ngCount++;
+                totalNG++;
+
+            }
+
+        });
+
+        summary[group] = {
+
+            ngCount,
+
+            status:
+                ngCount > 0
+                ? "NG"
+                : "PASS"
+
+        };
+
+    });
+
+    const failedTests =
+        Object.keys(summary)
+        .filter(
+            group =>
+                summary[group].ngCount > 0
+        );
+
+    return {
+
+        groups,
+        summary,
+        totalNG,
+        failedTests,
+
+        result:
+            totalNG > 0
+            ? "NG"
+            : "PASS"
 
     };
 
-    /*
-    Supported generic formats:
+}
 
-    Speaker_FR,100,85.2
-    MIC_FR,100,-38.5
-    Speaker_THD,400,5.2
 
-    or:
+/* =========================================================
+   DETECT MEASUREMENT GROUPS
+========================================================= */
 
-    Speaker_FR 100 85.2
+function detectMeasurementGroups(row) {
 
-    The parser can be expanded once your
-    exact production logs are added.
-    */
+    const groups = {};
 
-    const lines =
-        block.split(/\r?\n/);
+    for (
+        let i = 0;
+        i < headers.length;
+        i++
+    ) {
 
-    lines.forEach(line => {
+        const header =
+            String(headers[i] || "")
+            .trim();
 
-        const clean =
-            line.trim();
+        if (!header) continue;
 
-        if (!clean)
-            return;
+        const upperHeader =
+            header.toUpperCase();
 
-        let match;
+        if (
+            !upperHeader.includes("MIC")
+            &&
+            !upperHeader.includes("SPK")
+        ) {
+            continue;
+        }
 
-        match =
-            clean.match(
-                /speaker[_\s-]*fr[^0-9-]*([\d.]+)[,\s]+(-?[\d.]+)/i
+        const info =
+            parseMeasurementHeader(
+                upperHeader
             );
 
-        if (match) {
+        if (!info) continue;
 
-            data.speakerFR.push({
+        let value =
+            toNumber(row[i]);
 
-                hz: Number(match[1]),
+        let lower =
+            toNumber(
+                lowerRow?.[i]
+            );
 
-                value: Number(match[2])
+        let upper =
+            toNumber(
+                upperRow?.[i]
+            );
 
-            });
 
-            return;
+        /* ==========================================
+           APPLY SELECTED MODEL SPECIFICATION
+        ========================================== */
+
+        const modelLimits =
+            getModelLimits(
+                info.group,
+                info.frequency
+            );
+
+
+        /*
+            Model specification takes priority
+            whenever a model limit exists.
+        */
+
+        if (
+            modelLimits.lower !== null
+        ) {
+
+            lower =
+                modelLimits.lower;
+
+        }
+
+        if (
+            modelLimits.upper !== null
+        ) {
+
+            upper =
+                modelLimits.upper;
 
         }
 
 
-        match =
-            clean.match(
-                /speaker[_\s-]*rb[^0-9-]*([\d.]+)[,\s]+(-?[\d.]+)/i
-            );
+        /*
+            BLA4 FR specifically keeps
+            the LL / UL from the CSV.
+        */
 
-        if (match) {
+        if (
+            selectedModel === "BLA4"
+            &&
+            (
+                info.group.includes("SPK_FR")
+                ||
+                info.group.includes("MIC_FR")
+            )
+        ) {
 
-            data.speakerRB.push({
+            lower =
+                toNumber(
+                    lowerRow?.[i]
+                );
 
-                hz: Number(match[1]),
-
-                value: Number(match[2])
-
-            });
-
-            return;
-
-        }
-
-
-        match =
-            clean.match(
-                /speaker[_\s-]*thd[^0-9-]*([\d.]+)[,\s]+(-?[\d.]+)/i
-            );
-
-        if (match) {
-
-            data.speakerTHD.push({
-
-                hz: Number(match[1]),
-
-                value: Number(match[2])
-
-            });
-
-            return;
+            upper =
+                toNumber(
+                    upperRow?.[i]
+                );
 
         }
 
 
-        match =
-            clean.match(
-                /mic[_\s-]*fr[^0-9-]*([\d.]+)[,\s]+(-?[\d.]+)/i
-            );
+        if (
+            value === null
+            &&
+            lower === null
+            &&
+            upper === null
+        ) {
+            continue;
+        }
 
-        if (match) {
+        if (!groups[info.group]) {
 
-            data.micFR.push({
-
-                hz: Number(match[1]),
-
-                value: Number(match[2])
-
-            });
-
-            return;
+            groups[info.group] = [];
 
         }
 
+        groups[info.group]
+        .push({
 
-        match =
-            clean.match(
-                /mic[_\s-]*thd[^0-9-]*([\d.]+)[,\s]+(-?[\d.]+)/i
-            );
+            column: i,
 
-        if (match) {
+            header,
 
-            data.micTHD.push({
+            frequency:
+                info.frequency,
 
-                hz: Number(match[1]),
+            value,
 
-                value: Number(match[2])
+            lower,
 
-            });
+            upper
 
-            return;
+        });
 
-        }
+    }
 
+    Object.values(groups)
+    .forEach(items => {
 
-        match =
-            clean.match(
-                /mic[_\s-]*seal[^0-9-]*([\d.]+)[,\s]+(-?[\d.]+)/i
-            );
-
-        if (match) {
-
-            data.micSeal.push({
-
-                hz: Number(match[1]),
-
-                value: Number(match[2])
-
-            });
-
-            return;
-
-        }
+        items.sort(
+            (a, b) =>
+                a.frequency
+                - b.frequency
+        );
 
     });
 
-    return data;
+    return groups;
 
 }
 
 
-/* =====================================================
-   EVALUATE UNIT
-===================================================== */
+/* =========================================================
+   GET MODEL LIMITS
+========================================================= */
 
-function evaluateUnit(data) {
+function getModelLimits(
+    group,
+    frequency
+) {
 
-    const ngTypes = [];
+    let lower = null;
+    let upper = null;
 
-    const spec =
-        SPECS[selectedModel];
 
-    function checkFR(values, limits, name) {
+    /* ==========================================
+       2RS4 / XUA4
+    ========================================== */
 
-        if (!values.length)
-            return;
+    if (
+        selectedModel === "2RS4"
+        ||
+        selectedModel === "XUA4"
+    ) {
 
-        if (!limits.lower)
-            return;
+        const spec =
+            parsedModelSpecs[
+                selectedModel
+            ]?.[frequency];
 
-        for (const item of values) {
+        if (!spec) {
 
-            const lower =
-                limits.lower[item.hz];
+            return {
+                lower,
+                upper
+            };
 
-            const upper =
-                limits.upper[item.hz];
+        }
+
+        if (
+            group.includes("SPK_FR")
+        ) {
+
+            lower =
+                spec.spkFRLL;
+
+            upper =
+                spec.spkFRUL;
+
+        }
+
+        else if (
+            group.includes("SPK_RB")
+        ) {
+
+            upper =
+                spec.spkRBUL;
+
+        }
+
+        else if (
+            group.includes("SPK_THD")
+        ) {
+
+            upper =
+                spec.spkTHDUL;
+
+        }
+
+        else if (
+            group.includes("MIC_FR")
+        ) {
+
+            lower =
+                spec.micFRLL;
+
+            upper =
+                spec.micFRUL;
+
+        }
+
+        else if (
+            group.includes("MIC_SEAL")
+        ) {
+
+            lower =
+                spec.micSealLL;
+
+            upper =
+                spec.micSealUL;
+
+        }
+
+        else if (
+            group.includes("MIC_THD")
+        ) {
+
+            upper =
+                spec.micTHDUL;
+
+        }
+
+    }
+
+
+    /* ==========================================
+       BLA4 RULE-BASED SPECIFICATION
+
+       SPK FR / MIC FR
+       remain from CSV.
+    ========================================== */
+
+    if (
+        selectedModel === "BLA4"
+    ) {
+
+        /*
+            SPEAKER THD
+
+            <= 400 Hz = 40%
+            > resonance = 10%
+
+            Since resonance point is not
+            explicitly provided in the CSV,
+            use:
+            100-400 = 40
+            401+ = 10
+        */
+
+        if (
+            group.includes("SPK_THD")
+        ) {
 
             if (
-                lower !== undefined &&
-                item.value < lower
+                frequency <= 400
             ) {
 
-                ngTypes.push(
-                    name + " BELOW LL"
-                );
+                upper = 40;
 
-                break;
+            }
+
+            else {
+
+                upper = 10;
+
+            }
+
+        }
+
+
+        /*
+            SPEAKER RB
+
+            <= 300 Hz = 1.2%
+            > 300 Hz = 0.7%
+        */
+
+        else if (
+            group.includes("SPK_RB")
+        ) {
+
+            if (
+                frequency <= 300
+            ) {
+
+                upper = 1.2;
+
+            }
+
+            else {
+
+                upper = 0.7;
+
+            }
+
+        }
+
+
+        /*
+            MIC THD
+
+            100 - 2500 = 1%
+            2500 - 6300 = 1.5%
+            6300 - 8000 = 1%
+        */
+
+        else if (
+            group.includes("MIC_THD")
+        ) {
+
+            if (
+                frequency >= 100
+                &&
+                frequency <= 2500
+            ) {
+
+                upper = 1;
+
+            }
+
+            else if (
+                frequency > 2500
+                &&
+                frequency <= 6300
+            ) {
+
+                upper = 1.5;
+
+            }
+
+            else if (
+                frequency > 6300
+                &&
+                frequency <= 8000
+            ) {
+
+                upper = 1;
+
+            }
+
+        }
+
+
+        /*
+            MIC SEAL
+
+            LL = 25 from 200 Hz onward
+            UL = 100 dB
+        */
+
+        else if (
+            group.includes("MIC_SEAL")
+        ) {
+
+            if (
+                frequency >= 200
+            ) {
+
+                lower = 25;
 
             }
 
             if (
-                upper !== undefined &&
-                item.value > upper
+                frequency >= 100
+                &&
+                frequency <= 10000
             ) {
 
-                ngTypes.push(
-                    name + " ABOVE UL"
-                );
-
-                break;
+                upper = 100;
 
             }
 
@@ -1170,147 +1845,530 @@ function evaluateUnit(data) {
 
     }
 
-    checkFR(
-        data.speakerFR,
-        spec.speakerFR,
-        "SPEAKER FR"
-    );
-
-    checkFR(
-        data.micFR,
-        spec.micFR,
-        "MIC FR"
-    );
 
     return {
-
-        status:
-            ngTypes.length
-                ? "NG"
-                : "GOOD",
-
-        ngTypes: ngTypes
-
+        lower,
+        upper
     };
 
 }
 
 
-/* =====================================================
-   FILTER
-===================================================== */
+/* =========================================================
+   PARSE HEADER
+========================================================= */
 
-function setFilter(filter, button) {
+function parseMeasurementHeader(header) {
 
-    currentFilter = filter;
-
-    document.querySelectorAll(".filter-btn")
-        .forEach(btn =>
-            btn.classList.remove("active")
+    const match =
+        header.match(
+            /_(\d+(?:\.\d+)?)$/
         );
 
-    button.classList.add("active");
+    let group =
+        header;
 
-    renderSNList();
+    let frequency = 0;
+
+    if (match) {
+
+        frequency =
+            Number(match[1]);
+
+        group =
+            header.replace(
+                /_(\d+(?:\.\d+)?)$/,
+                ""
+            );
+
+    }
+
+    return {
+        group,
+        frequency
+    };
 
 }
 
 
-/* =====================================================
-   RENDER SN LIST
-===================================================== */
+/* =========================================================
+   CHECK NG
+========================================================= */
 
-function renderSNList() {
+function isNG(item) {
 
-    const list =
-        document.getElementById("snList");
+    if (
+        item.value === null
+    ) {
 
-    const search =
-        document.getElementById("searchSN")
+        return false;
+
+    }
+
+    if (
+        item.lower !== null
+        &&
+        item.value < item.lower
+    ) {
+
+        return true;
+
+    }
+
+    if (
+        item.upper !== null
+        &&
+        item.value > item.upper
+    ) {
+
+        return true;
+
+    }
+
+    return false;
+
+}
+
+
+/* =========================================================
+   CHECK MEASUREMENT DATA
+========================================================= */
+
+function hasMeasurementData(items) {
+
+    if (
+        !items
+        ||
+        items.length === 0
+    ) {
+
+        return false;
+
+    }
+
+    return items.some(item => {
+
+        return (
+            item.value !== null
+            &&
+            item.value !== undefined
+            &&
+            Number.isFinite(
+                Number(item.value)
+            )
+        );
+
+    });
+
+}
+
+
+function getGroupsWithData(groups) {
+
+    return Object.keys(groups)
+    .filter(group =>
+        hasMeasurementData(
+            groups[group]
+        )
+    );
+
+}
+
+
+/* =========================================================
+   STATION FILTER
+========================================================= */
+
+function populateStationFilter() {
+
+    const select =
+        document.getElementById(
+            "stationFilter"
+        );
+
+    const stations =
+        [
+            ...new Set(
+                dutRows
+                .map(
+                    row =>
+                        String(
+                            row[stationColumn]
+                            || ""
+                        ).trim()
+                )
+                .filter(Boolean)
+            )
+        ]
+        .sort();
+
+    select.innerHTML = `
+        <option value="ALL">
+            ALL STATIONS
+        </option>
+    `;
+
+    stations.forEach(station => {
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+        option.value =
+            station;
+
+        option.textContent =
+            station;
+
+        select.appendChild(option);
+
+    });
+
+    select.onchange =
+        function() {
+
+            activeStation =
+                this.value;
+
+            applyFilters();
+
+        };
+
+}
+
+
+/* =========================================================
+   STATUS FILTER
+========================================================= */
+
+document
+.querySelectorAll(
+    ".status-filter"
+)
+.forEach(button => {
+
+    button.addEventListener(
+        "click",
+        function() {
+
+            activeStatus =
+                this.dataset.status;
+
+            document
+            .querySelectorAll(
+                ".status-filter"
+            )
+            .forEach(btn =>
+                btn.classList.remove(
+                    "active"
+                )
+            );
+
+            this.classList.add(
+                "active"
+            );
+
+            applyFilters();
+
+        }
+    );
+
+});
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+document
+.getElementById(
+    "searchInput"
+)
+.addEventListener(
+    "input",
+    function() {
+
+        applyFilters();
+
+    }
+);
+
+
+/* =========================================================
+   APPLY FILTERS
+========================================================= */
+
+function applyFilters() {
+
+    const searchText =
+        document
+        .getElementById(
+            "searchInput"
+        )
         .value
         .trim()
         .toLowerCase();
 
     const searchTerms =
-        search
-        .split(/[,\s]+/)
-        .filter(Boolean);
+        searchText
+        ? searchText
+            .split(/[\s,;]+/)
+            .filter(Boolean)
+        : [];
 
-    list.innerHTML = "";
+    filteredRows =
+        dutRows.filter(row => {
 
-    parsedUnits.forEach(unit => {
+            const analysis =
+                row._analysis;
+
+            const station =
+                String(
+                    row[stationColumn]
+                    || ""
+                ).trim();
+
+            const sn =
+                String(
+                    row[0] || ""
+                )
+                .toLowerCase();
+
+            const work =
+                String(
+                    row[1] || ""
+                )
+                .toLowerCase();
+
+            if (
+                activeStation !== "ALL"
+                &&
+                station !== activeStation
+            ) {
+
+                return false;
+
+            }
+
+            if (
+                activeStatus !== "ALL"
+                &&
+                analysis.result
+                !== activeStatus
+            ) {
+
+                return false;
+
+            }
+
+            if (
+                searchTerms.length > 0
+            ) {
+
+                const found =
+                    searchTerms.some(
+                        term =>
+                            sn.includes(term)
+                            ||
+                            work.includes(term)
+                    );
+
+                if (!found) {
+
+                    return false;
+
+                }
+
+            }
+
+            return true;
+
+        });
+
+    renderSidebar();
+
+    if (
+        filteredRows.length > 0
+    ) {
+
+        const selected =
+            dutRows[
+                selectedDutIndex
+            ];
 
         if (
-            currentFilter !== "ALL" &&
-            unit.status !== currentFilter
-        )
-            return;
+            !filteredRows.includes(
+                selected
+            )
+        ) {
 
-        if (searchTerms.length) {
-
-            const match =
-                searchTerms.some(term =>
-                    unit.sn
-                    .toLowerCase()
-                    .includes(term)
+            selectedDutIndex =
+                dutRows.indexOf(
+                    filteredRows[0]
                 );
-
-            if (!match)
-                return;
 
         }
 
-        const item =
-            document.createElement("div");
+        if (
+            activeView === "UNIT"
+        ) {
 
-        item.className =
-            "sn-item" +
-            (
-                activeSN === unit.sn
-                ? " active"
-                : ""
+            renderUnitView();
+
+        }
+
+    }
+
+    else {
+
+        if (
+            activeView === "UNIT"
+        ) {
+
+            document
+            .getElementById(
+                "unitView"
+            )
+            .innerHTML = `
+                <div class="no-graph">
+                    No units found.
+                </div>
+            `;
+
+        }
+
+    }
+
+    if (
+        activeView === "STATION"
+    ) {
+
+        renderStationView();
+
+    }
+
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+function renderSidebar() {
+
+    document
+    .getElementById(
+        "totalCount"
+    )
+    .textContent =
+        `Total: ${filteredRows.length}`;
+
+    const list =
+        document.getElementById(
+            "snList"
+        );
+
+    list.innerHTML = "";
+
+    filteredRows.forEach(row => {
+
+        const actualIndex =
+            dutRows.indexOf(row);
+
+        const analysis =
+            row._analysis;
+
+        const item =
+            document.createElement(
+                "div"
             );
 
-        item.onclick =
-            () => showUnit(unit.sn);
+        item.className =
+            "sn-row";
 
-        const ngText =
-            unit.ngTypes.length
-            ? unit.ngTypes.join(", ")
-            : "PASS";
+        if (
+            actualIndex
+            === selectedDutIndex
+        ) {
+
+            item.classList.add(
+                "selected"
+            );
+
+        }
+
+        const failedNames =
+            analysis.failedTests
+            .map(formatGroupName)
+            .join(", ");
 
         item.innerHTML = `
 
-            <div class="sn-title">
+            <div class="sn-number">
+                ${actualIndex + 1}
+            </div>
 
-                <span>${unit.sn}</span>
+            <div class="sn-pcba">
+                ${escapeHTML(
+                    row[0] || "-"
+                )}
+            </div>
 
-                <span class="${
-                    unit.status === "GOOD"
-                    ? "good"
-                    : "ng"
-                }">
+            <div class="sn-station">
+                ${escapeHTML(
+                    row[stationColumn]
+                    || "-"
+                )}
+            </div>
 
-                    ${unit.status}
+            <div>
+
+                <span class="
+                    status-badge
+                    ${
+                        analysis.result === "PASS"
+                        ? "status-pass"
+                        : "status-ng"
+                    }
+                ">
+
+                    ${
+                        analysis.result === "PASS"
+                        ? "GOOD"
+                        : `NG (${analysis.totalNG})`
+                    }
 
                 </span>
 
             </div>
 
-            <div class="sn-info">
+            <div class="ng-details">
 
-                StationIP:
-                ${unit.stationIP}
+                ${
+                    failedNames
+                    ? escapeHTML(
+                        failedNames
+                    )
+                    : "-"
+                }
 
             </div>
 
-            <div class="sn-info">
-
-                ${ngText}
-
+            <div class="arrow">
+                ›
             </div>
 
         `;
+
+        item.onclick =
+            function() {
+
+                selectDUT(
+                    actualIndex
+                );
+
+            };
 
         list.appendChild(item);
 
@@ -1319,493 +2377,1743 @@ function renderSNList() {
 }
 
 
-/* =====================================================
-   SHOW UNIT
-===================================================== */
+/* =========================================================
+   SELECT DUT
+========================================================= */
 
-function showUnit(sn) {
+function selectDUT(index) {
 
-    activeSN = sn;
+    selectedDutIndex =
+        index;
 
-    charts.forEach(chart =>
-        chart.destroy()
+    if (
+        activeView === "UNIT"
+    ) {
+
+        renderUnitView();
+
+    }
+
+    renderSidebar();
+
+}
+
+
+/* =========================================================
+   VIEW MODE
+========================================================= */
+
+document
+.querySelectorAll(
+    ".view-mode-button"
+)
+.forEach(button => {
+
+    button.addEventListener(
+        "click",
+        function() {
+
+            activeView =
+                this.dataset.view;
+
+            activeTest =
+                "ALL";
+
+            document
+            .querySelectorAll(
+                ".view-mode-button"
+            )
+            .forEach(btn =>
+                btn.classList.remove(
+                    "active"
+                )
+            );
+
+            this.classList.add(
+                "active"
+            );
+
+            if (
+                activeView === "UNIT"
+            ) {
+
+                document
+                .getElementById(
+                    "unitView"
+                )
+                .style.display =
+                    "block";
+
+                document
+                .getElementById(
+                    "stationView"
+                )
+                .style.display =
+                    "none";
+
+                renderUnitView();
+
+            }
+
+            else {
+
+                document
+                .getElementById(
+                    "unitView"
+                )
+                .style.display =
+                    "none";
+
+                document
+                .getElementById(
+                    "stationView"
+                )
+                .style.display =
+                    "block";
+
+                renderStationView();
+
+            }
+
+        }
     );
 
-    charts = [];
+});
 
-    const unit =
-        parsedUnits.find(
-            x => x.sn === sn
+
+/* =========================================================
+   UNIT VIEW
+========================================================= */
+
+function renderUnitView() {
+
+    destroyCharts();
+
+    const container =
+        document.getElementById(
+            "unitView"
         );
 
-    if (!unit)
+    const row =
+        dutRows[
+            selectedDutIndex
+        ];
+
+    if (!row) {
+
+        container.innerHTML = `
+            <div class="no-graph">
+                No DUT selected.
+            </div>
+        `;
+
         return;
 
-    renderSNList();
+    }
 
-    const main =
-        document.getElementById("mainContent");
+    const analysis =
+        row._analysis;
 
-    main.innerHTML = "";
+    container.innerHTML = `
 
-    const details =
-        document.createElement("div");
+        <div class="info-bar">
 
-    details.className =
-        "unit-details";
+            <div class="info-item">
 
-    details.innerHTML = `
-
-        <h2>${unit.sn}</h2>
-
-        <div class="details-grid">
-
-            <div class="detail-box">
-
-                <div class="detail-label">
-                    MODEL
+                <div class="info-label">
+                    PRODUCT
                 </div>
 
-                <div class="detail-value">
-                    ${selectedModel}
+                <div class="info-value">
+                    ${escapeHTML(selectedModel)}
                 </div>
 
             </div>
 
-            <div class="detail-box">
+            <div class="info-item">
 
-                <div class="detail-label">
-                    STATUS
+                <div class="info-label">
+                    PCBA / SN
                 </div>
 
-                <div class="detail-value ${
-                    unit.status === "GOOD"
-                    ? "good"
-                    : "ng"
-                }">
-
-                    ${unit.status}
-
+                <div class="info-value">
+                    ${escapeHTML(
+                        row[0] || "-"
+                    )}
                 </div>
 
             </div>
 
-            <div class="detail-box">
+            <div class="info-item">
 
-                <div class="detail-label">
+                <div class="info-label">
                     STATION IP
                 </div>
 
-                <div class="detail-value">
-                    ${unit.stationIP}
+                <div class="info-value">
+                    ${escapeHTML(
+                        row[stationColumn]
+                        || "-"
+                    )}
                 </div>
 
             </div>
 
-            <div class="detail-box">
+            <div class="info-item">
 
-                <div class="detail-label">
-                    NG TYPE
+                <div class="info-label">
+                    OVERALL RESULT
                 </div>
 
-                <div class="detail-value">
+                <div class="
+                    info-value
+                    ${
+                        analysis.result === "PASS"
+                        ? "result-pass"
+                        : "result-ng"
+                    }
+                ">
 
                     ${
-                        unit.ngTypes.length
-                        ? unit.ngTypes.join(", ")
-                        : "PASS"
+                        analysis.result === "PASS"
+                        ? "GOOD"
+                        : `NG (${analysis.totalNG})`
                     }
 
+                </div>
+
+            </div>
+
+            <div class="ng-summary">
+
+                <div class="ng-summary-title">
+                    NG SUMMARY
+                </div>
+
+                <div
+                    class="ng-pills"
+                    id="unitNGSummary">
                 </div>
 
             </div>
 
         </div>
 
+        <div class="test-filter-section">
+
+            <div class="test-filter-title">
+                SELECT TEST TO DISPLAY
+            </div>
+
+            <div
+                class="test-tabs"
+                id="unitTestTabs">
+            </div>
+
+        </div>
+
+        <div
+            class="graphs"
+            id="unitGraphs">
+        </div>
+
     `;
 
-    main.appendChild(details);
-
-
-    createGraph(
-        main,
-        "Speaker Frequency Response",
-        unit.measurements.speakerFR,
-        "speakerFR"
+    renderUnitNGSummary(
+        analysis
     );
 
-    createGraph(
-        main,
-        "Speaker RB",
-        unit.measurements.speakerRB,
-        "speakerRB"
+    renderTestTabs(
+        "unitTestTabs",
+        analysis.groups,
+        function() {
+
+            renderUnitView();
+
+        }
     );
 
-    createGraph(
-        main,
-        "Speaker THD",
-        unit.measurements.speakerTHD,
-        "speakerTHD"
-    );
-
-    createGraph(
-        main,
-        "Mic Frequency Response",
-        unit.measurements.micFR,
-        "micFR"
-    );
-
-    createGraph(
-        main,
-        "Mic THD",
-        unit.measurements.micTHD,
-        "micTHD"
-    );
-
-    createGraph(
-        main,
-        "Mic Sealing",
-        unit.measurements.micSeal,
-        "micSeal"
+    renderUnitGraphs(
+        analysis.groups
     );
 
 }
 
 
-/* =====================================================
-   CREATE GRAPH
-===================================================== */
-
-function createGraph(
-    container,
-    title,
-    data,
-    type
+function renderUnitNGSummary(
+    analysis
 ) {
 
-    /*
-    If no data,
-    DO NOT create graph.
-    */
+    const container =
+        document.getElementById(
+            "unitNGSummary"
+        );
 
-    if (!data || !data.length)
+    const groups =
+        getGroupsWithData(
+            analysis.groups
+        );
+
+    if (
+        groups.length === 0
+    ) {
+
+        container.innerHTML =
+            "No measurement data.";
+
         return;
 
-    const section =
-        document.createElement("div");
+    }
 
-    section.className =
-        "graph-section";
+    groups.forEach(group => {
 
-    const heading =
-        document.createElement("h3");
+        const data =
+            analysis.summary[group];
 
-    heading.className =
-        "graph-title";
+        const pill =
+            document.createElement(
+                "div"
+            );
 
-    heading.textContent =
-        title;
+        pill.className =
+            "ng-pill";
 
-    const wrapper =
-        document.createElement("div");
+        pill.innerHTML = `
 
-    wrapper.className =
-        "graph-wrapper";
+            ${formatGroupName(group)}
 
-    const canvas =
-        document.createElement("canvas");
+            <span>
+                ${data.ngCount}
+            </span>
 
-    wrapper.appendChild(canvas);
+        `;
 
-    section.appendChild(heading);
+        container.appendChild(
+            pill
+        );
 
-    section.appendChild(wrapper);
+    });
 
-    container.appendChild(section);
+}
 
+
+/* =========================================================
+   TEST TABS
+========================================================= */
+
+function renderTestTabs(
+    containerID,
+    groups,
+    callback
+) {
+
+    const container =
+        document.getElementById(
+            containerID
+        );
+
+    container.innerHTML = "";
+
+    let groupKeys =
+        getGroupsWithData(
+            groups
+        );
+
+    if (
+        activeTest !== "ALL"
+        &&
+        !groupKeys.includes(
+            activeTest
+        )
+    ) {
+
+        activeTest = "ALL";
+
+    }
+
+    createTestButton(
+        container,
+        "ALL TESTS",
+        "ALL",
+        callback
+    );
+
+    groupKeys.forEach(group => {
+
+        createTestButton(
+            container,
+            formatGroupName(group),
+            group,
+            callback
+        );
+
+    });
+
+}
+
+
+function createTestButton(
+    container,
+    label,
+    test,
+    callback
+) {
+
+    const button =
+        document.createElement(
+            "button"
+        );
+
+    button.className =
+        "test-tab";
+
+    if (
+        activeTest === test
+    ) {
+
+        button.classList.add(
+            "active"
+        );
+
+    }
+
+    button.textContent =
+        label;
+
+    button.onclick =
+        function() {
+
+            activeTest =
+                test;
+
+            callback();
+
+        };
+
+    container.appendChild(
+        button
+    );
+
+}
+
+
+/* =========================================================
+   UNIT GRAPHS
+========================================================= */
+
+function renderUnitGraphs(
+    groups
+) {
+
+    const container =
+        document.getElementById(
+            "unitGraphs"
+        );
+
+    container.innerHTML = "";
+
+    let groupKeys =
+        getGroupsWithData(
+            groups
+        );
+
+    if (
+        activeTest !== "ALL"
+    ) {
+
+        groupKeys =
+            groupKeys.filter(
+                group =>
+                    group === activeTest
+            );
+
+    }
+
+    if (
+        groupKeys.length === 0
+    ) {
+
+        container.innerHTML = `
+            <div class="no-graph">
+                No measurement data available.
+            </div>
+        `;
+
+        return;
+
+    }
+
+    groupKeys.forEach(
+        (group, index) => {
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+            card.className =
+                "graph-card";
+
+            if (
+                activeTest !== "ALL"
+            ) {
+
+                card.classList.add(
+                    "expanded"
+                );
+
+            }
+
+            card.innerHTML = `
+
+                <div class="graph-header">
+
+                    <div class="graph-title">
+                        ${formatGroupName(group)}
+                    </div>
+
+                    <div class="graph-controls">
+
+                        <button
+                            class="graph-zoom-btn"
+                            onclick="zoomGraph('unitChart_${index}',1.2)">
+
+                            +
+
+                        </button>
+
+                        <button
+                            class="graph-zoom-btn"
+                            onclick="zoomGraph('unitChart_${index}',0.8)">
+
+                            −
+
+                        </button>
+
+                        <button
+                            class="graph-reset-btn"
+                            onclick="resetGraph('unitChart_${index}')">
+
+                            Reset
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="canvas-wrapper">
+
+                    <canvas
+                        id="unitChart_${index}">
+                    </canvas>
+
+                </div>
+
+            `;
+
+            container.appendChild(card);
+
+            createUnitChart(
+
+                document
+                .getElementById(
+                    `unitChart_${index}`
+                ),
+
+                groups[group]
+
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   STATION VIEW
+========================================================= */
+
+function renderStationView() {
+
+    destroyCharts();
+
+    const container =
+        document.getElementById(
+            "stationView"
+        );
+
+    const rows =
+        filteredRows;
+
+    if (
+        rows.length === 0
+    ) {
+
+        container.innerHTML = `
+            <div class="no-graph">
+                No units available for the selected filters.
+            </div>
+        `;
+
+        return;
+
+    }
+
+    const stationName =
+        activeStation === "ALL"
+        ? "ALL STATIONS"
+        : activeStation;
+
+    const total =
+        rows.length;
+
+    const good =
+        rows.filter(
+            row =>
+                row._analysis.result
+                === "PASS"
+        ).length;
+
+    const ng =
+        total - good;
+
+    const groupSummary =
+        calculateGroupSummary(rows);
+
+    const allGroups =
+        getAllGroupsWithData(rows);
+
+    if (
+        activeTest !== "ALL"
+        &&
+        !allGroups.includes(activeTest)
+    ) {
+
+        activeTest = "ALL";
+
+    }
+
+    container.innerHTML = `
+
+        <div class="station-summary">
+
+            <div class="station-summary-header">
+
+                <div>
+
+                    <div class="station-summary-title">
+
+                        STATION SUMMARY:
+                        ${escapeHTML(stationName)}
+
+                    </div>
+
+                    <div class="station-summary-subtitle">
+
+                        Product:
+                        ${escapeHTML(selectedModel)}
+                        • Compiled from
+                        ${total}
+                        filtered unit(s)
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="summary-stats">
+
+                <div class="summary-stat">
+
+                    <div class="summary-stat-label">
+                        TOTAL UNITS
+                    </div>
+
+                    <div class="summary-stat-value">
+                        ${total}
+                    </div>
+
+                </div>
+
+                <div class="summary-stat">
+
+                    <div class="summary-stat-label">
+                        GOOD
+                    </div>
+
+                    <div class="
+                        summary-stat-value
+                        summary-good">
+
+                        ${good}
+
+                    </div>
+
+                </div>
+
+                <div class="summary-stat">
+
+                    <div class="summary-stat-label">
+                        NG
+                    </div>
+
+                    <div class="
+                        summary-stat-value
+                        summary-ng">
+
+                        ${ng}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div
+                class="test-ng-summary"
+                id="stationNGSummary">
+            </div>
+
+        </div>
+
+        <div class="test-filter-section">
+
+            <div class="test-filter-title">
+                SELECT COMPILED TEST GRAPH
+            </div>
+
+            <div
+                class="test-tabs"
+                id="stationTestTabs">
+            </div>
+
+        </div>
+
+        <div
+            class="graphs"
+            id="stationGraphs">
+        </div>
+
+    `;
+
+    renderStationNGSummary(
+        groupSummary,
+        allGroups
+    );
+
+    renderStationTestTabs(
+        allGroups,
+        function() {
+
+            renderStationView();
+
+        }
+    );
+
+    renderStationGraphs(
+        rows,
+        allGroups
+    );
+
+}
+
+
+/* =========================================================
+   GROUP SUMMARY
+========================================================= */
+
+function calculateGroupSummary(rows) {
+
+    const summary = {};
+
+    rows.forEach(row => {
+
+        Object.keys(
+            row._analysis.summary
+        )
+        .forEach(group => {
+
+            if (
+                !hasMeasurementData(
+                    row._analysis.groups[group]
+                )
+            ) {
+
+                return;
+
+            }
+
+            if (!summary[group]) {
+
+                summary[group] = 0;
+
+            }
+
+            summary[group] +=
+                row
+                ._analysis
+                .summary[group]
+                .ngCount;
+
+        });
+
+    });
+
+    return summary;
+
+}
+
+
+function renderStationNGSummary(
+    summary,
+    groupsWithData
+) {
+
+    const container =
+        document.getElementById(
+            "stationNGSummary"
+        );
+
+    container.innerHTML = "";
+
+    groupsWithData.forEach(group => {
+
+        const item =
+            document.createElement(
+                "div"
+            );
+
+        item.className =
+            "test-ng-item";
+
+        item.innerHTML = `
+
+            ${formatGroupName(group)}
+
+            <b>
+                NG: ${summary[group] || 0}
+            </b>
+
+        `;
+
+        container.appendChild(item);
+
+    });
+
+}
+
+
+function getAllGroupsWithData(rows) {
+
+    const groups =
+        new Set();
+
+    rows.forEach(row => {
+
+        Object.keys(
+            row._analysis.groups
+        )
+        .forEach(group => {
+
+            if (
+                hasMeasurementData(
+                    row._analysis.groups[group]
+                )
+            ) {
+
+                groups.add(group);
+
+            }
+
+        });
+
+    });
+
+    return [...groups];
+
+}
+
+
+function renderStationTestTabs(
+    groups,
+    callback
+) {
+
+    const container =
+        document.getElementById(
+            "stationTestTabs"
+        );
+
+    container.innerHTML = "";
+
+    createTestButton(
+        container,
+        "ALL TESTS",
+        "ALL",
+        callback
+    );
+
+    groups.forEach(group => {
+
+        createTestButton(
+            container,
+            formatGroupName(group),
+            group,
+            callback
+        );
+
+    });
+
+}
+
+
+/* =========================================================
+   STATION GRAPHS
+========================================================= */
+
+function renderStationGraphs(
+    rows,
+    allGroups
+) {
+
+    const container =
+        document.getElementById(
+            "stationGraphs"
+        );
+
+    container.innerHTML = "";
+
+    let groupKeys =
+        allGroups;
+
+    if (
+        activeTest !== "ALL"
+    ) {
+
+        groupKeys =
+            groupKeys.filter(
+                group =>
+                    group === activeTest
+            );
+
+    }
+
+    groupKeys =
+        groupKeys.filter(group => {
+
+            return rows.some(row => {
+
+                const items =
+                    row
+                    ._analysis
+                    .groups[group];
+
+                return hasMeasurementData(
+                    items
+                );
+
+            });
+
+        });
+
+    if (
+        groupKeys.length === 0
+    ) {
+
+        container.innerHTML = `
+            <div class="no-graph">
+                No measurement data available for the selected test.
+            </div>
+        `;
+
+        return;
+
+    }
+
+    groupKeys.forEach(
+        (group, index) => {
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+            card.className =
+                "graph-card";
+
+            if (
+                activeTest !== "ALL"
+            ) {
+
+                card.classList.add(
+                    "expanded"
+                );
+
+            }
+
+            card.innerHTML = `
+
+                <div class="graph-header">
+
+                    <div class="graph-title">
+
+                        ${formatGroupName(group)}
+
+                        — COMPILED STATION DATA
+
+                    </div>
+
+                    <div class="graph-controls">
+
+                        <button
+                            class="graph-zoom-btn"
+                            onclick="zoomGraph('stationChart_${index}',1.2)">
+
+                            +
+
+                        </button>
+
+                        <button
+                            class="graph-zoom-btn"
+                            onclick="zoomGraph('stationChart_${index}',0.8)">
+
+                            −
+
+                        </button>
+
+                        <button
+                            class="graph-reset-btn"
+                            onclick="resetGraph('stationChart_${index}')">
+
+                            Reset
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="canvas-wrapper">
+
+                    <canvas
+                        id="stationChart_${index}">
+                    </canvas>
+
+                </div>
+
+            `;
+
+            container.appendChild(card);
+
+            createStationChart(
+
+                document
+                .getElementById(
+                    `stationChart_${index}`
+                ),
+
+                rows,
+                group
+
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   CREATE UNIT CHART
+========================================================= */
+
+function createUnitChart(
+    canvas,
+    items
+) {
+
+    if (
+        !hasMeasurementData(items)
+    ) {
+
+        return;
+
+    }
 
     const labels =
-        data.map(x => x.hz);
+        items.map(
+            item =>
+                item.frequency !== 0
+                ? item.frequency
+                : formatSingleLabel(
+                    item.header
+                )
+        );
 
     const values =
-        data.map(x => x.value);
+        items.map(
+            item =>
+                item.value
+        );
 
+    const upper =
+        items.map(
+            item =>
+                item.upper
+        );
 
-    const datasets = [
-
-        {
-
-            label: title,
-
-            data: values,
-
-            borderWidth: 2,
-
-            tension: 0,
-
-            pointRadius: 0
-
-        }
-
-    ];
-
-
-    const spec =
-        SPECS[selectedModel];
-
-
-    /*
-    FR LIMITS
-    */
-
-    if (
-        type === "speakerFR" ||
-        type === "micFR"
-    ) {
-
-        const limits =
-            spec[type];
-
-        if (
-            limits &&
-            limits.lower &&
-            Object.keys(limits.lower).length
-        ) {
-
-            datasets.push({
-
-                label: "LL",
-
-                data:
-                    labels.map(
-                        hz =>
-                            limits.lower[hz]
-                            ?? null
-                    ),
-
-                borderWidth: 2,
-
-                pointRadius: 0,
-
-                tension: 0
-
-            });
-
-        }
-
-
-        if (
-            limits &&
-            limits.upper &&
-            Object.keys(limits.upper).length
-        ) {
-
-            datasets.push({
-
-                label: "UL",
-
-                data:
-                    labels.map(
-                        hz =>
-                            limits.upper[hz]
-                            ?? null
-                    ),
-
-                borderWidth: 2,
-
-                pointRadius: 0,
-
-                tension: 0
-
-            });
-
-        }
-
-    }
-
-
-    /*
-    MIC SEAL
-    */
-
-    if (
-        type === "micSeal" &&
-        spec.micSeal
-    ) {
-
-        datasets.push({
-
-            label: "LL",
-
-            data:
-                labels.map(
-                    hz =>
-                        hz >= 200
-                        ? spec.micSeal.lower
-                        : null
-                ),
-
-            borderWidth: 2,
-
-            pointRadius: 0,
-
-            tension: 0
-
-        });
-
-
-        datasets.push({
-
-            label: "UL",
-
-            data:
-                labels.map(
-                    hz =>
-                        spec.micSeal.upper
-                ),
-
-            borderWidth: 2,
-
-            pointRadius: 0,
-
-            tension: 0
-
-        });
-
-    }
-
+    const lower =
+        items.map(
+            item =>
+                item.lower
+        );
 
     const chart =
-        new Chart(
-            canvas,
-            {
+        new Chart(canvas, {
 
-                type: "line",
+            type: "line",
 
-                data: {
+            data: {
 
-                    labels: labels,
+                labels,
 
-                    datasets: datasets
+                datasets: [
 
-                },
+                    {
 
-                options: {
+                        label: "Measurement",
 
-                    responsive: true,
+                        data: values,
 
-                    maintainAspectRatio: false,
+                        borderColor: "#2563eb",
 
-                    interaction: {
+                        borderWidth: 2,
 
-                        intersect: false,
+                        pointRadius: 0,
 
-                        mode: "index"
+                        pointHoverRadius: 3,
 
-                    },
+                        tension: 0.15,
 
-                    scales: {
-
-                        x: {
-
-                            title: {
-
-                                display: true,
-
-                                text: "Frequency (Hz)"
-
-                            }
-
-                        },
-
-                        y: {
-
-                            title: {
-
-                                display: true,
-
-                                text: "Value"
-
-                            }
-
-                        }
+                        spanGaps: true
 
                     },
 
-                    plugins: {
+                    {
 
-                        legend: {
+                        label: "Upper Limit",
 
-                            display: true
+                        data: upper,
 
-                        },
+                        borderColor: "#dc2626",
 
-                        zoom: {
+                        borderWidth: 1.5,
 
-                            pan: {
+                        pointRadius: 0,
 
-                                enabled: true,
+                        pointHoverRadius: 0,
 
-                                mode: "y"
+                        tension: 0,
 
-                            },
+                        spanGaps: true
 
-                            zoom: {
+                    },
 
-                                wheel: {
+                    {
 
-                                    enabled: true
+                        label: "Lower Limit",
 
-                                },
+                        data: lower,
 
-                                pinch: {
+                        borderColor: "#dc2626",
 
-                                    enabled: true
+                        borderWidth: 1.5,
 
-                                },
+                        pointRadius: 0,
 
-                                mode: "y"
+                        pointHoverRadius: 0,
 
-                            }
+                        tension: 0,
 
-                        }
+                        spanGaps: true
 
                     }
 
-                }
+                ]
 
-            }
-        );
+            },
 
+            options:
+                chartOptions(false)
+
+        });
 
     charts.push(chart);
 
 }
 
 
-/* =====================================================
-   STATION SUMMARY
-===================================================== */
+/* =========================================================
+   CREATE STATION CHART
+========================================================= */
 
-function showStationSummary() {
+function createStationChart(
+    canvas,
+    rows,
+    group
+) {
 
-    /*
-    Reserved for compiled graph summary
-    per StationIP.
+    const firstRow =
+        rows.find(row => {
 
-    Example:
+            const items =
+                row
+                ._analysis
+                .groups[group];
 
-    StationIP 192.168.1.10
+            return hasMeasurementData(
+                items
+            );
 
-    Combined Speaker FR
-    Combined Mic FR
+        });
 
-    All available SN measurements
-    can be plotted together.
+    if (!firstRow) return;
 
-    This can be expanded after confirming
-    your actual audio log format.
-    */
+    const firstItems =
+        firstRow
+        ._analysis
+        .groups[group];
+
+    const labels =
+        firstItems.map(
+            item =>
+                item.frequency !== 0
+                ? item.frequency
+                : formatSingleLabel(
+                    item.header
+                )
+        );
+
+    const datasets = [];
+
+    rows.forEach(
+        (row, index) => {
+
+            const items =
+                row
+                ._analysis
+                .groups[group];
+
+            if (
+                !hasMeasurementData(items)
+            ) {
+
+                return;
+
+            }
+
+            datasets.push({
+
+                label:
+                    `DUT ${index + 1}`,
+
+                data:
+                    items.map(
+                        item =>
+                            item.value
+                    ),
+
+                borderColor:
+                    "rgba(37,99,235,0.18)",
+
+                borderWidth: 1,
+
+                pointRadius: 0,
+
+                pointHoverRadius: 0,
+
+                tension: 0.1,
+
+                spanGaps: true
+
+            });
+
+        }
+    );
+
+    datasets.push({
+
+        label: "Upper Limit",
+
+        data:
+            firstItems.map(
+                item =>
+                    item.upper
+            ),
+
+        borderColor: "#dc2626",
+
+        borderWidth: 2,
+
+        pointRadius: 0,
+
+        pointHoverRadius: 0,
+
+        tension: 0,
+
+        spanGaps: true
+
+    });
+
+    datasets.push({
+
+        label: "Lower Limit",
+
+        data:
+            firstItems.map(
+                item =>
+                    item.lower
+            ),
+
+        borderColor: "#dc2626",
+
+        borderWidth: 2,
+
+        pointRadius: 0,
+
+        pointHoverRadius: 0,
+
+        tension: 0,
+
+        spanGaps: true
+
+    });
+
+    const chart =
+        new Chart(canvas, {
+
+            type: "line",
+
+            data: {
+                labels,
+                datasets
+            },
+
+            options:
+                chartOptions(true)
+
+        });
+
+    charts.push(chart);
+
+}
+
+
+/* =========================================================
+   CHART OPTIONS
+========================================================= */
+
+function chartOptions(
+    isStation = false
+) {
+
+    return {
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        interaction: {
+
+            mode: "nearest",
+
+            intersect: false,
+
+            axis: "y"
+
+        },
+
+        plugins: {
+
+            legend: {
+
+                position: "top",
+
+                labels: {
+
+                    font: {
+                        size: 9
+                    },
+
+                    boxWidth: 18,
+
+                    filter:
+                        function(item) {
+
+                            if (
+                                isStation
+                                &&
+                                item.text.startsWith(
+                                    "DUT "
+                                )
+                            ) {
+
+                                return false;
+
+                            }
+
+                            return true;
+
+                        }
+
+                }
+
+            },
+
+            tooltip: {
+
+                enabled: true,
+
+                filter:
+                    function(context) {
+
+                        if (
+                            isStation
+                            &&
+                            context.dataset.label
+                            .startsWith(
+                                "DUT "
+                            )
+                        ) {
+
+                            return false;
+
+                        }
+
+                        return true;
+
+                    },
+
+                callbacks: {
+
+                    label:
+                        function(context) {
+
+                            if (
+                                context.raw === null
+                            ) {
+
+                                return null;
+
+                            }
+
+                            return (
+                                context.dataset.label
+                                +
+                                ": "
+                                +
+                                context.raw
+                            );
+
+                        }
+
+                }
+
+            },
+
+            zoom: {
+
+                pan: {
+
+                    enabled: true,
+
+                    mode: "y",
+
+                    modifierKey: "shift"
+
+                },
+
+                zoom: {
+
+                    wheel: {
+                        enabled: true
+                    },
+
+                    pinch: {
+                        enabled: true
+                    },
+
+                    mode: "y"
+
+                },
+
+                limits: {
+
+                    x: {
+
+                        min: "original",
+
+                        max: "original"
+
+                    }
+
+                }
+
+            }
+
+        },
+
+        scales: {
+
+            x: {
+
+                grid: {
+
+                    color:
+                        "rgba(148,163,184,.14)"
+
+                },
+
+                title: {
+
+                    display: true,
+
+                    text: "Frequency"
+
+                },
+
+                ticks: {
+
+                    maxRotation: 45,
+
+                    minRotation: 45,
+
+                    autoSkip: true,
+
+                    maxTicksLimit: 18,
+
+                    font: {
+                        size: 9
+                    }
+
+                }
+
+            },
+
+            y: {
+
+                grid: {
+
+                    color:
+                        "rgba(148,163,184,.20)"
+
+                },
+
+                title: {
+
+                    display: true,
+
+                    text: "Measurement"
+
+                },
+
+                ticks: {
+
+                    font: {
+                        size: 9
+                    }
+
+                }
+
+            }
+
+        }
+
+    };
+
+}
+
+
+/* =========================================================
+   GRAPH CONTROLS
+========================================================= */
+
+function getChartByCanvasID(
+    canvasID
+) {
+
+    return charts.find(
+        chart =>
+            chart.canvas.id
+            === canvasID
+    );
+
+}
+
+
+function zoomGraph(
+    canvasID,
+    amount
+) {
+
+    const chart =
+        getChartByCanvasID(
+            canvasID
+        );
+
+    if (!chart) return;
+
+    chart.zoom({
+        y: amount
+    });
+
+}
+
+
+function resetGraph(
+    canvasID
+) {
+
+    const chart =
+        getChartByCanvasID(
+            canvasID
+        );
+
+    if (!chart) return;
+
+    chart.resetZoom();
+
+}
+
+
+function destroyCharts() {
+
+    charts.forEach(
+        chart =>
+            chart.destroy()
+    );
+
+    charts = [];
+
+}
+
+
+/* =========================================================
+   FORMAT
+========================================================= */
+
+function formatGroupName(name) {
+
+    return name
+
+        .replace(
+            /^F_MB_/,
+            ""
+        )
+
+        .replace(
+            /_/g,
+            " "
+        );
+
+}
+
+
+function formatSingleLabel(
+    header
+) {
+
+    return header.replace(
+        /^F_MB_/,
+        ""
+    );
+
+}
+
+
+/* =========================================================
+   NUMBER CONVERSION
+========================================================= */
+
+function toNumber(value) {
+
+    if (
+        value === undefined
+        ||
+        value === null
+    ) {
+
+        return null;
+
+    }
+
+    const text =
+        String(value)
+        .trim();
+
+    if (
+        text === ""
+        ||
+        text === "-"
+        ||
+        text.toLowerCase()
+        === "nan"
+    ) {
+
+        return null;
+
+    }
+
+    const number =
+        Number(
+            text.replace(
+                /,/g,
+                ""
+            )
+        );
+
+    return Number.isNaN(number)
+        ? null
+        : number;
+
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHTML(value) {
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 
 }
 
