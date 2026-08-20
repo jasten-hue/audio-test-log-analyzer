@@ -1022,7 +1022,6 @@ Hz,Spk_FR_LL,Spk_FR_UL,Spk_RB_UL,Spk_THD_UL,Mic_FR_LL,Mic_FR_UL,Mic_Seal_LL,Mic_
 `
 };
 
-
 let parsedModelSpecs = {};
 
 
@@ -1475,22 +1474,11 @@ function detectMeasurementGroups(row) {
                 upperRow?.[i]
             );
 
-
-        /* ==========================================
-           APPLY SELECTED MODEL SPECIFICATION
-        ========================================== */
-
         const modelLimits =
             getModelLimits(
                 info.group,
                 info.frequency
             );
-
-
-        /*
-            Model specification takes priority
-            whenever a model limit exists.
-        */
 
         if (
             modelLimits.lower !== null
@@ -1509,12 +1497,6 @@ function detectMeasurementGroups(row) {
                 modelLimits.upper;
 
         }
-
-
-        /*
-            BLA4 FR specifically keeps
-            the LL / UL from the CSV.
-        */
 
         if (
             selectedModel === "BLA4"
@@ -1537,7 +1519,6 @@ function detectMeasurementGroups(row) {
                 );
 
         }
-
 
         if (
             value === null
@@ -1602,11 +1583,6 @@ function getModelLimits(
 
     let lower = null;
     let upper = null;
-
-
-    /* ==========================================
-       2RS4 / XUA4
-    ========================================== */
 
     if (
         selectedModel === "2RS4"
@@ -1693,87 +1669,31 @@ function getModelLimits(
 
     }
 
-
-    /* ==========================================
-       BLA4 RULE-BASED SPECIFICATION
-
-       SPK FR / MIC FR
-       remain from CSV.
-    ========================================== */
-
     if (
         selectedModel === "BLA4"
     ) {
-
-        /*
-            SPEAKER THD
-
-            <= 400 Hz = 40%
-            > resonance = 10%
-
-            Since resonance point is not
-            explicitly provided in the CSV,
-            use:
-            100-400 = 40
-            401+ = 10
-        */
 
         if (
             group.includes("SPK_THD")
         ) {
 
-            if (
+            upper =
                 frequency <= 400
-            ) {
-
-                upper = 40;
-
-            }
-
-            else {
-
-                upper = 10;
-
-            }
+                ? 40
+                : 10;
 
         }
-
-
-        /*
-            SPEAKER RB
-
-            <= 300 Hz = 1.2%
-            > 300 Hz = 0.7%
-        */
 
         else if (
             group.includes("SPK_RB")
         ) {
 
-            if (
+            upper =
                 frequency <= 300
-            ) {
-
-                upper = 1.2;
-
-            }
-
-            else {
-
-                upper = 0.7;
-
-            }
+                ? 1.2
+                : 0.7;
 
         }
-
-
-        /*
-            MIC THD
-
-            100 - 2500 = 1%
-            2500 - 6300 = 1.5%
-            6300 - 8000 = 1%
-        */
 
         else if (
             group.includes("MIC_THD")
@@ -1811,14 +1731,6 @@ function getModelLimits(
 
         }
 
-
-        /*
-            MIC SEAL
-
-            LL = 25 from 200 Hz onward
-            UL = 100 dB
-        */
-
         else if (
             group.includes("MIC_SEAL")
         ) {
@@ -1844,7 +1756,6 @@ function getModelLimits(
         }
 
     }
-
 
     return {
         lower,
@@ -1932,12 +1843,18 @@ function isNG(item) {
 
 /* =========================================================
    CHECK MEASUREMENT DATA
+
+   IMPORTANT:
+   A graph/test will only be displayed if there is
+   at least one REAL DUT measurement value.
+
+   UL and LL alone will NOT create a graph.
 ========================================================= */
 
 function hasMeasurementData(items) {
 
     if (
-        !items
+        !Array.isArray(items)
         ||
         items.length === 0
     ) {
@@ -1948,14 +1865,20 @@ function hasMeasurementData(items) {
 
     return items.some(item => {
 
-        return (
-            item.value !== null
-            &&
-            item.value !== undefined
-            &&
-            Number.isFinite(
-                Number(item.value)
-            )
+        if (
+            item.value === null
+            ||
+            item.value === undefined
+            ||
+            item.value === ""
+        ) {
+
+            return false;
+
+        }
+
+        return Number.isFinite(
+            Number(item.value)
         );
 
     });
@@ -1966,11 +1889,13 @@ function hasMeasurementData(items) {
 function getGroupsWithData(groups) {
 
     return Object.keys(groups)
-    .filter(group =>
-        hasMeasurementData(
+    .filter(group => {
+
+        return hasMeasurementData(
             groups[group]
-        )
-    );
+        );
+
+    });
 
 }
 
@@ -3434,6 +3359,8 @@ function createUnitChart(
     canvas,
     items
 ) {
+
+    /* Do not create graph if there is no actual measurement */
 
     if (
         !hasMeasurementData(items)
