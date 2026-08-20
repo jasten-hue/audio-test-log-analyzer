@@ -7,6 +7,7 @@
 <title>AUDIO TEST LOG ANALYZER</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.2.0/dist/chartjs-plugin-zoom.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
 <style>
@@ -527,10 +528,48 @@ header {
     min-height: calc(100vh - 310px);
 }
 
+.graph-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
 .graph-title {
     font-size: 13px;
     font-weight: bold;
-    margin-bottom: 10px;
+}
+
+.graph-controls {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.graph-zoom-btn,
+.graph-reset-btn {
+    border: 1px solid var(--border);
+    background: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    height: 28px;
+}
+
+.graph-zoom-btn {
+    width: 30px;
+    font-size: 16px;
+}
+
+.graph-reset-btn {
+    padding: 0 10px;
+    font-size: 10px;
+}
+
+.graph-zoom-btn:hover,
+.graph-reset-btn:hover {
+    background: #f1f5f9;
 }
 
 .canvas-wrapper {
@@ -552,17 +591,12 @@ header {
     color: var(--muted);
 }
 
-.footer-note {
-    text-align: center;
-    font-size: 10px;
-    color: var(--muted);
-    margin-top: 12px;
-}
-
 @media (max-width: 1150px) {
+
     .app-layout {
         grid-template-columns: 390px 1fr;
     }
+
 }
 
 @media (max-width: 850px) {
@@ -600,8 +634,14 @@ header {
     </div>
 
     <label class="upload-button">
+
         ⇧ Upload New CSV
-        <input type="file" id="fileInput" accept=".csv">
+
+        <input
+            type="file"
+            id="fileInput"
+            accept=".csv">
+
     </label>
 
 </header>
@@ -642,8 +682,12 @@ header {
                 ▌ ALL SN / DUT LIST
             </div>
 
-            <div class="total-count" id="totalCount">
+            <div
+                class="total-count"
+                id="totalCount">
+
                 Total: 0
+
             </div>
 
         </div>
@@ -652,7 +696,10 @@ header {
             STATION IP
         </label>
 
-        <select id="stationFilter" class="station-select"></select>
+        <select
+            id="stationFilter"
+            class="station-select">
+        </select>
 
         <label class="filter-label">
             STATUS
@@ -660,16 +707,28 @@ header {
 
         <div class="status-filters">
 
-            <button class="status-filter active" data-status="ALL">
+            <button
+                class="status-filter active"
+                data-status="ALL">
+
                 ALL
+
             </button>
 
-            <button class="status-filter" data-status="PASS">
+            <button
+                class="status-filter"
+                data-status="PASS">
+
                 GOOD
+
             </button>
 
-            <button class="status-filter" data-status="NG">
+            <button
+                class="status-filter"
+                data-status="NG">
+
                 NG
+
             </button>
 
         </div>
@@ -700,7 +759,10 @@ Comma, space, semicolon or new line supported"></textarea>
 
     </div>
 
-    <div class="sn-list" id="snList"></div>
+    <div
+        class="sn-list"
+        id="snList">
+    </div>
 
 </aside>
 
@@ -708,19 +770,30 @@ Comma, space, semicolon or new line supported"></textarea>
 
 <div class="view-mode-section">
 
-    <button class="view-mode-button active" data-view="UNIT">
+    <button
+        class="view-mode-button active"
+        data-view="UNIT">
+
         UNIT VIEW
+
     </button>
 
-    <button class="view-mode-button" data-view="STATION">
+    <button
+        class="view-mode-button"
+        data-view="STATION">
+
         STATION SUMMARY
+
     </button>
 
 </div>
 
 <div id="unitView"></div>
 
-<div id="stationView" style="display:none;"></div>
+<div
+    id="stationView"
+    style="display:none;">
+</div>
 
 </main>
 
@@ -755,23 +828,29 @@ let charts = [];
 
 document
 .getElementById("fileInput")
-.addEventListener("change", handleFile);
+.addEventListener(
+    "change",
+    handleFile
+);
 
 
 function handleFile(event) {
 
-    const file = event.target.files[0];
+    const file =
+        event.target.files[0];
 
     if (!file) return;
 
     Papa.parse(file, {
 
         header: false,
+
         skipEmptyLines: true,
 
         complete: function(results) {
 
-            csvData = results.data;
+            csvData =
+                results.data;
 
             processCSV();
 
@@ -794,21 +873,29 @@ function processCSV() {
 
     }
 
-    headers = csvData[0];
+    headers =
+        csvData[0];
 
-    lowerRow = findRow("Lower");
-    upperRow = findRow("Upper");
+    lowerRow =
+        findRow("Lower");
+
+    upperRow =
+        findRow("Upper");
 
     stationColumn =
-        headers.findIndex(header =>
-            String(header || "")
-            .trim()
-            .toLowerCase() === "stationip"
+        headers.findIndex(
+            header =>
+                String(header || "")
+                .trim()
+                .toLowerCase()
+                === "stationip"
         );
 
     if (stationColumn === -1) {
 
-        alert("StationIP column was not found.");
+        alert(
+            "StationIP column was not found."
+        );
 
         return;
 
@@ -827,6 +914,7 @@ function processCSV() {
             if (!first) return false;
 
             const excluded = [
+
                 "lower",
                 "upper",
                 "min",
@@ -836,6 +924,7 @@ function processCSV() {
                 "cpl",
                 "cpu",
                 "cpk"
+
             ];
 
             return !excluded.includes(first);
@@ -874,10 +963,12 @@ function processCSV() {
 
 function findRow(name) {
 
-    return csvData.find(row =>
-        String(row[0] || "")
-        .trim()
-        .toLowerCase() === name.toLowerCase()
+    return csvData.find(
+        row =>
+            String(row[0] || "")
+            .trim()
+            .toLowerCase()
+            === name.toLowerCase()
     );
 
 }
@@ -899,11 +990,13 @@ function analyzeDUT(row) {
 
         let ngCount = 0;
 
-        groups[group].forEach(item => {
+        groups[group]
+        .forEach(item => {
 
             if (isNG(item)) {
 
                 ngCount++;
+
                 totalNG++;
 
             }
@@ -953,10 +1046,16 @@ function detectMeasurementGroups(row) {
 
     const groups = {};
 
-    for (let i = 0; i < headers.length; i++) {
+    for (
+        let i = 0;
+        i < headers.length;
+        i++
+    ) {
 
         const header =
-            String(headers[i] || "").trim();
+            String(
+                headers[i] || ""
+            ).trim();
 
         if (!header) continue;
 
@@ -972,54 +1071,85 @@ function detectMeasurementGroups(row) {
         }
 
         const info =
-            parseMeasurementHeader(upperHeader);
+            parseMeasurementHeader(
+                upperHeader
+            );
 
         if (!info) continue;
 
-        let value = toNumber(row[i]);
+        let value =
+            toNumber(row[i]);
 
         let lower =
-            toNumber(lowerRow?.[i]);
+            toNumber(
+                lowerRow?.[i]
+            );
 
         let upper =
-            toNumber(upperRow?.[i]);
+            toNumber(
+                upperRow?.[i]
+            );
 
-        if (info.group === "F_MB_MIC_SEAL") {
+        if (
+            info.group
+            === "F_MB_MIC_SEAL"
+        ) {
 
             const limits =
                 getMicSealLimits();
 
-            if (limits.lower !== null) {
-                lower = limits.lower;
+            if (
+                limits.lower !== null
+            ) {
+
+                lower =
+                    limits.lower;
+
             }
 
-            if (limits.upper !== null) {
-                upper = limits.upper;
+            if (
+                limits.upper !== null
+            ) {
+
+                upper =
+                    limits.upper;
+
             }
 
         }
 
         if (
+
             value === null
             &&
             lower === null
             &&
             upper === null
+
         ) {
             continue;
         }
 
         if (!groups[info.group]) {
+
             groups[info.group] = [];
+
         }
 
-        groups[info.group].push({
+        groups[info.group]
+        .push({
 
             column: i,
+
             header,
-            frequency: info.frequency,
+
+            frequency:
+                info.frequency,
+
             value,
+
             lower,
+
             upper
 
         });
@@ -1031,7 +1161,8 @@ function detectMeasurementGroups(row) {
 
         items.sort(
             (a, b) =>
-                a.frequency - b.frequency
+                a.frequency
+                - b.frequency
         );
 
     });
@@ -1048,44 +1179,70 @@ function getMicSealLimits() {
     let firstLower = null;
     let firstUpper = null;
 
-    for (let i = 0; i < headers.length; i++) {
+    for (
+        let i = 0;
+        i < headers.length;
+        i++
+    ) {
 
         const header =
-            String(headers[i] || "")
-            .toUpperCase();
+            String(
+                headers[i] || ""
+            ).toUpperCase();
 
-        if (!header.startsWith("F_MB_MIC_SEAL")) {
+        if (
+            !header.startsWith(
+                "F_MB_MIC_SEAL"
+            )
+        ) {
             continue;
         }
 
         const lower =
-            toNumber(lowerRow?.[i]);
+            toNumber(
+                lowerRow?.[i]
+            );
 
         const upper =
-            toNumber(upperRow?.[i]);
+            toNumber(
+                upperRow?.[i]
+            );
 
         if (
+
             firstLower === null
             &&
             lower !== null
+
         ) {
-            firstLower = lower;
+
+            firstLower =
+                lower;
+
         }
 
         if (
+
             firstUpper === null
             &&
             upper !== null
+
         ) {
-            firstUpper = upper;
+
+            firstUpper =
+                upper;
+
         }
 
     }
 
     return {
 
-        lower: firstLower,
-        upper: firstUpper
+        lower:
+            firstLower,
+
+        upper:
+            firstUpper
 
     };
 
@@ -1097,9 +1254,13 @@ function getMicSealLimits() {
 function parseMeasurementHeader(header) {
 
     const match =
-        header.match(/_(\d+(?:\.\d+)?)$/);
+        header.match(
+            /_(\d+(?:\.\d+)?)$/
+        );
 
-    let group = header;
+    let group =
+        header;
+
     let frequency = 0;
 
     if (match) {
@@ -1118,6 +1279,7 @@ function parseMeasurementHeader(header) {
     return {
 
         group,
+
         frequency
 
     };
@@ -1129,24 +1291,36 @@ function parseMeasurementHeader(header) {
 
 function isNG(item) {
 
-    if (item.value === null) {
+    if (
+        item.value === null
+    ) {
+
         return false;
+
     }
 
     if (
+
         item.lower !== null
         &&
         item.value < item.lower
+
     ) {
+
         return true;
+
     }
 
     if (
+
         item.upper !== null
         &&
         item.value > item.upper
+
     ) {
+
         return true;
+
     }
 
     return false;
@@ -1159,42 +1333,64 @@ function isNG(item) {
 function populateStationFilter() {
 
     const select =
-        document.getElementById("stationFilter");
+        document.getElementById(
+            "stationFilter"
+        );
 
     const stations =
-        [...new Set(
-            dutRows
-            .map(row =>
-                String(row[stationColumn] || "").trim()
+        [
+
+            ...new Set(
+
+                dutRows
+                .map(
+                    row =>
+                        String(
+                            row[stationColumn]
+                            || ""
+                        ).trim()
+                )
+                .filter(Boolean)
+
             )
-            .filter(Boolean)
-        )]
+
+        ]
         .sort();
 
-    select.innerHTML =
-        `<option value="ALL">
+    select.innerHTML = `
+
+        <option value="ALL">
             ALL STATIONS
-        </option>`;
+        </option>
+
+    `;
 
     stations.forEach(station => {
 
         const option =
-            document.createElement("option");
+            document.createElement(
+                "option"
+            );
 
-        option.value = station;
-        option.textContent = station;
+        option.value =
+            station;
+
+        option.textContent =
+            station;
 
         select.appendChild(option);
 
     });
 
-    select.onchange = function() {
+    select.onchange =
+        function() {
 
-        activeStation = this.value;
+            activeStation =
+                this.value;
 
-        applyFilters();
+            applyFilters();
 
-    };
+        };
 
 }
 
@@ -1202,7 +1398,9 @@ function populateStationFilter() {
 /* STATUS FILTER */
 
 document
-.querySelectorAll(".status-filter")
+.querySelectorAll(
+    ".status-filter"
+)
 .forEach(button => {
 
     button.addEventListener(
@@ -1213,12 +1411,18 @@ document
                 this.dataset.status;
 
             document
-            .querySelectorAll(".status-filter")
+            .querySelectorAll(
+                ".status-filter"
+            )
             .forEach(btn =>
-                btn.classList.remove("active")
+                btn.classList.remove(
+                    "active"
+                )
             );
 
-            this.classList.add("active");
+            this.classList.add(
+                "active"
+            );
 
             applyFilters();
 
@@ -1231,12 +1435,17 @@ document
 /* MULTIPLE SEARCH */
 
 document
-.getElementById("searchInput")
-.addEventListener("input", function() {
+.getElementById(
+    "searchInput"
+)
+.addEventListener(
+    "input",
+    function() {
 
-    applyFilters();
+        applyFilters();
 
-});
+    }
+);
 
 
 /* APPLY FILTERS */
@@ -1245,16 +1454,20 @@ function applyFilters() {
 
     const searchText =
         document
-        .getElementById("searchInput")
+        .getElementById(
+            "searchInput"
+        )
         .value
         .trim()
         .toLowerCase();
 
     const searchTerms =
         searchText
+
         ? searchText
             .split(/[\s,;]+/)
             .filter(Boolean)
+
         : [];
 
     filteredRows =
@@ -1264,43 +1477,65 @@ function applyFilters() {
                 row._analysis;
 
             const station =
-                String(row[stationColumn] || "").trim();
+                String(
+                    row[stationColumn]
+                    || ""
+                ).trim();
 
             const sn =
-                String(row[0] || "")
+                String(
+                    row[0] || ""
+                )
                 .toLowerCase();
 
             const work =
-                String(row[1] || "")
+                String(
+                    row[1] || ""
+                )
                 .toLowerCase();
 
             if (
+
                 activeStation !== "ALL"
                 &&
                 station !== activeStation
+
             ) {
+
                 return false;
+
             }
 
             if (
+
                 activeStatus !== "ALL"
                 &&
-                analysis.result !== activeStatus
+                analysis.result
+                !== activeStatus
+
             ) {
+
                 return false;
+
             }
 
-            if (searchTerms.length > 0) {
+            if (
+                searchTerms.length > 0
+            ) {
 
                 const found =
-                    searchTerms.some(term =>
-                        sn.includes(term)
-                        ||
-                        work.includes(term)
+                    searchTerms.some(
+                        term =>
+
+                            sn.includes(term)
+                            ||
+                            work.includes(term)
                     );
 
                 if (!found) {
+
                     return false;
+
                 }
 
             }
@@ -1311,19 +1546,31 @@ function applyFilters() {
 
     renderSidebar();
 
-    if (filteredRows.length > 0) {
+    if (
+        filteredRows.length > 0
+    ) {
 
         const selected =
-            dutRows[selectedDutIndex];
+            dutRows[
+                selectedDutIndex
+            ];
 
-        if (!filteredRows.includes(selected)) {
+        if (
+            !filteredRows.includes(
+                selected
+            )
+        ) {
 
             selectedDutIndex =
-                dutRows.indexOf(filteredRows[0]);
+                dutRows.indexOf(
+                    filteredRows[0]
+                );
 
         }
 
-        if (activeView === "UNIT") {
+        if (
+            activeView === "UNIT"
+        ) {
 
             renderUnitView();
 
@@ -1331,7 +1578,9 @@ function applyFilters() {
 
     }
 
-    if (activeView === "STATION") {
+    if (
+        activeView === "STATION"
+    ) {
 
         renderStationView();
 
@@ -1345,12 +1594,16 @@ function applyFilters() {
 function renderSidebar() {
 
     document
-    .getElementById("totalCount")
+    .getElementById(
+        "totalCount"
+    )
     .textContent =
         `Total: ${filteredRows.length}`;
 
     const list =
-        document.getElementById("snList");
+        document.getElementById(
+            "snList"
+        );
 
     list.innerHTML = "";
 
@@ -1363,13 +1616,21 @@ function renderSidebar() {
             row._analysis;
 
         const item =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
-        item.className = "sn-row";
+        item.className =
+            "sn-row";
 
-        if (actualIndex === selectedDutIndex) {
+        if (
+            actualIndex
+            === selectedDutIndex
+        ) {
 
-            item.classList.add("selected");
+            item.classList.add(
+                "selected"
+            );
 
         }
 
@@ -1385,11 +1646,16 @@ function renderSidebar() {
             </div>
 
             <div class="sn-pcba">
-                ${escapeHTML(row[0] || "-")}
+                ${escapeHTML(
+                    row[0] || "-"
+                )}
             </div>
 
             <div class="sn-station">
-                ${escapeHTML(row[stationColumn] || "-")}
+                ${escapeHTML(
+                    row[stationColumn]
+                    || "-"
+                )}
             </div>
 
             <div>
@@ -1404,8 +1670,11 @@ function renderSidebar() {
                 ">
 
                     ${
-                        analysis.result === "PASS"
+                        analysis.result
+                        === "PASS"
+
                         ? "GOOD"
+
                         : `NG (${analysis.totalNG})`
                     }
 
@@ -1417,7 +1686,11 @@ function renderSidebar() {
 
                 ${
                     failedNames
-                    ? escapeHTML(failedNames)
+
+                    ? escapeHTML(
+                        failedNames
+                    )
+
                     : "-"
                 }
 
@@ -1429,11 +1702,14 @@ function renderSidebar() {
 
         `;
 
-        item.onclick = function() {
+        item.onclick =
+            function() {
 
-            selectDUT(actualIndex);
+                selectDUT(
+                    actualIndex
+                );
 
-        };
+            };
 
         list.appendChild(item);
 
@@ -1446,9 +1722,12 @@ function renderSidebar() {
 
 function selectDUT(index) {
 
-    selectedDutIndex = index;
+    selectedDutIndex =
+        index;
 
-    if (activeView === "UNIT") {
+    if (
+        activeView === "UNIT"
+    ) {
 
         renderUnitView();
 
@@ -1462,7 +1741,9 @@ function selectDUT(index) {
 /* VIEW MODE */
 
 document
-.querySelectorAll(".view-mode-button")
+.querySelectorAll(
+    ".view-mode-button"
+)
 .forEach(button => {
 
     button.addEventListener(
@@ -1473,34 +1754,56 @@ document
                 this.dataset.view;
 
             document
-            .querySelectorAll(".view-mode-button")
+            .querySelectorAll(
+                ".view-mode-button"
+            )
             .forEach(btn =>
-                btn.classList.remove("active")
+                btn.classList.remove(
+                    "active"
+                )
             );
 
-            this.classList.add("active");
+            this.classList.add(
+                "active"
+            );
 
-            if (activeView === "UNIT") {
+            if (
+                activeView === "UNIT"
+            ) {
 
                 document
-                .getElementById("unitView")
-                .style.display = "block";
+                .getElementById(
+                    "unitView"
+                )
+                .style.display =
+                    "block";
 
                 document
-                .getElementById("stationView")
-                .style.display = "none";
+                .getElementById(
+                    "stationView"
+                )
+                .style.display =
+                    "none";
 
                 renderUnitView();
 
-            } else {
+            }
+
+            else {
 
                 document
-                .getElementById("unitView")
-                .style.display = "none";
+                .getElementById(
+                    "unitView"
+                )
+                .style.display =
+                    "none";
 
                 document
-                .getElementById("stationView")
-                .style.display = "block";
+                .getElementById(
+                    "stationView"
+                )
+                .style.display =
+                    "block";
 
                 renderStationView();
 
@@ -1519,17 +1822,24 @@ function renderUnitView() {
     destroyCharts();
 
     const container =
-        document.getElementById("unitView");
+        document.getElementById(
+            "unitView"
+        );
 
     const row =
-        dutRows[selectedDutIndex];
+        dutRows[
+            selectedDutIndex
+        ];
 
     if (!row) {
 
-        container.innerHTML =
-            `<div class="no-graph">
+        container.innerHTML = `
+
+            <div class="no-graph">
                 No DUT selected.
-            </div>`;
+            </div>
+
+        `;
 
         return;
 
@@ -1549,7 +1859,9 @@ function renderUnitView() {
                 </div>
 
                 <div class="info-value">
-                    ${escapeHTML(row[0] || "-")}
+                    ${escapeHTML(
+                        row[0] || "-"
+                    )}
                 </div>
 
             </div>
@@ -1561,7 +1873,10 @@ function renderUnitView() {
                 </div>
 
                 <div class="info-value">
-                    ${escapeHTML(row[stationColumn] || "-")}
+                    ${escapeHTML(
+                        row[stationColumn]
+                        || "-"
+                    )}
                 </div>
 
             </div>
@@ -1626,7 +1941,9 @@ function renderUnitView() {
 
     `;
 
-    renderUnitNGSummary(analysis);
+    renderUnitNGSummary(
+        analysis
+    );
 
     renderTestTabs(
         "unitTestTabs",
@@ -1638,28 +1955,39 @@ function renderUnitView() {
         }
     );
 
-    renderUnitGraphs(analysis.groups);
+    renderUnitGraphs(
+        analysis.groups
+    );
 
 }
 
 
 /* UNIT NG SUMMARY */
 
-function renderUnitNGSummary(analysis) {
+function renderUnitNGSummary(
+    analysis
+) {
 
     const container =
-        document.getElementById("unitNGSummary");
+        document.getElementById(
+            "unitNGSummary"
+        );
 
-    Object.keys(analysis.summary)
+    Object.keys(
+        analysis.summary
+    )
     .forEach(group => {
 
         const data =
             analysis.summary[group];
 
         const pill =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
-        pill.className = "ng-pill";
+        pill.className =
+            "ng-pill";
 
         pill.innerHTML = `
 
@@ -1671,7 +1999,9 @@ function renderUnitNGSummary(analysis) {
 
         `;
 
-        container.appendChild(pill);
+        container.appendChild(
+            pill
+        );
 
     });
 
@@ -1687,7 +2017,9 @@ function renderTestTabs(
 ) {
 
     const container =
-        document.getElementById(containerID);
+        document.getElementById(
+            containerID
+        );
 
     container.innerHTML = "";
 
@@ -1695,9 +2027,13 @@ function renderTestTabs(
         Object.keys(groups);
 
     if (
+
         activeTest !== "ALL"
         &&
-        !groupKeys.includes(activeTest)
+        !groupKeys.includes(
+            activeTest
+        )
+
     ) {
 
         activeTest = "ALL";
@@ -1733,91 +2069,167 @@ function createTestButton(
 ) {
 
     const button =
-        document.createElement("button");
+        document.createElement(
+            "button"
+        );
 
-    button.className = "test-tab";
+    button.className =
+        "test-tab";
 
-    if (activeTest === test) {
+    if (
+        activeTest === test
+    ) {
 
-        button.classList.add("active");
+        button.classList.add(
+            "active"
+        );
 
     }
 
-    button.textContent = label;
+    button.textContent =
+        label;
 
-    button.onclick = function() {
+    button.onclick =
+        function() {
 
-        activeTest = test;
+            activeTest =
+                test;
 
-        callback();
+            callback();
 
-    };
+        };
 
-    container.appendChild(button);
+    container.appendChild(
+        button
+    );
 
 }
 
 
 /* UNIT GRAPHS */
 
-function renderUnitGraphs(groups) {
+function renderUnitGraphs(
+    groups
+) {
 
     const container =
-        document.getElementById("unitGraphs");
+        document.getElementById(
+            "unitGraphs"
+        );
 
     container.innerHTML = "";
 
     let groupKeys =
         Object.keys(groups);
 
-    if (activeTest !== "ALL") {
+    if (
+        activeTest !== "ALL"
+    ) {
 
         groupKeys =
             groupKeys.filter(
-                group => group === activeTest
+                group =>
+                    group === activeTest
             );
 
     }
 
-    groupKeys.forEach((group, index) => {
+    groupKeys.forEach(
+        (group, index) => {
 
-        const card =
-            document.createElement("div");
+            const card =
+                document.createElement(
+                    "div"
+                );
 
-        card.className = "graph-card";
+            card.className =
+                "graph-card";
 
-        if (activeTest !== "ALL") {
+            if (
+                activeTest !== "ALL"
+            ) {
 
-            card.classList.add("expanded");
+                card.classList.add(
+                    "expanded"
+                );
+
+            }
+
+            card.innerHTML = `
+
+                <div class="graph-header">
+
+                    <div class="graph-title">
+                        ${formatGroupName(
+                            group
+                        )}
+                    </div>
+
+                    <div class="graph-controls">
+
+                        <button
+                            class="graph-zoom-btn"
+                            onclick="zoomGraph(
+                                'unitChart_${index}',
+                                1.2
+                            )">
+
+                            +
+
+                        </button>
+
+                        <button
+                            class="graph-zoom-btn"
+                            onclick="zoomGraph(
+                                'unitChart_${index}',
+                                0.8
+                            )">
+
+                            −
+
+                        </button>
+
+                        <button
+                            class="graph-reset-btn"
+                            onclick="resetGraph(
+                                'unitChart_${index}'
+                            )">
+
+                            Reset
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="canvas-wrapper">
+
+                    <canvas
+                        id="unitChart_${index}">
+                    </canvas>
+
+                </div>
+
+            `;
+
+            container.appendChild(
+                card
+            );
+
+            createUnitChart(
+
+                document
+                .getElementById(
+                    `unitChart_${index}`
+                ),
+
+                groups[group]
+
+            );
 
         }
-
-        card.innerHTML = `
-
-            <div class="graph-title">
-                ${formatGroupName(group)}
-            </div>
-
-            <div class="canvas-wrapper">
-
-                <canvas
-                    id="unitChart_${index}">
-                </canvas>
-
-            </div>
-
-        `;
-
-        container.appendChild(card);
-
-        createUnitChart(
-            document.getElementById(
-                `unitChart_${index}`
-            ),
-            groups[group]
-        );
-
-    });
+    );
 
 }
 
@@ -1829,17 +2241,24 @@ function renderStationView() {
     destroyCharts();
 
     const container =
-        document.getElementById("stationView");
+        document.getElementById(
+            "stationView"
+        );
 
     const rows =
         filteredRows;
 
-    if (rows.length === 0) {
+    if (
+        rows.length === 0
+    ) {
 
-        container.innerHTML =
-            `<div class="no-graph">
+        container.innerHTML = `
+
+            <div class="no-graph">
                 No units available for the selected filters.
-            </div>`;
+            </div>
+
+        `;
 
         return;
 
@@ -1856,30 +2275,44 @@ function renderStationView() {
     const good =
         rows.filter(
             row =>
-                row._analysis.result === "PASS"
+                row._analysis.result
+                === "PASS"
         ).length;
 
     const ng =
         total - good;
 
     const groupSummary =
-        calculateGroupSummary(rows);
+        calculateGroupSummary(
+            rows
+        );
 
     container.innerHTML = `
 
         <div class="station-summary">
 
-            <div class="station-summary-header">
+            <div
+                class="station-summary-header">
 
                 <div>
 
-                    <div class="station-summary-title">
+                    <div
+                        class="station-summary-title">
+
                         STATION SUMMARY:
-                        ${escapeHTML(stationName)}
+                        ${escapeHTML(
+                            stationName
+                        )}
+
                     </div>
 
-                    <div class="station-summary-subtitle">
-                        Compiled from ${total} filtered unit(s)
+                    <div
+                        class="station-summary-subtitle">
+
+                        Compiled from
+                        ${total}
+                        filtered unit(s)
+
                     </div>
 
                 </div>
@@ -1890,20 +2323,29 @@ function renderStationView() {
 
                 <div class="summary-stat">
 
-                    <div class="summary-stat-label">
+                    <div
+                        class="summary-stat-label">
+
                         TOTAL UNITS
+
                     </div>
 
-                    <div class="summary-stat-value">
+                    <div
+                        class="summary-stat-value">
+
                         ${total}
+
                     </div>
 
                 </div>
 
                 <div class="summary-stat">
 
-                    <div class="summary-stat-label">
+                    <div
+                        class="summary-stat-label">
+
                         GOOD
+
                     </div>
 
                     <div class="
@@ -1918,8 +2360,11 @@ function renderStationView() {
 
                 <div class="summary-stat">
 
-                    <div class="summary-stat-label">
+                    <div
+                        class="summary-stat-label">
+
                         NG
+
                     </div>
 
                     <div class="
@@ -1961,7 +2406,9 @@ function renderStationView() {
 
     `;
 
-    renderStationNGSummary(groupSummary);
+    renderStationNGSummary(
+        groupSummary
+    );
 
     const allGroups =
         getAllGroups(rows);
@@ -1985,7 +2432,9 @@ function renderStationView() {
 
 /* GROUP SUMMARY */
 
-function calculateGroupSummary(rows) {
+function calculateGroupSummary(
+    rows
+) {
 
     const summary = {};
 
@@ -2003,6 +2452,7 @@ function calculateGroupSummary(rows) {
             }
 
             summary[group] +=
+
                 row
                 ._analysis
                 .summary[group]
@@ -2019,18 +2469,25 @@ function calculateGroupSummary(rows) {
 
 /* STATION NG SUMMARY */
 
-function renderStationNGSummary(summary) {
+function renderStationNGSummary(
+    summary
+) {
 
     const container =
-        document.getElementById("stationNGSummary");
+        document.getElementById(
+            "stationNGSummary"
+        );
 
     Object.keys(summary)
     .forEach(group => {
 
         const item =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
-        item.className = "test-ng-item";
+        item.className =
+            "test-ng-item";
 
         item.innerHTML = `
 
@@ -2042,7 +2499,9 @@ function renderStationNGSummary(summary) {
 
         `;
 
-        container.appendChild(item);
+        container.appendChild(
+            item
+        );
 
     });
 
@@ -2051,9 +2510,12 @@ function renderStationNGSummary(summary) {
 
 /* GET ALL GROUPS */
 
-function getAllGroups(rows) {
+function getAllGroups(
+    rows
+) {
 
-    const groups = new Set();
+    const groups =
+        new Set();
 
     rows.forEach(row => {
 
@@ -2079,14 +2541,20 @@ function renderStationTestTabs(
 ) {
 
     const container =
-        document.getElementById("stationTestTabs");
+        document.getElementById(
+            "stationTestTabs"
+        );
 
     container.innerHTML = "";
 
     if (
+
         activeTest !== "ALL"
         &&
-        !groups.includes(activeTest)
+        !groups.includes(
+            activeTest
+        )
+
     ) {
 
         activeTest = "ALL";
@@ -2122,70 +2590,133 @@ function renderStationGraphs(
 ) {
 
     const container =
-        document.getElementById("stationGraphs");
+        document.getElementById(
+            "stationGraphs"
+        );
 
     container.innerHTML = "";
 
-    let groupKeys = allGroups;
+    let groupKeys =
+        allGroups;
 
-    if (activeTest !== "ALL") {
+    if (
+        activeTest !== "ALL"
+    ) {
 
         groupKeys =
             groupKeys.filter(
-                group => group === activeTest
+                group =>
+                    group === activeTest
             );
 
     }
 
-    groupKeys.forEach((group, index) => {
+    groupKeys.forEach(
+        (group, index) => {
 
-        const card =
-            document.createElement("div");
+            const card =
+                document.createElement(
+                    "div"
+                );
 
-        card.className = "graph-card";
+            card.className =
+                "graph-card";
 
-        if (activeTest !== "ALL") {
+            if (
+                activeTest !== "ALL"
+            ) {
 
-            card.classList.add("expanded");
+                card.classList.add(
+                    "expanded"
+                );
+
+            }
+
+            card.innerHTML = `
+
+                <div class="graph-header">
+
+                    <div class="graph-title">
+
+                        ${formatGroupName(
+                            group
+                        )}
+                        — COMPILED STATION DATA
+
+                    </div>
+
+                    <div class="graph-controls">
+
+                        <button
+                            class="graph-zoom-btn"
+                            onclick="zoomGraph(
+                                'stationChart_${index}',
+                                1.2
+                            )">
+
+                            +
+
+                        </button>
+
+                        <button
+                            class="graph-zoom-btn"
+                            onclick="zoomGraph(
+                                'stationChart_${index}',
+                                0.8
+                            )">
+
+                            −
+
+                        </button>
+
+                        <button
+                            class="graph-reset-btn"
+                            onclick="resetGraph(
+                                'stationChart_${index}'
+                            )">
+
+                            Reset
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="canvas-wrapper">
+
+                    <canvas
+                        id="stationChart_${index}">
+                    </canvas>
+
+                </div>
+
+            `;
+
+            container.appendChild(
+                card
+            );
+
+            createStationChart(
+
+                document
+                .getElementById(
+                    `stationChart_${index}`
+                ),
+
+                rows,
+
+                group
+
+            );
 
         }
-
-        card.innerHTML = `
-
-            <div class="graph-title">
-
-                ${formatGroupName(group)}
-                — COMPILED STATION DATA
-
-            </div>
-
-            <div class="canvas-wrapper">
-
-                <canvas
-                    id="stationChart_${index}">
-                </canvas>
-
-            </div>
-
-        `;
-
-        container.appendChild(card);
-
-        createStationChart(
-            document.getElementById(
-                `stationChart_${index}`
-            ),
-            rows,
-            group
-        );
-
-    });
+    );
 
 }
 
 
-/* UNIT CHART
-   NO NG DOTS */
+/* UNIT CHART */
 
 function createUnitChart(
     canvas,
@@ -2193,24 +2724,41 @@ function createUnitChart(
 ) {
 
     const labels =
-        items.map(item =>
-            item.frequency !== 0
-            ? item.frequency
-            : formatSingleLabel(item.header)
+        items.map(
+            item =>
+
+                item.frequency !== 0
+
+                ? item.frequency
+
+                : formatSingleLabel(
+                    item.header
+                )
         );
 
     const values =
-        items.map(item => item.value);
+        items.map(
+            item =>
+                item.value
+        );
 
     const upper =
-        items.map(item => item.upper);
+        items.map(
+            item =>
+                item.upper
+        );
 
     const lower =
-        items.map(item => item.lower);
+        items.map(
+            item =>
+                item.lower
+        );
 
     const chart =
         new Chart(
+
             canvas,
+
             {
 
                 type: "line",
@@ -2223,55 +2771,76 @@ function createUnitChart(
 
                         {
 
-                            label: "Measurement",
+                            label:
+                                "Measurement",
 
-                            data: values,
+                            data:
+                                values,
 
-                            borderColor: "#2563eb",
+                            borderColor:
+                                "#2563eb",
 
-                            borderWidth: 2,
+                            borderWidth:
+                                2,
 
-                            pointRadius: 0,
+                            pointRadius:
+                                0,
 
-                            tension: 0.15,
+                            tension:
+                                0.15,
 
-                            spanGaps: true
-
-                        },
-
-                        {
-
-                            label: "Upper Limit",
-
-                            data: upper,
-
-                            borderColor: "#dc2626",
-
-                            borderWidth: 1.5,
-
-                            pointRadius: 0,
-
-                            tension: 0,
-
-                            spanGaps: true
+                            spanGaps:
+                                true
 
                         },
 
                         {
 
-                            label: "Lower Limit",
+                            label:
+                                "Upper Limit",
 
-                            data: lower,
+                            data:
+                                upper,
 
-                            borderColor: "#dc2626",
+                            borderColor:
+                                "#dc2626",
 
-                            borderWidth: 1.5,
+                            borderWidth:
+                                1.5,
 
-                            pointRadius: 0,
+                            pointRadius:
+                                0,
 
-                            tension: 0,
+                            tension:
+                                0,
 
-                            spanGaps: true
+                            spanGaps:
+                                true
+
+                        },
+
+                        {
+
+                            label:
+                                "Lower Limit",
+
+                            data:
+                                lower,
+
+                            borderColor:
+                                "#dc2626",
+
+                            borderWidth:
+                                1.5,
+
+                            pointRadius:
+                                0,
+
+                            tension:
+                                0,
+
+                            spanGaps:
+                                true
 
                         }
 
@@ -2291,8 +2860,7 @@ function createUnitChart(
 }
 
 
-/* STATION COMPILED CHART
-   NO NG DOTS */
+/* STATION COMPILED CHART */
 
 function createStationChart(
     canvas,
@@ -2301,81 +2869,109 @@ function createStationChart(
 ) {
 
     const firstRow =
-        rows.find(row =>
-            row._analysis.groups[group]
+        rows.find(
+            row =>
+                row
+                ._analysis
+                .groups[group]
         );
 
     if (!firstRow) return;
 
     const firstItems =
-        firstRow._analysis.groups[group];
+        firstRow
+        ._analysis
+        .groups[group];
 
     const labels =
-        firstItems.map(item =>
-            item.frequency !== 0
-            ? item.frequency
-            : formatSingleLabel(item.header)
+        firstItems.map(
+            item =>
+
+                item.frequency !== 0
+
+                ? item.frequency
+
+                : formatSingleLabel(
+                    item.header
+                )
         );
 
     const datasets = [];
 
 
-    /* ONE BLUE MEASUREMENT LINE
-       FOR EACH DUT */
+    /* MEASUREMENT LINE FOR EACH DUT */
 
-    rows.forEach((row, index) => {
+    rows.forEach(
+        (row, index) => {
 
-        const items =
-            row._analysis.groups[group];
+            const items =
+                row
+                ._analysis
+                .groups[group];
 
-        if (!items) return;
+            if (!items) return;
 
-        datasets.push({
+            datasets.push({
 
-            label:
-                `DUT ${index + 1}: ${row[0] || ""}`,
+                label:
+                    `DUT ${index + 1}: ${
+                        row[0] || ""
+                    }`,
 
-            data:
-                items.map(
-                    item => item.value
-                ),
+                data:
+                    items.map(
+                        item =>
+                            item.value
+                    ),
 
-            borderColor:
-                "rgba(37,99,235,0.18)",
+                borderColor:
+                    "rgba(37,99,235,0.18)",
 
-            borderWidth: 1,
+                borderWidth:
+                    1,
 
-            pointRadius: 0,
+                pointRadius:
+                    0,
 
-            tension: 0.1,
+                tension:
+                    0.1,
 
-            spanGaps: true
+                spanGaps:
+                    true
 
-        });
+            });
 
-    });
+        }
+    );
 
 
     /* UPPER LIMIT */
 
     datasets.push({
 
-        label: "Upper Limit",
+        label:
+            "Upper Limit",
 
         data:
             firstItems.map(
-                item => item.upper
+                item =>
+                    item.upper
             ),
 
-        borderColor: "#dc2626",
+        borderColor:
+            "#dc2626",
 
-        borderWidth: 2,
+        borderWidth:
+            2,
 
-        pointRadius: 0,
+        pointRadius:
+            0,
 
-        tension: 0,
+        tension:
+            0,
 
-        spanGaps: true
+        spanGaps:
+            true
 
     });
 
@@ -2384,32 +2980,42 @@ function createStationChart(
 
     datasets.push({
 
-        label: "Lower Limit",
+        label:
+            "Lower Limit",
 
         data:
             firstItems.map(
-                item => item.lower
+                item =>
+                    item.lower
             ),
 
-        borderColor: "#dc2626",
+        borderColor:
+            "#dc2626",
 
-        borderWidth: 2,
+        borderWidth:
+            2,
 
-        pointRadius: 0,
+        pointRadius:
+            0,
 
-        tension: 0,
+        tension:
+            0,
 
-        spanGaps: true
+        spanGaps:
+            true
 
     });
 
 
     const chart =
         new Chart(
+
             canvas,
+
             {
 
-                type: "line",
+                type:
+                    "line",
 
                 data: {
 
@@ -2433,19 +3039,25 @@ function createStationChart(
 
 /* CHART OPTIONS */
 
-function chartOptions(isStation = false) {
+function chartOptions(
+    isStation = false
+) {
 
     return {
 
-        responsive: true,
+        responsive:
+            true,
 
-        maintainAspectRatio: false,
+        maintainAspectRatio:
+            false,
 
         interaction: {
 
-            mode: "index",
+            mode:
+                "index",
 
-            intersect: false
+            intersect:
+                false
 
         },
 
@@ -2453,7 +3065,8 @@ function chartOptions(isStation = false) {
 
             legend: {
 
-                position: "top",
+                position:
+                    "top",
 
                 labels: {
 
@@ -2461,23 +3074,69 @@ function chartOptions(isStation = false) {
                         size: 9
                     },
 
-                    boxWidth: 18,
+                    boxWidth:
+                        18,
 
-                    filter: function(item) {
+                    filter:
+                        function(item) {
 
-                        if (
-                            isStation
-                            &&
-                            item.text.startsWith("DUT ")
-                        ) {
+                            if (
 
-                            return false;
+                                isStation
+                                &&
+                                item.text.startsWith(
+                                    "DUT "
+                                )
+
+                            ) {
+
+                                return false;
+
+                            }
+
+                            return true;
 
                         }
 
-                        return true;
+                }
 
-                    }
+            },
+
+            /* ZOOM AND PAN */
+
+            zoom: {
+
+                pan: {
+
+                    enabled:
+                        true,
+
+                    mode:
+                        "xy",
+
+                    modifierKey:
+                        "shift"
+
+                },
+
+                zoom: {
+
+                    wheel: {
+
+                        enabled:
+                            true
+
+                    },
+
+                    pinch: {
+
+                        enabled:
+                            true
+
+                    },
+
+                    mode:
+                        "xy"
 
                 }
 
@@ -2487,25 +3146,37 @@ function chartOptions(isStation = false) {
 
                 callbacks: {
 
-                    label: function(context) {
+                    label:
+                        function(context) {
 
-                        if (
-                            context.raw === null
-                        ) {
+                            if (
 
-                            return null;
+                                context.raw
+                                === null
+
+                            ) {
+
+                                return null;
+
+                            }
+
+                            return (
+
+                                context
+                                .dataset
+                                .label
+
+                                +
+
+                                ": "
+
+                                +
+
+                                context.raw
+
+                            );
 
                         }
-
-                        return (
-                            context.dataset.label
-                            +
-                            ": "
-                            +
-                            context.raw
-                        );
-
-                    }
 
                 }
 
@@ -2526,21 +3197,27 @@ function chartOptions(isStation = false) {
 
                 title: {
 
-                    display: true,
+                    display:
+                        true,
 
-                    text: "Frequency"
+                    text:
+                        "Frequency"
 
                 },
 
                 ticks: {
 
-                    maxRotation: 45,
+                    maxRotation:
+                        45,
 
-                    minRotation: 45,
+                    minRotation:
+                        45,
 
-                    autoSkip: true,
+                    autoSkip:
+                        true,
 
-                    maxTicksLimit: 18,
+                    maxTicksLimit:
+                        18,
 
                     font: {
                         size: 9
@@ -2561,9 +3238,11 @@ function chartOptions(isStation = false) {
 
                 title: {
 
-                    display: true,
+                    display:
+                        true,
 
-                    text: "Measurement"
+                    text:
+                        "Measurement"
 
                 },
 
@@ -2584,15 +3263,62 @@ function chartOptions(isStation = false) {
 }
 
 
+/* ZOOM FUNCTIONS */
+
+function getChartByCanvasID(
+    canvasID
+) {
+
+    return charts.find(
+        chart =>
+            chart.canvas.id
+            === canvasID
+    );
+
+}
+
+
+function zoomGraph(
+    canvasID,
+    amount
+) {
+
+    const chart =
+        getChartByCanvasID(
+            canvasID
+        );
+
+    if (!chart) return;
+
+    chart.zoom(amount);
+
+}
+
+
+function resetGraph(
+    canvasID
+) {
+
+    const chart =
+        getChartByCanvasID(
+            canvasID
+        );
+
+    if (!chart) return;
+
+    chart.resetZoom();
+
+}
+
+
 /* DESTROY CHARTS */
 
 function destroyCharts() {
 
-    charts.forEach(chart => {
-
-        chart.destroy();
-
-    });
+    charts.forEach(
+        chart =>
+            chart.destroy()
+    );
 
     charts = [];
 
@@ -2601,31 +3327,49 @@ function destroyCharts() {
 
 /* FORMAT */
 
-function formatGroupName(name) {
+function formatGroupName(
+    name
+) {
 
     return name
-        .replace(/^F_MB_/, "")
-        .replace(/_/g, " ");
+
+        .replace(
+            /^F_MB_/,
+            ""
+        )
+
+        .replace(
+            /_/g,
+            " "
+        );
 
 }
 
 
-function formatSingleLabel(header) {
+function formatSingleLabel(
+    header
+) {
 
-    return header
-        .replace(/^F_MB_/, "");
+    return header.replace(
+        /^F_MB_/,
+        ""
+    );
 
 }
 
 
 /* NUMBER */
 
-function toNumber(value) {
+function toNumber(
+    value
+) {
 
     if (
+
         value === undefined
         ||
         value === null
+
     ) {
 
         return null;
@@ -2637,11 +3381,14 @@ function toNumber(value) {
         .trim();
 
     if (
+
         text === ""
         ||
         text === "-"
         ||
-        text.toLowerCase() === "nan"
+        text.toLowerCase()
+        === "nan"
+
     ) {
 
         return null;
@@ -2650,11 +3397,18 @@ function toNumber(value) {
 
     const number =
         Number(
-            text.replace(/,/g, "")
+
+            text.replace(
+                /,/g,
+                ""
+            )
+
         );
 
     return Number.isNaN(number)
+
         ? null
+
         : number;
 
 }
@@ -2662,15 +3416,36 @@ function toNumber(value) {
 
 /* ESCAPE HTML */
 
-function escapeHTML(value) {
+function escapeHTML(
+    value
+) {
 
     return String(value)
 
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 
 }
 
