@@ -682,12 +682,8 @@ header {
                 ▌ ALL SN / DUT LIST
             </div>
 
-            <div
-                class="total-count"
-                id="totalCount">
-
+            <div class="total-count" id="totalCount">
                 Total: 0
-
             </div>
 
         </div>
@@ -759,10 +755,7 @@ Comma, space, semicolon or new line supported"></textarea>
 
     </div>
 
-    <div
-        class="sn-list"
-        id="snList">
-    </div>
+    <div class="sn-list" id="snList"></div>
 
 </aside>
 
@@ -914,7 +907,6 @@ function processCSV() {
             if (!first) return false;
 
             const excluded = [
-
                 "lower",
                 "upper",
                 "min",
@@ -924,7 +916,6 @@ function processCSV() {
                 "cpl",
                 "cpu",
                 "cpk"
-
             ];
 
             return !excluded.includes(first);
@@ -996,7 +987,6 @@ function analyzeDUT(row) {
             if (isNG(item)) {
 
                 ngCount++;
-
                 totalNG++;
 
             }
@@ -1053,9 +1043,8 @@ function detectMeasurementGroups(row) {
     ) {
 
         const header =
-            String(
-                headers[i] || ""
-            ).trim();
+            String(headers[i] || "")
+            .trim();
 
         if (!header) continue;
 
@@ -1119,13 +1108,11 @@ function detectMeasurementGroups(row) {
         }
 
         if (
-
             value === null
             &&
             lower === null
             &&
             upper === null
-
         ) {
             continue;
         }
@@ -1186,9 +1173,8 @@ function getMicSealLimits() {
     ) {
 
         const header =
-            String(
-                headers[i] || ""
-            ).toUpperCase();
+            String(headers[i] || "")
+            .toUpperCase();
 
         if (
             !header.startsWith(
@@ -1209,11 +1195,9 @@ function getMicSealLimits() {
             );
 
         if (
-
             firstLower === null
             &&
             lower !== null
-
         ) {
 
             firstLower =
@@ -1222,11 +1206,9 @@ function getMicSealLimits() {
         }
 
         if (
-
             firstUpper === null
             &&
             upper !== null
-
         ) {
 
             firstUpper =
@@ -1238,11 +1220,8 @@ function getMicSealLimits() {
 
     return {
 
-        lower:
-            firstLower,
-
-        upper:
-            firstUpper
+        lower: firstLower,
+        upper: firstUpper
 
     };
 
@@ -1279,7 +1258,6 @@ function parseMeasurementHeader(header) {
     return {
 
         group,
-
         frequency
 
     };
@@ -1300,11 +1278,9 @@ function isNG(item) {
     }
 
     if (
-
         item.lower !== null
         &&
         item.value < item.lower
-
     ) {
 
         return true;
@@ -1312,11 +1288,9 @@ function isNG(item) {
     }
 
     if (
-
         item.upper !== null
         &&
         item.value > item.upper
-
     ) {
 
         return true;
@@ -1339,9 +1313,7 @@ function populateStationFilter() {
 
     const stations =
         [
-
             ...new Set(
-
                 dutRows
                 .map(
                     row =>
@@ -1351,18 +1323,14 @@ function populateStationFilter() {
                         ).trim()
                 )
                 .filter(Boolean)
-
             )
-
         ]
         .sort();
 
     select.innerHTML = `
-
         <option value="ALL">
             ALL STATIONS
         </option>
-
     `;
 
     stations.forEach(station => {
@@ -1495,11 +1463,9 @@ function applyFilters() {
                 .toLowerCase();
 
             if (
-
                 activeStation !== "ALL"
                 &&
                 station !== activeStation
-
             ) {
 
                 return false;
@@ -1507,12 +1473,10 @@ function applyFilters() {
             }
 
             if (
-
                 activeStatus !== "ALL"
                 &&
                 analysis.result
                 !== activeStatus
-
             ) {
 
                 return false;
@@ -1526,7 +1490,6 @@ function applyFilters() {
                 const found =
                     searchTerms.some(
                         term =>
-
                             sn.includes(term)
                             ||
                             work.includes(term)
@@ -1670,11 +1633,8 @@ function renderSidebar() {
                 ">
 
                     ${
-                        analysis.result
-                        === "PASS"
-
+                        analysis.result === "PASS"
                         ? "GOOD"
-
                         : `NG (${analysis.totalNG})`
                     }
 
@@ -1686,11 +1646,9 @@ function renderSidebar() {
 
                 ${
                     failedNames
-
                     ? escapeHTML(
                         failedNames
                     )
-
                     : "-"
                 }
 
@@ -1834,11 +1792,9 @@ function renderUnitView() {
     if (!row) {
 
         container.innerHTML = `
-
             <div class="no-graph">
                 No DUT selected.
             </div>
-
         `;
 
         return;
@@ -2027,13 +1983,11 @@ function renderTestTabs(
         Object.keys(groups);
 
     if (
-
         activeTest !== "ALL"
         &&
         !groupKeys.includes(
             activeTest
         )
-
     ) {
 
         activeTest = "ALL";
@@ -2548,13 +2502,11 @@ function renderStationTestTabs(
     container.innerHTML = "";
 
     if (
-
         activeTest !== "ALL"
         &&
         !groups.includes(
             activeTest
         )
-
     ) {
 
         activeTest = "ALL";
@@ -2726,11 +2678,8 @@ function createUnitChart(
     const labels =
         items.map(
             item =>
-
                 item.frequency !== 0
-
                 ? item.frequency
-
                 : formatSingleLabel(
                     item.header
                 )
@@ -2849,7 +2798,7 @@ function createUnitChart(
                 },
 
                 options:
-                    chartOptions()
+                    chartOptions(false)
 
             }
 
@@ -2886,11 +2835,8 @@ function createStationChart(
     const labels =
         firstItems.map(
             item =>
-
                 item.frequency !== 0
-
                 ? item.frequency
-
                 : formatSingleLabel(
                     item.header
                 )
@@ -2899,7 +2845,12 @@ function createStationChart(
     const datasets = [];
 
 
-    /* MEASUREMENT LINE FOR EACH DUT */
+    /*
+        COMPILED MEASUREMENT LINES
+
+        All DUT lines use the same
+        uniform color.
+    */
 
     rows.forEach(
         (row, index) => {
@@ -2914,9 +2865,7 @@ function createStationChart(
             datasets.push({
 
                 label:
-                    `DUT ${index + 1}: ${
-                        row[0] || ""
-                    }`,
+                    `DUT ${index + 1}`,
 
                 data:
                     items.map(
@@ -2931,6 +2880,9 @@ function createStationChart(
                     1,
 
                 pointRadius:
+                    0,
+
+                pointHoverRadius:
                     0,
 
                 tension:
@@ -2967,6 +2919,9 @@ function createStationChart(
         pointRadius:
             0,
 
+        pointHoverRadius:
+            0,
+
         tension:
             0,
 
@@ -2996,6 +2951,9 @@ function createStationChart(
             2,
 
         pointRadius:
+            0,
+
+        pointHoverRadius:
             0,
 
         tension:
@@ -3045,19 +3003,26 @@ function chartOptions(
 
     return {
 
-        responsive:
-            true,
+        responsive: true,
 
-        maintainAspectRatio:
-            false,
+        maintainAspectRatio: false,
+
+        /*
+            The interaction only finds
+            the nearest point.
+
+            This prevents the tooltip
+            from showing every DUT/SN
+            at the same time.
+        */
 
         interaction: {
 
-            mode:
-                "index",
+            mode: "nearest",
 
-            intersect:
-                false
+            intersect: false,
+
+            axis: "y"
 
         },
 
@@ -3065,8 +3030,7 @@ function chartOptions(
 
             legend: {
 
-                position:
-                    "top",
+                position: "top",
 
                 labels: {
 
@@ -3074,20 +3038,27 @@ function chartOptions(
                         size: 9
                     },
 
-                    boxWidth:
-                        18,
+                    boxWidth: 18,
+
+                    /*
+                        Hide DUT lines from
+                        the legend in Station
+                        Summary.
+
+                        Only Measurement /
+                        Upper Limit /
+                        Lower Limit remain.
+                    */
 
                     filter:
                         function(item) {
 
                             if (
-
                                 isStation
                                 &&
                                 item.text.startsWith(
                                     "DUT "
                                 )
-
                             ) {
 
                                 return false;
@@ -3102,20 +3073,25 @@ function chartOptions(
 
             },
 
-            /* ZOOM AND PAN */
+
+            /*
+                Y-AXIS ONLY ZOOM
+
+                The X-axis remains fixed.
+
+                All frequency/data points
+                remain visible.
+            */
 
             zoom: {
 
                 pan: {
 
-                    enabled:
-                        true,
+                    enabled: true,
 
-                    mode:
-                        "xy",
+                    mode: "y",
 
-                    modifierKey:
-                        "shift"
+                    modifierKey: "shift"
 
                 },
 
@@ -3123,26 +3099,62 @@ function chartOptions(
 
                     wheel: {
 
-                        enabled:
-                            true
+                        enabled: true
 
                     },
 
                     pinch: {
 
-                        enabled:
-                            true
+                        enabled: true
 
                     },
 
-                    mode:
-                        "xy"
+                    mode: "y"
+
+                },
+
+                limits: {
+
+                    x: {
+
+                        min: "original",
+
+                        max: "original"
+
+                    }
 
                 }
 
             },
 
+
             tooltip: {
+
+                enabled: true,
+
+                /*
+                    Prevent showing
+                    floating DUT/SN data
+                    in Station Summary.
+                */
+
+                filter:
+                    function(context) {
+
+                        if (
+                            isStation
+                            &&
+                            context.dataset.label
+                            .startsWith("DUT ")
+                        ) {
+
+                            return false;
+
+                        }
+
+                        return true;
+
+                    },
 
                 callbacks: {
 
@@ -3150,10 +3162,8 @@ function chartOptions(
                         function(context) {
 
                             if (
-
                                 context.raw
                                 === null
-
                             ) {
 
                                 return null;
@@ -3162,10 +3172,7 @@ function chartOptions(
 
                             return (
 
-                                context
-                                .dataset
-                                .label
-
+                                context.dataset.label
                                 +
 
                                 ": "
@@ -3188,6 +3195,16 @@ function chartOptions(
 
             x: {
 
+                /*
+                    X AXIS IS LOCKED
+                    TO THE ORIGINAL
+                    FULL DATA RANGE.
+                */
+
+                min: undefined,
+
+                max: undefined,
+
                 grid: {
 
                     color:
@@ -3197,27 +3214,21 @@ function chartOptions(
 
                 title: {
 
-                    display:
-                        true,
+                    display: true,
 
-                    text:
-                        "Frequency"
+                    text: "Frequency"
 
                 },
 
                 ticks: {
 
-                    maxRotation:
-                        45,
+                    maxRotation: 45,
 
-                    minRotation:
-                        45,
+                    minRotation: 45,
 
-                    autoSkip:
-                        true,
+                    autoSkip: true,
 
-                    maxTicksLimit:
-                        18,
+                    maxTicksLimit: 18,
 
                     font: {
                         size: 9
@@ -3238,11 +3249,9 @@ function chartOptions(
 
                 title: {
 
-                    display:
-                        true,
+                    display: true,
 
-                    text:
-                        "Measurement"
+                    text: "Measurement"
 
                 },
 
@@ -3263,7 +3272,7 @@ function chartOptions(
 }
 
 
-/* ZOOM FUNCTIONS */
+/* GET CHART */
 
 function getChartByCanvasID(
     canvasID
@@ -3278,6 +3287,16 @@ function getChartByCanvasID(
 }
 
 
+/*
+    ZOOM BUTTON
+
+    Only the Y-axis changes.
+
+    X-axis remains fixed so the
+    complete frequency range
+    always stays visible.
+*/
+
 function zoomGraph(
     canvasID,
     amount
@@ -3290,10 +3309,16 @@ function zoomGraph(
 
     if (!chart) return;
 
-    chart.zoom(amount);
+    chart.zoom({
+
+        y: amount
+
+    });
 
 }
 
+
+/* RESET ZOOM */
 
 function resetGraph(
     canvasID
@@ -3365,11 +3390,9 @@ function toNumber(
 ) {
 
     if (
-
         value === undefined
         ||
         value === null
-
     ) {
 
         return null;
@@ -3381,14 +3404,12 @@ function toNumber(
         .trim();
 
     if (
-
         text === ""
         ||
         text === "-"
         ||
         text.toLowerCase()
         === "nan"
-
     ) {
 
         return null;
@@ -3397,12 +3418,10 @@ function toNumber(
 
     const number =
         Number(
-
             text.replace(
                 /,/g,
                 ""
             )
-
         );
 
     return Number.isNaN(number)
