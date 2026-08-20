@@ -867,6 +867,42 @@ let charts = [];
 
 let selectedModel = "";
 
+/* =========================================================
+   AUDIO GRAPH / TEST FILTER
+
+   Only these six real audio measurements are allowed.
+   Any NO_DATA measurement is ignored completely.
+========================================================= */
+
+const ALLOWED_AUDIO_GROUPS = new Set([
+    "F_MB_MIC_FR",
+    "F_MB_MIC_SEAL",
+    "F_MB_MIC_THD",
+    "F_MB_SPK_FR",
+    "F_MB_SPK_RB",
+    "F_MB_SPK_THD"
+]);
+
+function isAllowedAudioGroup(group) {
+
+    const normalized = String(group || "")
+        .trim()
+        .toUpperCase();
+
+    // Never allow NO_DATA groups.
+    if (normalized.includes("NO_DATA")) {
+        return false;
+    }
+
+    return ALLOWED_AUDIO_GROUPS.has(normalized);
+}
+
+function getAllowedAudioGroups(groups) {
+
+    return Object.keys(groups || {})
+        .filter(isAllowedAudioGroup);
+}
+
 
 /* =========================================================
    MASTER SPECIFICATION DATA
@@ -1550,6 +1586,13 @@ function detectMeasurementGroups(row) {
             );
 
         if (!info) continue;
+
+        // Filter BEFORE creating the group.
+        // This prevents unwanted tests and NO_DATA from appearing
+        // anywhere in Unit View or Station Summary.
+        if (!isAllowedAudioGroup(info.group)) {
+            continue;
+        }
 
         let value =
             toNumber(row[i]);
@@ -2730,8 +2773,8 @@ function renderTestTabs(
     container.innerHTML = "";
 
     let groupKeys =
-        getGroupsWithData(
-            groups
+        getAllowedAudioGroups(groups).filter(group =>
+            hasMeasurementData(groups[group])
         );
 
     if (
@@ -2828,8 +2871,8 @@ function renderUnitGraphs(
     container.innerHTML = "";
 
     let groupKeys =
-        getGroupsWithData(
-            groups
+        getAllowedAudioGroups(groups).filter(group =>
+            hasMeasurementData(groups[group])
         );
 
     if (
@@ -3271,7 +3314,7 @@ function renderStationTestTabs(
         callback
     );
 
-    groups.forEach(group => {
+    groups.filter(isAllowedAudioGroup).forEach(group => {
 
         createTestButton(
             container,
@@ -3302,7 +3345,7 @@ function renderStationGraphs(
     container.innerHTML = "";
 
     let groupKeys =
-        allGroups;
+        allGroups.filter(isAllowedAudioGroup);
 
     if (
         activeTest !== "ALL"
