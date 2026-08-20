@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>AUDIO TEST LOG ANALYZER</title>
@@ -16,305 +15,802 @@
     box-sizing: border-box;
 }
 
+:root {
+    --blue: #2563eb;
+    --blue-dark: #1d4ed8;
+    --red: #dc2626;
+    --red-light: rgba(220,38,38,.72);
+    --green: #16a34a;
+    --bg: #f3f6fa;
+    --card: #ffffff;
+    --border: #dfe5ec;
+    --text: #1f2937;
+    --muted: #64748b;
+}
+
 body {
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
-    background: #f4f6f8;
-    color: #202124;
+    background: var(--bg);
+    color: var(--text);
 }
+
+/* =========================
+   HEADER
+========================= */
 
 header {
-    background: #ffffff;
-    border-bottom: 1px solid #dcdfe3;
-    padding: 20px;
-}
-
-.header-content {
-    max-width: 1400px;
-    margin: auto;
-}
-
-h1 {
-    margin: 0;
-    font-size: 24px;
-}
-
-.subtitle {
-    margin-top: 6px;
-    color: #6b7280;
-    font-size: 14px;
-}
-
-.container {
-    max-width: 1400px;
-    margin: auto;
-    padding: 25px;
-}
-
-.upload-box {
+    height: 68px;
     background: white;
-    border: 2px dashed #b8bec6;
-    border-radius: 12px;
-    padding: 35px;
-    text-align: center;
-    margin-bottom: 25px;
-}
-
-.upload-box input {
-    margin-top: 15px;
-}
-
-.controls {
-    display: none;
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 25px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
-
-.controls label {
-    font-weight: bold;
-    margin-right: 10px;
-}
-
-select {
-    padding: 10px 14px;
-    border: 1px solid #cfd4da;
-    border-radius: 6px;
-    font-size: 14px;
-    min-width: 300px;
-}
-
-.summary {
-    display: none;
-    margin-bottom: 25px;
-}
-
-.summary-card {
-    background: white;
-    border-radius: 12px;
-    padding: 18px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
-
-.summary-row {
+    border-bottom: 1px solid var(--border);
     display: flex;
-    gap: 25px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+}
+
+.header-title h1 {
+    margin: 0;
+    font-size: 21px;
+    letter-spacing: .3px;
+}
+
+.header-title p {
+    margin: 5px 0 0;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.upload-button {
+    border: 1px solid var(--border);
+    background: white;
+    border-radius: 8px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #374151;
+}
+
+.upload-button:hover {
+    background: #f8fafc;
+}
+
+#fileInput {
+    display: none;
+}
+
+/* =========================
+   START SCREEN
+========================= */
+
+#startScreen {
+    min-height: calc(100vh - 68px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+}
+
+.upload-card {
+    width: 520px;
+    max-width: 100%;
+    background: white;
+    border: 2px dashed #b9c4d0;
+    border-radius: 14px;
+    padding: 55px 30px;
+    text-align: center;
+}
+
+.upload-card h2 {
+    margin: 0 0 10px;
+}
+
+.upload-card p {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.upload-main-button {
+    margin-top: 15px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    background: var(--blue);
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* =========================
+   MAIN APP
+========================= */
+
+#app {
+    display: none;
+    height: calc(100vh - 68px);
+}
+
+.app-layout {
+    display: grid;
+    grid-template-columns: 460px 1fr;
+    height: 100%;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar {
+    background: white;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.sidebar-header {
+    padding: 18px 18px 10px;
+    border-bottom: 1px solid var(--border);
+}
+
+.sidebar-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-title {
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.total-count {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.search-box {
+    position: relative;
+    margin-top: 14px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 10px 38px 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    outline: none;
+}
+
+.search-icon {
+    position: absolute;
+    right: 12px;
+    top: 9px;
+    color: var(--muted);
+}
+
+/* TABLE */
+
+.sn-table-header,
+.sn-row {
+    display: grid;
+    grid-template-columns: 35px 1.25fr 1fr 1.05fr 72px 1.7fr 24px;
+    align-items: center;
+}
+
+.sn-table-header {
+    padding: 12px 10px;
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: bold;
+    border-bottom: 1px solid var(--border);
+    background: #f8fafc;
+}
+
+.sn-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.sn-row {
+    min-height: 58px;
+    padding: 7px 10px;
+    border-bottom: 1px solid #edf0f3;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+.sn-row:hover {
+    background: #f8fafc;
+}
+
+.sn-row.selected {
+    background: #eaf2ff;
+    box-shadow: inset 3px 0 0 var(--blue);
+}
+
+.sn-number {
+    color: var(--muted);
+}
+
+.sn-pcba {
+    font-weight: bold;
+    font-size: 10px;
+}
+
+.sn-work {
+    font-size: 10px;
+}
+
+.sn-time {
+    font-size: 9px;
+}
+
+.status-badge {
+    display: inline-block;
+    width: fit-content;
+    padding: 5px 7px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: bold;
+    color: white;
+}
+
+.status-pass {
+    background: var(--green);
+}
+
+.status-ng {
+    background: var(--red);
+}
+
+.ng-details {
+    font-size: 9px;
+    color: #475569;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.arrow {
+    font-size: 18px;
+    color: var(--blue);
+    text-align: right;
+}
+
+.pagination {
+    border-top: 1px solid var(--border);
+    padding: 12px;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+.page-button {
+    min-width: 28px;
+    height: 28px;
+    border: 1px solid var(--border);
+    background: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.page-button.active {
+    background: var(--blue);
+    color: white;
+    border-color: var(--blue);
+}
+
+/* =========================
+   CONTENT
+========================= */
+
+.content {
+    overflow-y: auto;
+    padding: 12px 18px 24px;
+}
+
+/* INFO BAR */
+
+.info-bar {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    min-height: 92px;
+    display: flex;
+    align-items: stretch;
+    margin-bottom: 14px;
+    overflow: hidden;
+}
+
+.info-item {
+    padding: 18px 20px;
+    min-width: 155px;
+    border-right: 1px solid #e9edf2;
+}
+
+.info-label {
+    font-size: 9px;
+    color: var(--muted);
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.info-value {
+    font-size: 15px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.selected-label {
+    display: inline-block;
+    background: #e8f0ff;
+    color: var(--blue-dark);
+    padding: 4px 7px;
+    border-radius: 3px;
+    font-size: 9px;
+}
+
+.result-pass {
+    color: var(--green);
+}
+
+.result-ng {
+    color: var(--red);
+}
+
+/* NG SUMMARY */
+
+.ng-summary {
+    flex: 1;
+    padding: 16px 20px;
+}
+
+.ng-summary-title {
+    font-size: 9px;
+    color: var(--muted);
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.ng-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.ng-pill {
+    padding: 7px 9px;
+    background: #f8fafc;
+    border-radius: 4px;
+    font-size: 9px;
+    color: #475569;
+    min-width: 70px;
+    text-align: center;
+}
+
+.ng-pill span {
+    color: var(--red);
+    font-weight: bold;
+    margin-left: 4px;
+}
+
+/* =========================
+   CATEGORY TABS
+========================= */
+
+.category-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.category-tab {
+    border: 1px solid var(--border);
+    background: #eef2f6;
+    padding: 9px 28px;
+    border-radius: 18px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.category-tab.active {
+    background: var(--blue);
+    color: white;
+    border-color: var(--blue);
+}
+
+/* TEST TABS */
+
+.test-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
     flex-wrap: wrap;
 }
 
-.summary-item {
-    min-width: 150px;
-}
-
-.summary-label {
-    font-size: 12px;
-    color: #6b7280;
-    text-transform: uppercase;
-}
-
-.summary-value {
-    margin-top: 5px;
-    font-size: 20px;
+.test-tab {
+    border: 1px solid var(--border);
+    background: #eef2f6;
+    min-width: 105px;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 10px;
     font-weight: bold;
 }
 
-.pass {
-    color: #16803c;
+.test-tab.active {
+    background: var(--blue);
+    color: white;
+    border-color: var(--blue);
 }
 
-.fail {
-    color: #d93025;
-}
+/* =========================
+   GRAPHS
+========================= */
 
 .graphs {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
 }
 
 .graph-card {
     background: white;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 14px;
+    min-height: 360px;
+}
+
+.graph-card.single {
+    grid-column: 1 / -1;
 }
 
 .graph-title {
-    font-size: 16px;
+    font-size: 13px;
     font-weight: bold;
-    margin-bottom: 15px;
-    border-left: 5px solid #2563eb;
-    padding-left: 10px;
+    margin-bottom: 8px;
 }
 
 .canvas-wrapper {
+    height: 300px;
     position: relative;
-    height: 350px;
 }
 
-.no-data {
+.footer-note {
     text-align: center;
-    padding: 40px;
-    color: #777;
+    color: var(--muted);
+    font-size: 10px;
+    margin-top: 12px;
 }
 
-@media (max-width: 600px) {
+.footer-note span {
+    color: var(--red);
+    font-weight: bold;
+}
 
-    .container {
-        padding: 15px;
+.no-graph {
+    padding: 50px;
+    text-align: center;
+    color: var(--muted);
+}
+
+@media (max-width: 1250px) {
+
+    .app-layout {
+        grid-template-columns: 390px 1fr;
+    }
+
+    .sn-table-header,
+    .sn-row {
+        grid-template-columns: 30px 1.25fr .9fr 1fr 62px 1.4fr 20px;
+    }
+
+}
+
+@media (max-width: 950px) {
+
+    #app {
+        height: auto;
+    }
+
+    .app-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        height: 500px;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
     }
 
     .graphs {
         grid-template-columns: 1fr;
     }
 
-    select {
-        width: 100%;
-        min-width: 0;
-        margin-top: 10px;
+    .graph-card.single {
+        grid-column: auto;
+    }
+
+    .info-bar {
+        flex-wrap: wrap;
     }
 
 }
 
 </style>
-
 </head>
 
 <body>
 
 <header>
 
-<div class="header-content">
+    <div class="header-title">
+        <h1>AUDIO TEST LOG ANALYZER</h1>
+        <p>Audio SPC CSV • UL/LL Detection • NG Highlighting</p>
+    </div>
 
-<h1>AUDIO TEST LOG ANALYZER</h1>
-
-<div class="subtitle">
-Upload Audio SPC CSV • Automatic UL/LL Detection • NG Highlighting
-</div>
-
-</div>
+    <label class="upload-button">
+        ⇧ &nbsp; Upload New CSV
+        <input type="file" id="fileInput" accept=".csv">
+    </label>
 
 </header>
 
 
-<div class="container">
+<!-- START SCREEN -->
 
-<div class="upload-box">
+<div id="startScreen">
 
-<h2>Upload Audio SPC CSV</h2>
+    <div class="upload-card">
 
-<p>Select your audio test SPC data file.</p>
+        <h2>Upload Audio SPC CSV</h2>
 
-<input
-type="file"
-id="fileInput"
-accept=".csv"
-/>
+        <p>
+            Select your Audio SPC data file to view all DUTs,
+            PASS/NG status, failed measurements, and graphs.
+        </p>
 
-</div>
+        <button class="upload-main-button"
+            onclick="document.getElementById('fileInput').click()">
 
+            Choose CSV File
 
-<div class="controls" id="controls">
+        </button>
 
-<label for="dutSelect">
-Select DUT / PCBA:
-</label>
-
-<select id="dutSelect"></select>
+    </div>
 
 </div>
 
 
-<div class="summary" id="summary">
+<!-- MAIN APP -->
 
-<div class="summary-card">
+<div id="app">
 
-<div class="summary-row">
+    <div class="app-layout">
 
-<div class="summary-item">
+        <!-- ================= SIDEBAR ================= -->
 
-<div class="summary-label">
-PCBA
-</div>
+        <aside class="sidebar">
 
-<div class="summary-value" id="pcbaValue">
--
-</div>
+            <div class="sidebar-header">
 
-</div>
+                <div class="sidebar-title-row">
 
+                    <div class="sidebar-title">
+                        ▌ ALL SN / DUT LIST
+                    </div>
 
-<div class="summary-item">
+                    <div class="total-count" id="totalCount">
+                        Total: 0
+                    </div>
 
-<div class="summary-label">
-Work No
-</div>
+                </div>
 
-<div class="summary-value" id="workValue">
--
-</div>
+                <div class="search-box">
 
-</div>
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="Search SN / PCBA..."
+                    >
 
+                    <span class="search-icon">
+                        ⌕
+                    </span>
 
-<div class="summary-item">
+                </div>
 
-<div class="summary-label">
-Timestamp
-</div>
-
-<div class="summary-value" id="timeValue">
--
-</div>
-
-</div>
+            </div>
 
 
-<div class="summary-item">
+            <div class="sn-table-header">
 
-<div class="summary-label">
-Overall Result
-</div>
+                <div>#</div>
+                <div>PCBA / SN</div>
+                <div>WORK NO</div>
+                <div>TIME</div>
+                <div>STATUS</div>
+                <div>NG DETAILS</div>
+                <div></div>
 
-<div class="summary-value" id="resultValue">
--
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
+            </div>
 
 
-<div class="graphs" id="graphs">
+            <div class="sn-list" id="snList"></div>
 
-<div class="no-data">
-Upload an Audio SPC CSV file to begin analysis.
-</div>
 
-</div>
+            <div class="pagination" id="pagination"></div>
+
+        </aside>
+
+
+        <!-- ================= CONTENT ================= -->
+
+        <main class="content">
+
+            <!-- INFO -->
+
+            <div class="info-bar">
+
+                <div class="info-item">
+
+                    <div class="info-label">
+                        SELECTED DUT / PCBA
+                    </div>
+
+                    <div class="selected-label"
+                        id="selectedPCBA">
+                        -
+                    </div>
+
+                    <div class="info-value"
+                        id="selectedPCBAMain">
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="info-item">
+
+                    <div class="info-label">
+                        WORK NO
+                    </div>
+
+                    <div class="info-value"
+                        id="selectedWork">
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="info-item">
+
+                    <div class="info-label">
+                        TIMESTAMP
+                    </div>
+
+                    <div class="info-value"
+                        id="selectedTime">
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="info-item">
+
+                    <div class="info-label">
+                        OVERALL RESULT
+                    </div>
+
+                    <div class="info-value"
+                        id="selectedResult">
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="ng-summary">
+
+                    <div class="ng-summary-title">
+                        NG SUMMARY (BY TEST)
+                    </div>
+
+                    <div class="ng-pills"
+                        id="ngSummary">
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- CATEGORY -->
+
+            <div class="category-tabs">
+
+                <button
+                    class="category-tab active"
+                    data-category="MIC"
+                >
+                    MICROPHONE
+                </button>
+
+                <button
+                    class="category-tab"
+                    data-category="SPK"
+                >
+                    SPEAKER
+                </button>
+
+            </div>
+
+
+            <!-- TEST TABS -->
+
+            <div class="test-tabs"
+                id="testTabs">
+            </div>
+
+
+            <!-- GRAPHS -->
+
+            <div class="graphs"
+                id="graphs">
+            </div>
+
+
+            <div class="footer-note">
+                <span>●</span>
+                NG points are highlighted in red.
+            </div>
+
+        </main>
+
+    </div>
 
 </div>
 
 
 <script>
 
+/* =========================================
+   GLOBAL VARIABLES
+========================================= */
+
 let csvData = [];
 let headers = [];
+
 let lowerRow = null;
 let upperRow = null;
+
 let dutRows = [];
+let filteredRows = [];
+
+let selectedDutIndex = 0;
+
+let currentPage = 1;
+const rowsPerPage = 15;
+
+let currentCategory = "MIC";
+
+let activeTest = null;
+
 let charts = [];
 
 
-/* ================================
+/* =========================================
    FILE UPLOAD
-================================ */
+========================================= */
 
 document
 .getElementById("fileInput")
@@ -347,17 +843,13 @@ function handleFile(event) {
 }
 
 
-
-/* ================================
+/* =========================================
    PROCESS CSV
-================================ */
+========================================= */
 
 function processCSV() {
 
-    destroyCharts();
-
-
-    if (csvData.length < 2) {
+    if (!csvData || csvData.length < 3) {
 
         alert("Invalid CSV file.");
 
@@ -377,7 +869,7 @@ function processCSV() {
     if (!lowerRow || !upperRow) {
 
         alert(
-            "Lower or Upper limit rows were not found."
+            "Could not find the Lower and Upper limit rows."
         );
 
         return;
@@ -385,12 +877,14 @@ function processCSV() {
     }
 
 
-    dutRows = csvData.filter(row => {
+    dutRows = csvData
+    .slice(1)
+    .filter(row => {
 
-        const firstValue =
+        const value =
             String(row[0] || "").trim();
 
-        if (!firstValue) return false;
+        if (!value) return false;
 
 
         const excluded = [
@@ -408,223 +902,152 @@ function processCSV() {
         ];
 
 
-        return !excluded.includes(firstValue);
+        return !excluded.some(item =>
+            item.toLowerCase() === value.toLowerCase()
+        );
 
     });
 
 
-    populateDUTSelector();
+    /* Analyze every DUT once */
+
+    dutRows.forEach(row => {
+
+        row._analysis =
+            analyzeDUT(row);
+
+    });
+
+
+    filteredRows = [...dutRows];
 
 
     document
-    .getElementById("controls")
-    .style.display = "block";
+    .getElementById("startScreen")
+    .style.display = "none";
 
 
     document
-    .getElementById("summary")
+    .getElementById("app")
     .style.display = "block";
+
+
+    currentPage = 1;
+
+
+    renderSidebar();
 
 
     if (dutRows.length > 0) {
 
-        renderDUT(0);
+        selectDUT(0);
 
     }
 
 }
 
 
-
-/* ================================
-   FIND ROW
-================================ */
+/* =========================================
+   FIND SPECIAL ROW
+========================================= */
 
 function findRow(name) {
 
     return csvData.find(row => {
 
-        return String(
-            row[0] || ""
-        )
-        .trim()
-        .toLowerCase()
-        ===
-        name.toLowerCase();
+        return String(row[0] || "")
+            .trim()
+            .toLowerCase()
+            ===
+            name.toLowerCase();
 
     });
 
 }
 
 
+/* =========================================
+   ANALYZE DUT
+========================================= */
 
-/* ================================
-   DUT SELECTOR
-================================ */
+function analyzeDUT(row) {
 
-function populateDUTSelector() {
-
-    const select =
-        document.getElementById("dutSelect");
-
-
-    select.innerHTML = "";
+    const groups =
+        detectMeasurementGroups(row);
 
 
-    dutRows.forEach((row, index) => {
-
-        const option =
-            document.createElement("option");
+    const summary = {};
 
 
-        option.value = index;
+    let totalNG = 0;
 
 
-        const pcba =
-            row[0] || `DUT ${index + 1}`;
+    Object.keys(groups)
+    .forEach(groupName => {
+
+        const items =
+            groups[groupName];
 
 
-        option.textContent =
-            pcba;
+        let ngCount = 0;
 
 
-        select.appendChild(option);
+        items.forEach(item => {
+
+            if (isNG(item)) {
+
+                ngCount++;
+                totalNG++;
+
+            }
+
+        });
+
+
+        summary[groupName] = {
+
+            ngCount: ngCount,
+
+            status:
+                ngCount > 0
+                ? "NG"
+                : "PASS"
+
+        };
 
     });
 
 
-    select.onchange = function() {
-
-        renderDUT(
-            Number(this.value)
+    const failedTests =
+        Object.keys(summary)
+        .filter(key =>
+            summary[key].ngCount > 0
         );
+
+
+    return {
+
+        groups: groups,
+
+        summary: summary,
+
+        totalNG: totalNG,
+
+        failedTests: failedTests,
+
+        result:
+            totalNG > 0
+            ? "NG"
+            : "PASS"
 
     };
 
 }
 
 
-
-/* ================================
-   RENDER DUT
-================================ */
-
-function renderDUT(index) {
-
-    const row =
-        dutRows[index];
-
-
-    destroyCharts();
-
-
-    updateSummary(row);
-
-
-    const groups =
-        detectMeasurementGroups(row);
-
-
-    renderGraphs(
-        groups,
-        row
-    );
-
-}
-
-
-
-/* ================================
-   SUMMARY
-================================ */
-
-function updateSummary(row) {
-
-    document
-    .getElementById("pcbaValue")
-    .textContent =
-        row[0] || "-";
-
-
-    document
-    .getElementById("workValue")
-    .textContent =
-        row[1] || "-";
-
-
-    document
-    .getElementById("timeValue")
-    .textContent =
-        row[2] || "-";
-
-
-    let ngCount = 0;
-
-
-    for (
-        let i = 0;
-        i < headers.length;
-        i++
-    ) {
-
-        const value =
-            toNumber(row[i]);
-
-        const lower =
-            toNumber(lowerRow[i]);
-
-        const upper =
-            toNumber(upperRow[i]);
-
-
-        if (
-            value !== null &&
-            (
-                (lower !== null && value < lower)
-                ||
-                (upper !== null && value > upper)
-            )
-        ) {
-
-            ngCount++;
-
-        }
-
-    }
-
-
-    const resultElement =
-        document
-        .getElementById("resultValue");
-
-
-    if (ngCount > 0) {
-
-        resultElement.textContent =
-            `NG (${ngCount})`;
-
-        resultElement.className =
-            "summary-value fail";
-
-    }
-
-    else {
-
-        resultElement.textContent =
-            "PASS";
-
-        resultElement.className =
-            "summary-value pass";
-
-    }
-
-}
-
-
-
-/* ================================
-   DETECT MEASUREMENT GROUPS
-================================ */
+/* =========================================
+   DETECT GROUPS
+========================================= */
 
 function detectMeasurementGroups(row) {
 
@@ -644,10 +1067,14 @@ function detectMeasurementGroups(row) {
         if (!header) continue;
 
 
+        const upperHeader =
+            header.toUpperCase();
+
+
         if (
-            !header.includes("MIC")
+            !upperHeader.includes("MIC")
             &&
-            !header.includes("SPK")
+            !upperHeader.includes("SPK")
         ) {
 
             continue;
@@ -655,16 +1082,61 @@ function detectMeasurementGroups(row) {
         }
 
 
+        const groupInfo =
+            parseMeasurementHeader(
+                upperHeader
+            );
+
+
+        if (!groupInfo) continue;
+
+
         const value =
             toNumber(row[i]);
 
 
-        const lower =
+        let lower =
             toNumber(lowerRow[i]);
 
 
-        const upper =
+        let upper =
             toNumber(upperRow[i]);
+
+
+        /*
+            SPECIAL RULE FOR MIC SEAL
+
+            Your actual CSV only places the UL/LL
+            in the first MIC SEAL column.
+
+            Apply the first valid MIC SEAL Lower/Upper
+            limit to ALL MIC SEAL frequencies.
+        */
+
+        if (
+            groupInfo.group === "F_MB_MIC_SEAL"
+        ) {
+
+            const sealLimits =
+                getMicSealLimits();
+
+
+            if (sealLimits.lower !== null) {
+
+                lower =
+                    sealLimits.lower;
+
+            }
+
+
+            if (sealLimits.upper !== null) {
+
+                upper =
+                    sealLimits.upper;
+
+            }
+
+        }
 
 
         if (
@@ -680,27 +1152,14 @@ function detectMeasurementGroups(row) {
         }
 
 
-        const groupInfo =
-            parseMeasurementHeader(
-                header
-            );
+        if (!groups[groupInfo.group]) {
 
-
-        if (!groupInfo) continue;
-
-
-        const key =
-            groupInfo.group;
-
-
-        if (!groups[key]) {
-
-            groups[key] = [];
+            groups[groupInfo.group] = [];
 
         }
 
 
-        groups[key].push({
+        groups[groupInfo.group].push({
 
             column: i,
 
@@ -723,10 +1182,11 @@ function detectMeasurementGroups(row) {
     Object.values(groups)
     .forEach(items => {
 
-        items.sort(
-            (a, b) =>
-                a.frequency - b.frequency
-        );
+        items.sort((a, b) => {
+
+            return a.frequency - b.frequency;
+
+        });
 
     });
 
@@ -736,49 +1196,119 @@ function detectMeasurementGroups(row) {
 }
 
 
+/* =========================================
+   GET MIC SEAL LIMITS
+========================================= */
 
-/* ================================
-   PARSE HEADER
-================================ */
+function getMicSealLimits() {
 
-function parseMeasurementHeader(header) {
-
-    const upper =
-        header.toUpperCase();
-
-
-    let group =
-        upper;
+    let firstLower = null;
+    let firstUpper = null;
 
 
-    let frequency =
-        null;
+    for (
+        let i = 0;
+        i < headers.length;
+        i++
+    ) {
+
+        const header =
+            String(headers[i] || "")
+            .toUpperCase();
 
 
-    const match =
-        upper.match(
-            /_(\d+(?:\.\d+)?)$/
-        );
+        if (
+            !header.startsWith(
+                "F_MB_MIC_SEAL"
+            )
+        ) {
+
+            continue;
+
+        }
 
 
-    if (match) {
+        if (firstLower === null) {
 
-        frequency =
-            Number(match[1]);
+            const value =
+                toNumber(lowerRow[i]);
 
 
-        group =
-            upper.replace(
-                /_(\d+(?:\.\d+)?)$/,
-                ""
-            );
+            if (value !== null) {
+
+                firstLower = value;
+
+            }
+
+        }
+
+
+        if (firstUpper === null) {
+
+            const value =
+                toNumber(upperRow[i]);
+
+
+            if (value !== null) {
+
+                firstUpper = value;
+
+            }
+
+        }
+
+
+        if (
+            firstLower !== null
+            &&
+            firstUpper !== null
+        ) {
+
+            break;
+
+        }
 
     }
 
 
-    if (frequency === null) {
+    return {
 
-        frequency = 0;
+        lower: firstLower,
+
+        upper: firstUpper
+
+    };
+
+}
+
+
+/* =========================================
+   PARSE MEASUREMENT HEADER
+========================================= */
+
+function parseMeasurementHeader(header) {
+
+    const frequencyMatch =
+        header.match(
+            /_(\d+(?:\.\d+)?)$/
+        );
+
+
+    let group = header;
+    let frequency = 0;
+
+
+    if (frequencyMatch) {
+
+        frequency =
+            Number(frequencyMatch[1]);
+
+
+        group =
+            header.replace(
+                /_(\d+(?:\.\d+)?)$/,
+                ""
+            );
 
     }
 
@@ -794,12 +1324,761 @@ function parseMeasurementHeader(header) {
 }
 
 
+/* =========================================
+   NG CHECK
+========================================= */
 
-/* ================================
+function isNG(item) {
+
+    if (item.value === null) {
+
+        return false;
+
+    }
+
+
+    if (
+        item.lower !== null
+        &&
+        item.value < item.lower
+    ) {
+
+        return true;
+
+    }
+
+
+    if (
+        item.upper !== null
+        &&
+        item.value > item.upper
+    ) {
+
+        return true;
+
+    }
+
+
+    return false;
+
+}
+
+
+/* =========================================
+   SIDEBAR
+========================================= */
+
+function renderSidebar() {
+
+    document
+    .getElementById("totalCount")
+    .textContent =
+        `Total: ${filteredRows.length}`;
+
+
+    const list =
+        document.getElementById("snList");
+
+
+    list.innerHTML = "";
+
+
+    const start =
+        (currentPage - 1)
+        * rowsPerPage;
+
+
+    const end =
+        start + rowsPerPage;
+
+
+    const pageRows =
+        filteredRows.slice(start, end);
+
+
+    pageRows.forEach((row, localIndex) => {
+
+        const actualIndex =
+            dutRows.indexOf(row);
+
+
+        const analysis =
+            row._analysis;
+
+
+        const originalIndex =
+            actualIndex + 1;
+
+
+        const item =
+            document.createElement("div");
+
+
+        item.className =
+            "sn-row";
+
+
+        if (
+            actualIndex === selectedDutIndex
+        ) {
+
+            item.classList.add(
+                "selected"
+            );
+
+        }
+
+
+        const failedNames =
+            analysis.failedTests
+            .map(formatGroupName)
+            .join(", ");
+
+
+        const timestamp =
+            String(row[2] || "");
+
+
+        const shortTime =
+            timestamp
+            .replace("2026/", "")
+            .replace("2025/", "");
+
+
+        item.innerHTML = `
+
+            <div class="sn-number">
+                ${originalIndex}
+            </div>
+
+            <div class="sn-pcba">
+                ${escapeHTML(row[0] || "-")}
+            </div>
+
+            <div class="sn-work">
+                ${escapeHTML(row[1] || "-")}
+            </div>
+
+            <div class="sn-time">
+                ${escapeHTML(shortTime)}
+            </div>
+
+            <div>
+
+                <span class="
+                    status-badge
+                    ${
+                        analysis.result === "PASS"
+                        ? "status-pass"
+                        : "status-ng"
+                    }
+                ">
+
+                    ${
+                        analysis.result === "PASS"
+                        ? "PASS"
+                        : `NG (${analysis.totalNG})`
+                    }
+
+                </span>
+
+            </div>
+
+            <div class="ng-details">
+
+                ${
+                    failedNames
+                    ? escapeHTML(failedNames)
+                    : "-"
+                }
+
+            </div>
+
+            <div class="arrow">
+                ›
+            </div>
+
+        `;
+
+
+        item.addEventListener(
+            "click",
+            function() {
+
+                selectDUT(
+                    actualIndex
+                );
+
+            }
+        );
+
+
+        list.appendChild(item);
+
+    });
+
+
+    renderPagination();
+
+}
+
+
+/* =========================================
+   PAGINATION
+========================================= */
+
+function renderPagination() {
+
+    const container =
+        document.getElementById(
+            "pagination"
+        );
+
+
+    container.innerHTML = "";
+
+
+    const totalPages =
+        Math.max(
+            1,
+            Math.ceil(
+                filteredRows.length
+                / rowsPerPage
+            )
+        );
+
+
+    createPageButton(
+        "«",
+        currentPage > 1,
+        function() {
+
+            currentPage--;
+
+            renderSidebar();
+
+        }
+    );
+
+
+    const maxVisible = 5;
+
+
+    let startPage =
+        Math.max(
+            1,
+            currentPage - 2
+        );
+
+
+    let endPage =
+        Math.min(
+            totalPages,
+            startPage + maxVisible - 1
+        );
+
+
+    if (
+        endPage - startPage
+        < maxVisible - 1
+    ) {
+
+        startPage =
+            Math.max(
+                1,
+                endPage - maxVisible + 1
+            );
+
+    }
+
+
+    for (
+        let page = startPage;
+        page <= endPage;
+        page++
+    ) {
+
+        const button =
+            document.createElement("button");
+
+
+        button.className =
+            "page-button";
+
+
+        if (
+            page === currentPage
+        ) {
+
+            button.classList.add(
+                "active"
+            );
+
+        }
+
+
+        button.textContent = page;
+
+
+        button.onclick = function() {
+
+            currentPage = page;
+
+            renderSidebar();
+
+        };
+
+
+        container.appendChild(button);
+
+    }
+
+
+    createPageButton(
+        "»",
+        currentPage < totalPages,
+        function() {
+
+            currentPage++;
+
+            renderSidebar();
+
+        }
+    );
+
+}
+
+
+function createPageButton(
+    text,
+    enabled,
+    callback
+) {
+
+    const container =
+        document.getElementById(
+            "pagination"
+        );
+
+
+    const button =
+        document.createElement("button");
+
+
+    button.className =
+        "page-button";
+
+
+    button.textContent = text;
+
+
+    button.disabled = !enabled;
+
+
+    if (enabled) {
+
+        button.onclick =
+            callback;
+
+    }
+
+
+    container.appendChild(button);
+
+}
+
+
+/* =========================================
+   SELECT DUT
+========================================= */
+
+function selectDUT(index) {
+
+    selectedDutIndex = index;
+
+
+    const row =
+        dutRows[index];
+
+
+    const analysis =
+        row._analysis;
+
+
+    document
+    .getElementById("selectedPCBA")
+    .textContent =
+        "SELECTED DUT / PCBA";
+
+
+    document
+    .getElementById("selectedPCBAMain")
+    .textContent =
+        row[0] || "-";
+
+
+    document
+    .getElementById("selectedWork")
+    .textContent =
+        row[1] || "-";
+
+
+    document
+    .getElementById("selectedTime")
+    .textContent =
+        row[2] || "-";
+
+
+    const resultElement =
+        document
+        .getElementById(
+            "selectedResult"
+        );
+
+
+    if (
+        analysis.result === "PASS"
+    ) {
+
+        resultElement.textContent =
+            "PASS";
+
+
+        resultElement.className =
+            "info-value result-pass";
+
+    }
+
+    else {
+
+        resultElement.textContent =
+            `NG (${analysis.totalNG})`;
+
+
+        resultElement.className =
+            "info-value result-ng";
+
+    }
+
+
+    renderNGSummary(
+        analysis
+    );
+
+
+    renderCategoryTabs();
+
+
+    renderTestTabs(
+        analysis.groups
+    );
+
+
+    renderGraphs(
+        analysis.groups
+    );
+
+
+    renderSidebar();
+
+}
+
+
+/* =========================================
+   NG SUMMARY
+========================================= */
+
+function renderNGSummary(analysis) {
+
+    const container =
+        document.getElementById(
+            "ngSummary"
+        );
+
+
+    container.innerHTML = "";
+
+
+    const order = [
+
+        "F_MB_MIC_SEAL",
+        "F_MB_MIC_SENS_NAN",
+        "F_MB_MIC_THD",
+        "F_MB_MIC_FR",
+        "F_MB_SPK_RB",
+        "F_MB_SPK_THD",
+        "F_MB_SPK_FR"
+
+    ];
+
+
+    order.forEach(key => {
+
+        if (
+            !analysis.summary[key]
+        ) {
+
+            return;
+
+        }
+
+
+        const item =
+            document.createElement("div");
+
+
+        item.className =
+            "ng-pill";
+
+
+        item.innerHTML = `
+
+            ${formatGroupName(key)}
+
+            <span>
+                ${analysis.summary[key].ngCount}
+            </span>
+
+        `;
+
+
+        container.appendChild(item);
+
+    });
+
+}
+
+
+/* =========================================
+   CATEGORY TABS
+========================================= */
+
+function renderCategoryTabs() {
+
+    const tabs =
+        document.querySelectorAll(
+            ".category-tab"
+        );
+
+
+    tabs.forEach(tab => {
+
+        if (
+            tab.dataset.category
+            ===
+            currentCategory
+        ) {
+
+            tab.classList.add(
+                "active"
+            );
+
+        }
+
+        else {
+
+            tab.classList.remove(
+                "active"
+            );
+
+        }
+
+
+        tab.onclick = function() {
+
+            currentCategory =
+                this.dataset.category;
+
+
+            activeTest = null;
+
+
+            const analysis =
+                dutRows[
+                    selectedDutIndex
+                ]._analysis;
+
+
+            renderCategoryTabs();
+
+            renderTestTabs(
+                analysis.groups
+            );
+
+            renderGraphs(
+                analysis.groups
+            );
+
+        };
+
+    });
+
+}
+
+
+/* =========================================
+   TEST TABS
+========================================= */
+
+function renderTestTabs(groups) {
+
+    const container =
+        document.getElementById(
+            "testTabs"
+        );
+
+
+    container.innerHTML = "";
+
+
+    const categoryGroups =
+        Object.keys(groups)
+        .filter(group => {
+
+            if (
+                currentCategory === "MIC"
+            ) {
+
+                return group.includes(
+                    "_MIC_"
+                );
+
+            }
+
+
+            return group.includes(
+                "_SPK_"
+            );
+
+        });
+
+
+    if (
+        !activeTest
+        ||
+        !categoryGroups.includes(
+            activeTest
+        )
+    ) {
+
+        activeTest =
+            "ALL";
+
+    }
+
+
+    const allButton =
+        document.createElement("button");
+
+
+    allButton.className =
+        "test-tab";
+
+
+    if (
+        activeTest === "ALL"
+    ) {
+
+        allButton.classList.add(
+            "active"
+        );
+
+    }
+
+
+    allButton.textContent =
+        "ALL TESTS";
+
+
+    allButton.onclick = function() {
+
+        activeTest = "ALL";
+
+
+        const analysis =
+            dutRows[
+                selectedDutIndex
+            ]._analysis;
+
+
+        renderTestTabs(
+            analysis.groups
+        );
+
+        renderGraphs(
+            analysis.groups
+        );
+
+    };
+
+
+    container.appendChild(
+        allButton
+    );
+
+
+    categoryGroups.forEach(group => {
+
+        const button =
+            document.createElement("button");
+
+
+        button.className =
+            "test-tab";
+
+
+        if (
+            activeTest === group
+        ) {
+
+            button.classList.add(
+                "active"
+            );
+
+        }
+
+
+        button.textContent =
+            formatGroupName(group);
+
+
+        button.onclick = function() {
+
+            activeTest = group;
+
+
+            const analysis =
+                dutRows[
+                    selectedDutIndex
+                ]._analysis;
+
+
+            renderTestTabs(
+                analysis.groups
+            );
+
+            renderGraphs(
+                analysis.groups
+            );
+
+        };
+
+
+        container.appendChild(button);
+
+    });
+
+}
+
+
+/* =========================================
    RENDER GRAPHS
-================================ */
+========================================= */
 
-function renderGraphs(groups, row) {
+function renderGraphs(groups) {
+
+    destroyCharts();
+
 
     const container =
         document.getElementById(
@@ -810,16 +2089,49 @@ function renderGraphs(groups, row) {
     container.innerHTML = "";
 
 
-    const keys =
-        Object.keys(groups);
+    let groupKeys =
+        Object.keys(groups)
+        .filter(group => {
+
+            if (
+                currentCategory === "MIC"
+            ) {
+
+                return group.includes(
+                    "_MIC_"
+                );
+
+            }
 
 
-    if (keys.length === 0) {
+            return group.includes(
+                "_SPK_"
+            );
+
+        });
+
+
+    if (
+        activeTest !== "ALL"
+    ) {
+
+        groupKeys =
+            groupKeys.filter(
+                group =>
+                    group === activeTest
+            );
+
+    }
+
+
+    if (
+        groupKeys.length === 0
+    ) {
 
         container.innerHTML =
             `
-            <div class="no-data">
-            No MIC or SPK measurements detected.
+            <div class="no-graph">
+                No measurement data found.
             </div>
             `;
 
@@ -828,95 +2140,93 @@ function renderGraphs(groups, row) {
     }
 
 
-    keys.forEach((key, index) => {
+    groupKeys.forEach(
+        (group, index) => {
 
-        const items =
-            groups[key];
-
-
-        const card =
-            document.createElement("div");
+            const card =
+                document.createElement("div");
 
 
-        card.className =
-            "graph-card";
+            card.className =
+                "graph-card";
 
 
-        const title =
-            document.createElement("div");
+            if (
+                activeTest !== "ALL"
+            ) {
+
+                card.classList.add(
+                    "single"
+                );
+
+            }
 
 
-        title.className =
-            "graph-title";
+            const title =
+                document.createElement("div");
 
 
-        title.textContent =
-            formatGroupName(key);
+            title.className =
+                "graph-title";
 
 
-        const wrapper =
-            document.createElement("div");
+            title.textContent =
+                formatGroupName(group);
 
 
-        wrapper.className =
-            "canvas-wrapper";
+            const wrapper =
+                document.createElement("div");
 
 
-        const canvas =
-            document.createElement("canvas");
+            wrapper.className =
+                "canvas-wrapper";
 
 
-        canvas.id =
-            "chart_" + index;
+            const canvas =
+                document.createElement(
+                    "canvas"
+                );
 
 
-        wrapper.appendChild(canvas);
+            canvas.id =
+                `chart_${group}_${index}`;
 
 
-        card.appendChild(title);
-
-        card.appendChild(wrapper);
-
-        container.appendChild(card);
+            wrapper.appendChild(
+                canvas
+            );
 
 
-        createChart(
-            canvas,
-            items,
-            formatGroupName(key)
-        );
-
-    });
-
-}
+            card.appendChild(
+                title
+            );
 
 
+            card.appendChild(
+                wrapper
+            );
 
-/* ================================
-   FORMAT NAME
-================================ */
 
-function formatGroupName(name) {
+            container.appendChild(
+                card
+            );
 
-    return name
 
-    .replace(
-        /^F_MB_/,
-        ""
-    )
+            createChart(
+                canvas,
+                groups[group],
+                formatGroupName(group)
+            );
 
-    .replace(
-        /_/g,
-        " "
+        }
     );
 
 }
 
 
-
-/* ================================
+/* =========================================
    CREATE CHART
-================================ */
+========================================= */
 
 function createChart(
     canvas,
@@ -931,9 +2241,12 @@ function createChart(
                 item.frequency === 0
             ) {
 
-                return item.header;
+                return formatSingleLabel(
+                    item.header
+                );
 
             }
+
 
             return item.frequency;
 
@@ -946,40 +2259,22 @@ function createChart(
         );
 
 
-    const lower =
-        items.map(
-            item => item.lower
-        );
-
-
     const upper =
         items.map(
             item => item.upper
         );
 
 
+    const lower =
+        items.map(
+            item => item.lower
+        );
+
+
     const ngPoints =
         items.map(item => {
 
-            const isNG =
-                item.value !== null
-                &&
-                (
-                    (
-                        item.lower !== null
-                        &&
-                        item.value < item.lower
-                    )
-                    ||
-                    (
-                        item.upper !== null
-                        &&
-                        item.value > item.upper
-                    )
-                );
-
-
-            return isNG
+            return isNG(item)
                 ? item.value
                 : null;
 
@@ -998,6 +2293,8 @@ function createChart(
                     labels: labels,
 
                     datasets: [
+
+                        /* MEASUREMENT */
 
                         {
 
@@ -1019,11 +2316,19 @@ function createChart(
                             pointRadius:
                                 0,
 
+                            pointHoverRadius:
+                                4,
+
                             tension:
-                                0.15
+                                0.15,
+
+                            spanGaps:
+                                true
 
                         },
 
+
+                        /* UL - SOLID RED */
 
                         {
 
@@ -1034,7 +2339,7 @@ function createChart(
                                 upper,
 
                             borderColor:
-                                "rgba(220,38,38,0.45)",
+                                "rgba(220,38,38,0.72)",
 
                             backgroundColor:
                                 "transparent",
@@ -1043,16 +2348,24 @@ function createChart(
                                 1.5,
 
                             borderDash:
-                                [6, 5],
+                                [],
 
                             pointRadius:
                                 0,
 
+                            pointHoverRadius:
+                                0,
+
                             tension:
-                                0
+                                0,
+
+                            spanGaps:
+                                true
 
                         },
 
+
+                        /* LL - SOLID RED */
 
                         {
 
@@ -1063,7 +2376,7 @@ function createChart(
                                 lower,
 
                             borderColor:
-                                "rgba(220,38,38,0.45)",
+                                "rgba(220,38,38,0.72)",
 
                             backgroundColor:
                                 "transparent",
@@ -1072,16 +2385,24 @@ function createChart(
                                 1.5,
 
                             borderDash:
-                                [6, 5],
+                                [],
 
                             pointRadius:
                                 0,
 
+                            pointHoverRadius:
+                                0,
+
                             tension:
-                                0
+                                0,
+
+                            spanGaps:
+                                true
 
                         },
 
+
+                        /* NG POINTS ONLY */
 
                         {
 
@@ -1104,7 +2425,10 @@ function createChart(
                                 "#dc2626",
 
                             pointBorderColor:
-                                "#dc2626"
+                                "#ffffff",
+
+                            pointBorderWidth:
+                                1
 
                         }
 
@@ -1138,15 +2462,57 @@ function createChart(
                         legend: {
 
                             display:
-                                true
+                                true,
+
+                            position:
+                                "top",
+
+                            labels: {
+
+                                font: {
+
+                                    size: 9
+
+                                },
+
+                                boxWidth:
+                                    22,
+
+                                boxHeight:
+                                    2
+
+                            }
 
                         },
 
 
-                        title: {
+                        tooltip: {
 
-                            display:
-                                false
+                            callbacks: {
+
+                                label:
+                                function(context) {
+
+                                    if (
+                                        context.raw === null
+                                    ) {
+
+                                        return null;
+
+                                    }
+
+
+                                    return (
+                                        context.dataset.label
+                                        +
+                                        ": "
+                                        +
+                                        context.raw
+                                    );
+
+                                }
+
+                            }
 
                         }
 
@@ -1157,23 +2523,51 @@ function createChart(
 
                         x: {
 
+                            grid: {
+
+                                color:
+                                    "rgba(148,163,184,.14)"
+
+                            },
+
+
                             title: {
 
                                 display:
                                     true,
 
                                 text:
-                                    "Frequency"
+                                    "Frequency (Hz)",
+
+                                font: {
+
+                                    size: 9
+
+                                }
 
                             },
 
+
                             ticks: {
+
+                                font: {
+
+                                    size: 8
+
+                                },
+
 
                                 maxRotation:
                                     45,
 
                                 minRotation:
-                                    45
+                                    45,
+
+                                autoSkip:
+                                    true,
+
+                                maxTicksLimit:
+                                    16
 
                             }
 
@@ -1182,13 +2576,38 @@ function createChart(
 
                         y: {
 
+                            grid: {
+
+                                color:
+                                    "rgba(148,163,184,.20)"
+
+                            },
+
+
                             title: {
 
                                 display:
                                     true,
 
                                 text:
-                                    "Measurement"
+                                    "Measurement",
+
+                                font: {
+
+                                    size: 9
+
+                                }
+
+                            },
+
+
+                            ticks: {
+
+                                font: {
+
+                                    size: 9
+
+                                }
 
                             }
 
@@ -1199,6 +2618,7 @@ function createChart(
                 }
 
             }
+
         );
 
 
@@ -1207,10 +2627,9 @@ function createChart(
 }
 
 
-
-/* ================================
-   DESTROY OLD CHARTS
-================================ */
+/* =========================================
+   DESTROY CHARTS
+========================================= */
 
 function destroyCharts() {
 
@@ -1226,10 +2645,97 @@ function destroyCharts() {
 }
 
 
+/* =========================================
+   SEARCH
+========================================= */
 
-/* ================================
+document
+.getElementById("searchInput")
+.addEventListener(
+    "input",
+    function() {
+
+        const keyword =
+            this.value
+            .trim()
+            .toLowerCase();
+
+
+        filteredRows =
+            dutRows.filter(row => {
+
+                const pcba =
+                    String(row[0] || "")
+                    .toLowerCase();
+
+
+                const work =
+                    String(row[1] || "")
+                    .toLowerCase();
+
+
+                return (
+                    pcba.includes(keyword)
+                    ||
+                    work.includes(keyword)
+                );
+
+            });
+
+
+        currentPage = 1;
+
+
+        renderSidebar();
+
+    }
+);
+
+
+/* =========================================
+   FORMAT GROUP NAME
+========================================= */
+
+function formatGroupName(name) {
+
+    return name
+
+        .replace(
+            /^F_MB_/,
+            ""
+        )
+
+        .replace(
+            /_NAN$/,
+            " NAN"
+        )
+
+        .replace(
+            /_/g,
+            " "
+        );
+
+}
+
+
+/* =========================================
+   SINGLE LABEL
+========================================= */
+
+function formatSingleLabel(header) {
+
+    return header
+        .replace(
+            /^F_MB_/,
+            ""
+        );
+
+}
+
+
+/* =========================================
    NUMBER CONVERSION
-================================ */
+========================================= */
 
 function toNumber(value) {
 
@@ -1237,8 +2743,24 @@ function toNumber(value) {
         value === undefined
         ||
         value === null
+    ) {
+
+        return null;
+
+    }
+
+
+    const text =
+        String(value)
+        .trim();
+
+
+    if (
+        text === ""
         ||
-        value === ""
+        text === "-"
+        ||
+        text.toLowerCase() === "nan"
     ) {
 
         return null;
@@ -1248,15 +2770,47 @@ function toNumber(value) {
 
     const number =
         Number(
-            String(value)
-            .replace(",", "")
-            .trim()
+            text.replace(
+                /,/g,
+                ""
+            )
         );
 
 
     return Number.isNaN(number)
         ? null
         : number;
+
+}
+
+
+/* =========================================
+   ESCAPE HTML
+========================================= */
+
+function escapeHTML(value) {
+
+    return String(value)
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 
 }
 
