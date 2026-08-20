@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AUDIO TEST LOG ANALYZER</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f6f8;
+    color: #202124;
+}
+
+header {
+    background: #ffffff;
+    border-bottom: 1px solid #dcdfe3;
+    padding: 20px;
+}
+
+.header-content {
+    max-width: 1400px;
+    margin: auto;
+}
+
+h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.subtitle {
+    margin-top: 6px;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.container {
+    max-width: 1400px;
+    margin: auto;
+    padding: 25px;
+}
+
+.upload-box {
+    background: white;
+    border: 2px dashed #b8bec6;
+    border-radius: 12px;
+    padding: 35px;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.upload-box input {
+    margin-top: 15px;
+}
+
+.controls {
+    display: none;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.controls label {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+select {
+    padding: 10px 14px;
+    border: 1px solid #cfd4da;
+    border-radius: 6px;
+    font-size: 14px;
+    min-width: 300px;
+}
+
+.summary {
+    display: none;
+    margin-bottom: 25px;
+}
+
+.summary-card {
+    background: white;
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.summary-row {
+    display: flex;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+.summary-item {
+    min-width: 150px;
+}
+
+.summary-label {
+    font-size: 12px;
+    color: #6b7280;
+    text-transform: uppercase;
+}
+
+.summary-value {
+    margin-top: 5px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.pass {
+    color: #16803c;
+}
+
+.fail {
+    color: #d93025;
+}
+
+.graphs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 20px;
+}
+
+.graph-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.graph-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    border-left: 5px solid #2563eb;
+    padding-left: 10px;
+}
+
+.canvas-wrapper {
+    position: relative;
+    height: 350px;
+}
+
+.no-data {
+    text-align: center;
+    padding: 40px;
+    color: #777;
+}
+
+@media (max-width: 600px) {
+
+    .container {
+        padding: 15px;
+    }
+
+    .graphs {
+        grid-template-columns: 1fr;
+    }
+
+    select {
+        width: 100%;
+        min-width: 0;
+        margin-top: 10px;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<div class="header-content">
+
+<h1>AUDIO TEST LOG ANALYZER</h1>
+
+<div class="subtitle">
+Upload Audio SPC CSV • Automatic UL/LL Detection • NG Highlighting
+</div>
+
+</div>
+
+</header>
+
+
+<div class="container">
+
+<div class="upload-box">
+
+<h2>Upload Audio SPC CSV</h2>
+
+<p>Select your audio test SPC data file.</p>
+
+<input
+type="file"
+id="fileInput"
+accept=".csv"
+/>
+
+</div>
+
+
+<div class="controls" id="controls">
+
+<label for="dutSelect">
+Select DUT / PCBA:
+</label>
+
+<select id="dutSelect"></select>
+
+</div>
+
+
+<div class="summary" id="summary">
+
+<div class="summary-card">
+
+<div class="summary-row">
+
+<div class="summary-item">
+
+<div class="summary-label">
+PCBA
+</div>
+
+<div class="summary-value" id="pcbaValue">
+-
+</div>
+
+</div>
+
+
+<div class="summary-item">
+
+<div class="summary-label">
+Work No
+</div>
+
+<div class="summary-value" id="workValue">
+-
+</div>
+
+</div>
+
+
+<div class="summary-item">
+
+<div class="summary-label">
+Timestamp
+</div>
+
+<div class="summary-value" id="timeValue">
+-
+</div>
+
+</div>
+
+
+<div class="summary-item">
+
+<div class="summary-label">
+Overall Result
+</div>
+
+<div class="summary-value" id="resultValue">
+-
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="graphs" id="graphs">
+
+<div class="no-data">
+Upload an Audio SPC CSV file to begin analysis.
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+let csvData = [];
+let headers = [];
+let lowerRow = null;
+let upperRow = null;
+let dutRows = [];
+let charts = [];
+
+
+/* ================================
+   FILE UPLOAD
+================================ */
+
+document
+.getElementById("fileInput")
+.addEventListener("change", handleFile);
+
+
+function handleFile(event) {
+
+    const file = event.target.files[0];
+
+    if (!file) return;
+
+
+    Papa.parse(file, {
+
+        header: false,
+
+        skipEmptyLines: true,
+
+        complete: function(results) {
+
+            csvData = results.data;
+
+            processCSV();
+
+        }
+
+    });
+
+}
+
+
+
+/* ================================
+   PROCESS CSV
+================================ */
+
+function processCSV() {
+
+    destroyCharts();
+
+
+    if (csvData.length < 2) {
+
+        alert("Invalid CSV file.");
+
+        return;
+
+    }
+
+
+    headers = csvData[0];
+
+
+    lowerRow = findRow("Lower");
+
+    upperRow = findRow("Upper");
+
+
+    if (!lowerRow || !upperRow) {
+
+        alert(
+            "Lower or Upper limit rows were not found."
+        );
+
+        return;
+
+    }
+
+
+    dutRows = csvData.filter(row => {
+
+        const firstValue =
+            String(row[0] || "").trim();
+
+        if (!firstValue) return false;
+
+
+        const excluded = [
+
+            "Lower",
+            "Upper",
+            "MIN",
+            "MAX",
+            "Mean",
+            "Sigma",
+            "CpL",
+            "CpU",
+            "Cpk"
+
+        ];
+
+
+        return !excluded.includes(firstValue);
+
+    });
+
+
+    populateDUTSelector();
+
+
+    document
+    .getElementById("controls")
+    .style.display = "block";
+
+
+    document
+    .getElementById("summary")
+    .style.display = "block";
+
+
+    if (dutRows.length > 0) {
+
+        renderDUT(0);
+
+    }
+
+}
+
+
+
+/* ================================
+   FIND ROW
+================================ */
+
+function findRow(name) {
+
+    return csvData.find(row => {
+
+        return String(
+            row[0] || ""
+        )
+        .trim()
+        .toLowerCase()
+        ===
+        name.toLowerCase();
+
+    });
+
+}
+
+
+
+/* ================================
+   DUT SELECTOR
+================================ */
+
+function populateDUTSelector() {
+
+    const select =
+        document.getElementById("dutSelect");
+
+
+    select.innerHTML = "";
+
+
+    dutRows.forEach((row, index) => {
+
+        const option =
+            document.createElement("option");
+
+
+        option.value = index;
+
+
+        const pcba =
+            row[0] || `DUT ${index + 1}`;
+
+
+        option.textContent =
+            pcba;
+
+
+        select.appendChild(option);
+
+    });
+
+
+    select.onchange = function() {
+
+        renderDUT(
+            Number(this.value)
+        );
+
+    };
+
+}
+
+
+
+/* ================================
+   RENDER DUT
+================================ */
+
+function renderDUT(index) {
+
+    const row =
+        dutRows[index];
+
+
+    destroyCharts();
+
+
+    updateSummary(row);
+
+
+    const groups =
+        detectMeasurementGroups(row);
+
+
+    renderGraphs(
+        groups,
+        row
+    );
+
+}
+
+
+
+/* ================================
+   SUMMARY
+================================ */
+
+function updateSummary(row) {
+
+    document
+    .getElementById("pcbaValue")
+    .textContent =
+        row[0] || "-";
+
+
+    document
+    .getElementById("workValue")
+    .textContent =
+        row[1] || "-";
+
+
+    document
+    .getElementById("timeValue")
+    .textContent =
+        row[2] || "-";
+
+
+    let ngCount = 0;
+
+
+    for (
+        let i = 0;
+        i < headers.length;
+        i++
+    ) {
+
+        const value =
+            toNumber(row[i]);
+
+        const lower =
+            toNumber(lowerRow[i]);
+
+        const upper =
+            toNumber(upperRow[i]);
+
+
+        if (
+            value !== null &&
+            (
+                (lower !== null && value < lower)
+                ||
+                (upper !== null && value > upper)
+            )
+        ) {
+
+            ngCount++;
+
+        }
+
+    }
+
+
+    const resultElement =
+        document
+        .getElementById("resultValue");
+
+
+    if (ngCount > 0) {
+
+        resultElement.textContent =
+            `NG (${ngCount})`;
+
+        resultElement.className =
+            "summary-value fail";
+
+    }
+
+    else {
+
+        resultElement.textContent =
+            "PASS";
+
+        resultElement.className =
+            "summary-value pass";
+
+    }
+
+}
+
+
+
+/* ================================
+   DETECT MEASUREMENT GROUPS
+================================ */
+
+function detectMeasurementGroups(row) {
+
+    const groups = {};
+
+
+    for (
+        let i = 0;
+        i < headers.length;
+        i++
+    ) {
+
+        const header =
+            String(headers[i] || "").trim();
+
+
+        if (!header) continue;
+
+
+        if (
+            !header.includes("MIC")
+            &&
+            !header.includes("SPK")
+        ) {
+
+            continue;
+
+        }
+
+
+        const value =
+            toNumber(row[i]);
+
+
+        const lower =
+            toNumber(lowerRow[i]);
+
+
+        const upper =
+            toNumber(upperRow[i]);
+
+
+        if (
+            value === null
+            &&
+            lower === null
+            &&
+            upper === null
+        ) {
+
+            continue;
+
+        }
+
+
+        const groupInfo =
+            parseMeasurementHeader(
+                header
+            );
+
+
+        if (!groupInfo) continue;
+
+
+        const key =
+            groupInfo.group;
+
+
+        if (!groups[key]) {
+
+            groups[key] = [];
+
+        }
+
+
+        groups[key].push({
+
+            column: i,
+
+            header: header,
+
+            frequency:
+                groupInfo.frequency,
+
+            value: value,
+
+            lower: lower,
+
+            upper: upper
+
+        });
+
+    }
+
+
+    Object.values(groups)
+    .forEach(items => {
+
+        items.sort(
+            (a, b) =>
+                a.frequency - b.frequency
+        );
+
+    });
+
+
+    return groups;
+
+}
+
+
+
+/* ================================
+   PARSE HEADER
+================================ */
+
+function parseMeasurementHeader(header) {
+
+    const upper =
+        header.toUpperCase();
+
+
+    let group =
+        upper;
+
+
+    let frequency =
+        null;
+
+
+    const match =
+        upper.match(
+            /_(\d+(?:\.\d+)?)$/
+        );
+
+
+    if (match) {
+
+        frequency =
+            Number(match[1]);
+
+
+        group =
+            upper.replace(
+                /_(\d+(?:\.\d+)?)$/,
+                ""
+            );
+
+    }
+
+
+    if (frequency === null) {
+
+        frequency = 0;
+
+    }
+
+
+    return {
+
+        group: group,
+
+        frequency: frequency
+
+    };
+
+}
+
+
+
+/* ================================
+   RENDER GRAPHS
+================================ */
+
+function renderGraphs(groups, row) {
+
+    const container =
+        document.getElementById(
+            "graphs"
+        );
+
+
+    container.innerHTML = "";
+
+
+    const keys =
+        Object.keys(groups);
+
+
+    if (keys.length === 0) {
+
+        container.innerHTML =
+            `
+            <div class="no-data">
+            No MIC or SPK measurements detected.
+            </div>
+            `;
+
+        return;
+
+    }
+
+
+    keys.forEach((key, index) => {
+
+        const items =
+            groups[key];
+
+
+        const card =
+            document.createElement("div");
+
+
+        card.className =
+            "graph-card";
+
+
+        const title =
+            document.createElement("div");
+
+
+        title.className =
+            "graph-title";
+
+
+        title.textContent =
+            formatGroupName(key);
+
+
+        const wrapper =
+            document.createElement("div");
+
+
+        wrapper.className =
+            "canvas-wrapper";
+
+
+        const canvas =
+            document.createElement("canvas");
+
+
+        canvas.id =
+            "chart_" + index;
+
+
+        wrapper.appendChild(canvas);
+
+
+        card.appendChild(title);
+
+        card.appendChild(wrapper);
+
+        container.appendChild(card);
+
+
+        createChart(
+            canvas,
+            items,
+            formatGroupName(key)
+        );
+
+    });
+
+}
+
+
+
+/* ================================
+   FORMAT NAME
+================================ */
+
+function formatGroupName(name) {
+
+    return name
+
+    .replace(
+        /^F_MB_/,
+        ""
+    )
+
+    .replace(
+        /_/g,
+        " "
+    );
+
+}
+
+
+
+/* ================================
+   CREATE CHART
+================================ */
+
+function createChart(
+    canvas,
+    items,
+    title
+) {
+
+    const labels =
+        items.map(item => {
+
+            if (
+                item.frequency === 0
+            ) {
+
+                return item.header;
+
+            }
+
+            return item.frequency;
+
+        });
+
+
+    const values =
+        items.map(
+            item => item.value
+        );
+
+
+    const lower =
+        items.map(
+            item => item.lower
+        );
+
+
+    const upper =
+        items.map(
+            item => item.upper
+        );
+
+
+    const ngPoints =
+        items.map(item => {
+
+            const isNG =
+                item.value !== null
+                &&
+                (
+                    (
+                        item.lower !== null
+                        &&
+                        item.value < item.lower
+                    )
+                    ||
+                    (
+                        item.upper !== null
+                        &&
+                        item.value > item.upper
+                    )
+                );
+
+
+            return isNG
+                ? item.value
+                : null;
+
+        });
+
+
+    const chart =
+        new Chart(
+            canvas,
+            {
+
+                type: "line",
+
+                data: {
+
+                    labels: labels,
+
+                    datasets: [
+
+                        {
+
+                            label:
+                                "Measurement",
+
+                            data:
+                                values,
+
+                            borderColor:
+                                "#2563eb",
+
+                            backgroundColor:
+                                "transparent",
+
+                            borderWidth:
+                                2,
+
+                            pointRadius:
+                                0,
+
+                            tension:
+                                0.15
+
+                        },
+
+
+                        {
+
+                            label:
+                                "Upper Limit",
+
+                            data:
+                                upper,
+
+                            borderColor:
+                                "rgba(220,38,38,0.45)",
+
+                            backgroundColor:
+                                "transparent",
+
+                            borderWidth:
+                                1.5,
+
+                            borderDash:
+                                [6, 5],
+
+                            pointRadius:
+                                0,
+
+                            tension:
+                                0
+
+                        },
+
+
+                        {
+
+                            label:
+                                "Lower Limit",
+
+                            data:
+                                lower,
+
+                            borderColor:
+                                "rgba(220,38,38,0.45)",
+
+                            backgroundColor:
+                                "transparent",
+
+                            borderWidth:
+                                1.5,
+
+                            borderDash:
+                                [6, 5],
+
+                            pointRadius:
+                                0,
+
+                            tension:
+                                0
+
+                        },
+
+
+                        {
+
+                            label:
+                                "NG",
+
+                            data:
+                                ngPoints,
+
+                            showLine:
+                                false,
+
+                            pointRadius:
+                                4,
+
+                            pointHoverRadius:
+                                6,
+
+                            pointBackgroundColor:
+                                "#dc2626",
+
+                            pointBorderColor:
+                                "#dc2626"
+
+                        }
+
+                    ]
+
+                },
+
+
+                options: {
+
+                    responsive:
+                        true,
+
+                    maintainAspectRatio:
+                        false,
+
+
+                    interaction: {
+
+                        mode:
+                            "index",
+
+                        intersect:
+                            false
+
+                    },
+
+
+                    plugins: {
+
+                        legend: {
+
+                            display:
+                                true
+
+                        },
+
+
+                        title: {
+
+                            display:
+                                false
+
+                        }
+
+                    },
+
+
+                    scales: {
+
+                        x: {
+
+                            title: {
+
+                                display:
+                                    true,
+
+                                text:
+                                    "Frequency"
+
+                            },
+
+                            ticks: {
+
+                                maxRotation:
+                                    45,
+
+                                minRotation:
+                                    45
+
+                            }
+
+                        },
+
+
+                        y: {
+
+                            title: {
+
+                                display:
+                                    true,
+
+                                text:
+                                    "Measurement"
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+
+    charts.push(chart);
+
+}
+
+
+
+/* ================================
+   DESTROY OLD CHARTS
+================================ */
+
+function destroyCharts() {
+
+    charts.forEach(chart => {
+
+        chart.destroy();
+
+    });
+
+
+    charts = [];
+
+}
+
+
+
+/* ================================
+   NUMBER CONVERSION
+================================ */
+
+function toNumber(value) {
+
+    if (
+        value === undefined
+        ||
+        value === null
+        ||
+        value === ""
+    ) {
+
+        return null;
+
+    }
+
+
+    const number =
+        Number(
+            String(value)
+            .replace(",", "")
+            .trim()
+        );
+
+
+    return Number.isNaN(number)
+        ? null
+        : number;
+
+}
+
+</script>
+
+</body>
+</html>
