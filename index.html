@@ -33,10 +33,6 @@ body {
     color: var(--text);
 }
 
-/* =========================
-   HEADER
-========================= */
-
 header {
     height: 68px;
     background: white;
@@ -70,10 +66,6 @@ header {
 #fileInput {
     display: none;
 }
-
-/* =========================
-   START SCREEN
-========================= */
 
 #startScreen {
     min-height: calc(100vh - 68px);
@@ -113,10 +105,6 @@ header {
     font-weight: bold;
 }
 
-/* =========================
-   APP
-========================= */
-
 #app {
     display: none;
     height: calc(100vh - 68px);
@@ -128,9 +116,7 @@ header {
     height: 100%;
 }
 
-/* =========================
-   SIDEBAR
-========================= */
+/* SIDEBAR */
 
 .sidebar {
     background: white;
@@ -160,10 +146,6 @@ header {
     font-size: 11px;
     color: var(--muted);
 }
-
-/* =========================
-   FILTERS
-========================= */
 
 .filter-label {
     display: block;
@@ -216,21 +198,12 @@ header {
     outline: none;
 }
 
-/* =========================
-   TABLE
-========================= */
+/* SN TABLE */
 
 .sn-table-header,
 .sn-row {
     display: grid;
-    grid-template-columns:
-        28px
-        1.2fr
-        1fr
-        62px
-        1.2fr
-        18px;
-
+    grid-template-columns: 28px 1.2fr 1fr 62px 1.2fr 18px;
     gap: 4px;
     align-items: center;
 }
@@ -312,18 +285,14 @@ header {
     font-size: 16px;
 }
 
-/* =========================
-   CONTENT
-========================= */
+/* MAIN CONTENT */
 
 .content {
     overflow-y: auto;
     padding: 14px 18px 25px;
 }
 
-/* =========================
-   VIEW MODE
-========================= */
+/* VIEW MODE */
 
 .view-mode-section {
     display: flex;
@@ -347,9 +316,7 @@ header {
     border-color: var(--blue);
 }
 
-/* =========================
-   INFO BAR
-========================= */
+/* INFO BAR */
 
 .info-bar {
     background: white;
@@ -419,9 +386,7 @@ header {
     margin-left: 4px;
 }
 
-/* =========================
-   STATION SUMMARY
-========================= */
+/* STATION SUMMARY */
 
 .station-summary {
     background: white;
@@ -502,9 +467,7 @@ header {
     margin-left: 5px;
 }
 
-/* =========================
-   TEST FILTER
-========================= */
+/* TEST FILTER */
 
 .test-filter-section {
     background: white;
@@ -543,9 +506,7 @@ header {
     color: white;
 }
 
-/* =========================
-   GRAPHS
-========================= */
+/* GRAPHS */
 
 .graphs {
     display: grid;
@@ -598,14 +559,6 @@ header {
     margin-top: 12px;
 }
 
-.footer-note span {
-    color: var(--red);
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-
 @media (max-width: 1150px) {
     .app-layout {
         grid-template-columns: 390px 1fr;
@@ -653,7 +606,6 @@ header {
 
 </header>
 
-
 <div id="startScreen">
 
     <div class="upload-card">
@@ -676,15 +628,9 @@ header {
 
 </div>
 
-
 <div id="app">
 
 <div class="app-layout">
-
-
-<!-- =========================
-     SIDEBAR
-========================= -->
 
 <aside class="sidebar">
 
@@ -702,17 +648,11 @@ header {
 
         </div>
 
-
         <label class="filter-label">
             STATION IP
         </label>
 
-        <select
-            id="stationFilter"
-            class="station-select">
-
-        </select>
-
+        <select id="stationFilter" class="station-select"></select>
 
         <label class="filter-label">
             STATUS
@@ -720,32 +660,19 @@ header {
 
         <div class="status-filters">
 
-            <button
-                class="status-filter active"
-                data-status="ALL">
-
+            <button class="status-filter active" data-status="ALL">
                 ALL
-
             </button>
 
-            <button
-                class="status-filter"
-                data-status="PASS">
-
+            <button class="status-filter" data-status="PASS">
                 GOOD
-
             </button>
 
-            <button
-                class="status-filter"
-                data-status="NG">
-
+            <button class="status-filter" data-status="NG">
                 NG
-
             </button>
 
         </div>
-
 
         <label class="filter-label">
             SEARCH SN / PCBA
@@ -762,7 +689,6 @@ Comma, space, semicolon or new line supported"></textarea>
 
     </div>
 
-
     <div class="sn-table-header">
 
         <div>#</div>
@@ -774,45 +700,27 @@ Comma, space, semicolon or new line supported"></textarea>
 
     </div>
 
-
     <div class="sn-list" id="snList"></div>
 
 </aside>
 
-
-
-<!-- =========================
-     MAIN CONTENT
-========================= -->
-
 <main class="content">
-
 
 <div class="view-mode-section">
 
-    <button
-        class="view-mode-button active"
-        data-view="UNIT">
-
+    <button class="view-mode-button active" data-view="UNIT">
         UNIT VIEW
-
     </button>
 
-    <button
-        class="view-mode-button"
-        data-view="STATION">
-
+    <button class="view-mode-button" data-view="STATION">
         STATION SUMMARY
-
     </button>
 
 </div>
 
-
 <div id="unitView"></div>
 
 <div id="stationView" style="display:none;"></div>
-
 
 </main>
 
@@ -820,12 +728,7 @@ Comma, space, semicolon or new line supported"></textarea>
 
 </div>
 
-
 <script>
-
-/* =========================================
-   GLOBAL
-========================================= */
 
 let csvData = [];
 let headers = [];
@@ -848,9 +751,7 @@ let stationColumn = -1;
 let charts = [];
 
 
-/* =========================================
-   FILE
-========================================= */
+/* FILE */
 
 document
 .getElementById("fileInput")
@@ -862,7 +763,6 @@ function handleFile(event) {
     const file = event.target.files[0];
 
     if (!file) return;
-
 
     Papa.parse(file, {
 
@@ -882,9 +782,7 @@ function handleFile(event) {
 }
 
 
-/* =========================================
-   PROCESS
-========================================= */
+/* PROCESS CSV */
 
 function processCSV() {
 
@@ -896,33 +794,25 @@ function processCSV() {
 
     }
 
-
     headers = csvData[0];
-
 
     lowerRow = findRow("Lower");
     upperRow = findRow("Upper");
-
 
     stationColumn =
         headers.findIndex(header =>
             String(header || "")
             .trim()
-            .toLowerCase()
-            === "stationip"
+            .toLowerCase() === "stationip"
         );
-
 
     if (stationColumn === -1) {
 
-        alert(
-            "StationIP column was not found."
-        );
+        alert("StationIP column was not found.");
 
         return;
 
     }
-
 
     dutRows =
         csvData
@@ -934,12 +824,9 @@ function processCSV() {
                 .trim()
                 .toLowerCase();
 
-
             if (!first) return false;
 
-
             const excluded = [
-
                 "lower",
                 "upper",
                 "min",
@@ -949,14 +836,11 @@ function processCSV() {
                 "cpl",
                 "cpu",
                 "cpk"
-
             ];
-
 
             return !excluded.includes(first);
 
         });
-
 
     dutRows.forEach(row => {
 
@@ -965,21 +849,17 @@ function processCSV() {
 
     });
 
-
     populateStationFilter();
 
     applyFilters();
-
 
     document
     .getElementById("startScreen")
     .style.display = "none";
 
-
     document
     .getElementById("app")
     .style.display = "block";
-
 
     if (dutRows.length > 0) {
 
@@ -990,42 +870,34 @@ function processCSV() {
 }
 
 
-/* =========================================
-   FIND ROW
-========================================= */
+/* FIND LOWER / UPPER */
 
 function findRow(name) {
 
     return csvData.find(row =>
         String(row[0] || "")
         .trim()
-        .toLowerCase()
-        === name.toLowerCase()
+        .toLowerCase() === name.toLowerCase()
     );
 
 }
 
 
-/* =========================================
-   ANALYZE DUT
-========================================= */
+/* ANALYZE DUT */
 
 function analyzeDUT(row) {
 
     const groups =
         detectMeasurementGroups(row);
 
-
     const summary = {};
 
     let totalNG = 0;
-
 
     Object.keys(groups)
     .forEach(group => {
 
         let ngCount = 0;
-
 
         groups[group].forEach(item => {
 
@@ -1037,7 +909,6 @@ function analyzeDUT(row) {
             }
 
         });
-
 
         summary[group] = {
 
@@ -1052,14 +923,12 @@ function analyzeDUT(row) {
 
     });
 
-
     const failedTests =
         Object.keys(summary)
         .filter(
             group =>
                 summary[group].ngCount > 0
         );
-
 
     return {
 
@@ -1078,94 +947,57 @@ function analyzeDUT(row) {
 }
 
 
-/* =========================================
-   MEASUREMENT GROUPS
-========================================= */
+/* DETECT MEASUREMENTS */
 
 function detectMeasurementGroups(row) {
 
     const groups = {};
 
-
-    for (
-        let i = 0;
-        i < headers.length;
-        i++
-    ) {
+    for (let i = 0; i < headers.length; i++) {
 
         const header =
-            String(headers[i] || "")
-            .trim();
-
+            String(headers[i] || "").trim();
 
         if (!header) continue;
 
-
         const upperHeader =
             header.toUpperCase();
-
 
         if (
             !upperHeader.includes("MIC")
             &&
             !upperHeader.includes("SPK")
         ) {
-
             continue;
-
         }
 
-
         const info =
-            parseMeasurementHeader(
-                upperHeader
-            );
-
+            parseMeasurementHeader(upperHeader);
 
         if (!info) continue;
 
-
-        let value =
-            toNumber(row[i]);
-
+        let value = toNumber(row[i]);
 
         let lower =
             toNumber(lowerRow?.[i]);
 
-
         let upper =
             toNumber(upperRow?.[i]);
 
-
-        if (
-            info.group === "F_MB_MIC_SEAL"
-        ) {
+        if (info.group === "F_MB_MIC_SEAL") {
 
             const limits =
                 getMicSealLimits();
 
-
-            if (
-                limits.lower !== null
-            ) {
-
-                lower =
-                    limits.lower;
-
+            if (limits.lower !== null) {
+                lower = limits.lower;
             }
 
-
-            if (
-                limits.upper !== null
-            ) {
-
-                upper =
-                    limits.upper;
-
+            if (limits.upper !== null) {
+                upper = limits.upper;
             }
 
         }
-
 
         if (
             value === null
@@ -1174,25 +1006,18 @@ function detectMeasurementGroups(row) {
             &&
             upper === null
         ) {
-
             continue;
-
         }
-
 
         if (!groups[info.group]) {
-
             groups[info.group] = [];
-
         }
-
 
         groups[info.group].push({
 
             column: i,
             header,
-            frequency:
-                info.frequency,
+            frequency: info.frequency,
             value,
             lower,
             upper
@@ -1200,7 +1025,6 @@ function detectMeasurementGroups(row) {
         });
 
     }
-
 
     Object.values(groups)
     .forEach(items => {
@@ -1212,75 +1036,51 @@ function detectMeasurementGroups(row) {
 
     });
 
-
     return groups;
 
 }
 
 
-/* =========================================
-   MIC SEAL LIMITS
-========================================= */
+/* MIC SEAL LIMITS */
 
 function getMicSealLimits() {
 
     let firstLower = null;
     let firstUpper = null;
 
-
-    for (
-        let i = 0;
-        i < headers.length;
-        i++
-    ) {
+    for (let i = 0; i < headers.length; i++) {
 
         const header =
             String(headers[i] || "")
             .toUpperCase();
 
-
-        if (
-            !header.startsWith(
-                "F_MB_MIC_SEAL"
-            )
-        ) {
-
+        if (!header.startsWith("F_MB_MIC_SEAL")) {
             continue;
-
         }
-
 
         const lower =
             toNumber(lowerRow?.[i]);
 
-
         const upper =
             toNumber(upperRow?.[i]);
-
 
         if (
             firstLower === null
             &&
             lower !== null
         ) {
-
             firstLower = lower;
-
         }
-
 
         if (
             firstUpper === null
             &&
             upper !== null
         ) {
-
             firstUpper = upper;
-
         }
 
     }
-
 
     return {
 
@@ -1292,28 +1092,20 @@ function getMicSealLimits() {
 }
 
 
-/* =========================================
-   PARSE HEADER
-========================================= */
+/* PARSE HEADER */
 
 function parseMeasurementHeader(header) {
 
     const match =
-        header.match(
-            /_(\d+(?:\.\d+)?)$/
-        );
-
+        header.match(/_(\d+(?:\.\d+)?)$/);
 
     let group = header;
-
     let frequency = 0;
-
 
     if (match) {
 
         frequency =
             Number(match[1]);
-
 
         group =
             header.replace(
@@ -1322,7 +1114,6 @@ function parseMeasurementHeader(header) {
             );
 
     }
-
 
     return {
 
@@ -1334,114 +1125,81 @@ function parseMeasurementHeader(header) {
 }
 
 
-/* =========================================
-   NG
-========================================= */
+/* NG CHECK */
 
 function isNG(item) {
 
-    if (
-        item.value === null
-    ) {
-
+    if (item.value === null) {
         return false;
-
     }
-
 
     if (
         item.lower !== null
         &&
         item.value < item.lower
     ) {
-
         return true;
-
     }
-
 
     if (
         item.upper !== null
         &&
         item.value > item.upper
     ) {
-
         return true;
-
     }
-
 
     return false;
 
 }
 
 
-/* =========================================
-   STATION FILTER
-========================================= */
+/* STATION FILTER */
 
 function populateStationFilter() {
 
     const select =
-        document.getElementById(
-            "stationFilter"
-        );
-
+        document.getElementById("stationFilter");
 
     const stations =
         [...new Set(
             dutRows
             .map(row =>
-                String(
-                    row[stationColumn] || ""
-                ).trim()
+                String(row[stationColumn] || "").trim()
             )
             .filter(Boolean)
         )]
         .sort();
-
 
     select.innerHTML =
         `<option value="ALL">
             ALL STATIONS
         </option>`;
 
-
     stations.forEach(station => {
 
         const option =
             document.createElement("option");
 
-
-        option.value =
-            station;
-
-
-        option.textContent =
-            station;
-
+        option.value = station;
+        option.textContent = station;
 
         select.appendChild(option);
 
     });
 
+    select.onchange = function() {
 
-    select.onchange =
-        function() {
+        activeStation = this.value;
 
-            activeStation =
-                this.value;
+        applyFilters();
 
-            applyFilters();
-
-        };
+    };
 
 }
 
 
-/* =========================================
-   STATUS FILTER
-========================================= */
+/* STATUS FILTER */
 
 document
 .querySelectorAll(".status-filter")
@@ -1454,22 +1212,13 @@ document
             activeStatus =
                 this.dataset.status;
 
-
             document
-            .querySelectorAll(
-                ".status-filter"
-            )
+            .querySelectorAll(".status-filter")
             .forEach(btn =>
-                btn.classList.remove(
-                    "active"
-                )
+                btn.classList.remove("active")
             );
 
-
-            this.classList.add(
-                "active"
-            );
-
+            this.classList.add("active");
 
             applyFilters();
 
@@ -1479,47 +1228,34 @@ document
 });
 
 
-/* =========================================
-   MULTIPLE SEARCH
-========================================= */
+/* MULTIPLE SEARCH */
 
 document
 .getElementById("searchInput")
-.addEventListener(
-    "input",
-    function() {
+.addEventListener("input", function() {
 
-        applyFilters();
+    applyFilters();
 
-    }
-);
+});
 
 
-/* =========================================
-   APPLY FILTERS
-========================================= */
+/* APPLY FILTERS */
 
 function applyFilters() {
 
     const searchText =
         document
-        .getElementById(
-            "searchInput"
-        )
+        .getElementById("searchInput")
         .value
         .trim()
         .toLowerCase();
 
-
     const searchTerms =
         searchText
         ? searchText
-            .split(
-                /[\s,;]+/
-            )
+            .split(/[\s,;]+/)
             .filter(Boolean)
         : [];
-
 
     filteredRows =
         dutRows.filter(row => {
@@ -1527,107 +1263,67 @@ function applyFilters() {
             const analysis =
                 row._analysis;
 
-
             const station =
-                String(
-                    row[stationColumn] || ""
-                ).trim();
-
+                String(row[stationColumn] || "").trim();
 
             const sn =
-                String(
-                    row[0] || ""
-                )
+                String(row[0] || "")
                 .toLowerCase();
-
 
             const work =
-                String(
-                    row[1] || ""
-                )
+                String(row[1] || "")
                 .toLowerCase();
-
 
             if (
                 activeStation !== "ALL"
                 &&
                 station !== activeStation
             ) {
-
                 return false;
-
             }
-
 
             if (
                 activeStatus !== "ALL"
                 &&
                 analysis.result !== activeStatus
             ) {
-
                 return false;
-
             }
 
-
-            if (
-                searchTerms.length > 0
-            ) {
+            if (searchTerms.length > 0) {
 
                 const found =
                     searchTerms.some(term =>
-
                         sn.includes(term)
                         ||
                         work.includes(term)
-
                     );
 
-
                 if (!found) {
-
                     return false;
-
                 }
 
             }
-
 
             return true;
 
         });
 
-
     renderSidebar();
 
-
-    if (
-        filteredRows.length > 0
-    ) {
+    if (filteredRows.length > 0) {
 
         const selected =
-            dutRows[
-                selectedDutIndex
-            ];
+            dutRows[selectedDutIndex];
 
-
-        if (
-            !filteredRows.includes(
-                selected
-            )
-        ) {
+        if (!filteredRows.includes(selected)) {
 
             selectedDutIndex =
-                dutRows.indexOf(
-                    filteredRows[0]
-                );
+                dutRows.indexOf(filteredRows[0]);
 
         }
 
-
-        if (
-            activeView === "UNIT"
-        ) {
+        if (activeView === "UNIT") {
 
             renderUnitView();
 
@@ -1635,10 +1331,7 @@ function applyFilters() {
 
     }
 
-
-    if (
-        activeView === "STATION"
-    ) {
+    if (activeView === "STATION") {
 
         renderStationView();
 
@@ -1647,9 +1340,7 @@ function applyFilters() {
 }
 
 
-/* =========================================
-   SIDEBAR
-========================================= */
+/* SIDEBAR */
 
 function renderSidebar() {
 
@@ -1658,52 +1349,34 @@ function renderSidebar() {
     .textContent =
         `Total: ${filteredRows.length}`;
 
-
     const list =
-        document.getElementById(
-            "snList"
-        );
-
+        document.getElementById("snList");
 
     list.innerHTML = "";
-
 
     filteredRows.forEach(row => {
 
         const actualIndex =
             dutRows.indexOf(row);
 
-
         const analysis =
             row._analysis;
-
 
         const item =
             document.createElement("div");
 
+        item.className = "sn-row";
 
-        item.className =
-            "sn-row";
+        if (actualIndex === selectedDutIndex) {
 
-
-        if (
-            actualIndex === selectedDutIndex
-        ) {
-
-            item.classList.add(
-                "selected"
-            );
+            item.classList.add("selected");
 
         }
 
-
         const failedNames =
             analysis.failedTests
-            .map(
-                formatGroupName
-            )
+            .map(formatGroupName)
             .join(", ");
-
 
         item.innerHTML = `
 
@@ -1716,9 +1389,7 @@ function renderSidebar() {
             </div>
 
             <div class="sn-station">
-                ${escapeHTML(
-                    row[stationColumn] || "-"
-                )}
+                ${escapeHTML(row[stationColumn] || "-")}
             </div>
 
             <div>
@@ -1746,9 +1417,7 @@ function renderSidebar() {
 
                 ${
                     failedNames
-                    ? escapeHTML(
-                        failedNames
-                    )
+                    ? escapeHTML(failedNames)
                     : "-"
                 }
 
@@ -1760,16 +1429,11 @@ function renderSidebar() {
 
         `;
 
+        item.onclick = function() {
 
-        item.onclick =
-            function() {
+            selectDUT(actualIndex);
 
-                selectDUT(
-                    actualIndex
-                );
-
-            };
-
+        };
 
         list.appendChild(item);
 
@@ -1778,37 +1442,27 @@ function renderSidebar() {
 }
 
 
-/* =========================================
-   SELECT DUT
-========================================= */
+/* SELECT DUT */
 
 function selectDUT(index) {
 
     selectedDutIndex = index;
 
-
-    if (
-        activeView === "UNIT"
-    ) {
+    if (activeView === "UNIT") {
 
         renderUnitView();
 
     }
-
 
     renderSidebar();
 
 }
 
 
-/* =========================================
-   VIEW MODE
-========================================= */
+/* VIEW MODE */
 
 document
-.querySelectorAll(
-    ".view-mode-button"
-)
+.querySelectorAll(".view-mode-button")
 .forEach(button => {
 
     button.addEventListener(
@@ -1818,64 +1472,35 @@ document
             activeView =
                 this.dataset.view;
 
-
             document
-            .querySelectorAll(
-                ".view-mode-button"
-            )
+            .querySelectorAll(".view-mode-button")
             .forEach(btn =>
-                btn.classList.remove(
-                    "active"
-                )
+                btn.classList.remove("active")
             );
 
+            this.classList.add("active");
 
-            this.classList.add(
-                "active"
-            );
-
-
-            if (
-                activeView === "UNIT"
-            ) {
+            if (activeView === "UNIT") {
 
                 document
-                .getElementById(
-                    "unitView"
-                )
-                .style.display =
-                    "block";
-
+                .getElementById("unitView")
+                .style.display = "block";
 
                 document
-                .getElementById(
-                    "stationView"
-                )
-                .style.display =
-                    "none";
-
+                .getElementById("stationView")
+                .style.display = "none";
 
                 renderUnitView();
 
-            }
-
-            else {
+            } else {
 
                 document
-                .getElementById(
-                    "unitView"
-                )
-                .style.display =
-                    "none";
-
+                .getElementById("unitView")
+                .style.display = "none";
 
                 document
-                .getElementById(
-                    "stationView"
-                )
-                .style.display =
-                    "block";
-
+                .getElementById("stationView")
+                .style.display = "block";
 
                 renderStationView();
 
@@ -1887,26 +1512,17 @@ document
 });
 
 
-/* =========================================
-   UNIT VIEW
-========================================= */
+/* UNIT VIEW */
 
 function renderUnitView() {
 
     destroyCharts();
 
-
     const container =
-        document.getElementById(
-            "unitView"
-        );
-
+        document.getElementById("unitView");
 
     const row =
-        dutRows[
-            selectedDutIndex
-        ];
-
+        dutRows[selectedDutIndex];
 
     if (!row) {
 
@@ -1919,10 +1535,8 @@ function renderUnitView() {
 
     }
 
-
     const analysis =
         row._analysis;
-
 
     container.innerHTML = `
 
@@ -1940,7 +1554,6 @@ function renderUnitView() {
 
             </div>
 
-
             <div class="info-item">
 
                 <div class="info-label">
@@ -1948,13 +1561,10 @@ function renderUnitView() {
                 </div>
 
                 <div class="info-value">
-                    ${escapeHTML(
-                        row[stationColumn] || "-"
-                    )}
+                    ${escapeHTML(row[stationColumn] || "-")}
                 </div>
 
             </div>
-
 
             <div class="info-item">
 
@@ -1981,19 +1591,20 @@ function renderUnitView() {
 
             </div>
 
-
             <div class="ng-summary">
 
                 <div class="ng-summary-title">
                     NG SUMMARY
                 </div>
 
-                <div class="ng-pills" id="unitNGSummary"></div>
+                <div
+                    class="ng-pills"
+                    id="unitNGSummary">
+                </div>
 
             </div>
 
         </div>
-
 
         <div class="test-filter-section">
 
@@ -2001,25 +1612,21 @@ function renderUnitView() {
                 SELECT TEST TO DISPLAY
             </div>
 
-            <div class="test-tabs" id="unitTestTabs"></div>
+            <div
+                class="test-tabs"
+                id="unitTestTabs">
+            </div>
 
         </div>
 
-
-        <div class="graphs" id="unitGraphs"></div>
-
-        <div class="footer-note">
-            <span>●</span>
-            NG points are highlighted in red.
+        <div
+            class="graphs"
+            id="unitGraphs">
         </div>
 
     `;
 
-
-    renderUnitNGSummary(
-        analysis
-    );
-
+    renderUnitNGSummary(analysis);
 
     renderTestTabs(
         "unitTestTabs",
@@ -2031,46 +1638,28 @@ function renderUnitView() {
         }
     );
 
-
-    renderUnitGraphs(
-        analysis.groups
-    );
+    renderUnitGraphs(analysis.groups);
 
 }
 
 
-/* =========================================
-   UNIT NG SUMMARY
-========================================= */
+/* UNIT NG SUMMARY */
 
-function renderUnitNGSummary(
-    analysis
-) {
+function renderUnitNGSummary(analysis) {
 
     const container =
-        document.getElementById(
-            "unitNGSummary"
-        );
+        document.getElementById("unitNGSummary");
 
-
-    Object.keys(
-        analysis.summary
-    )
+    Object.keys(analysis.summary)
     .forEach(group => {
 
         const data =
             analysis.summary[group];
 
-
         const pill =
-            document.createElement(
-                "div"
-            );
+            document.createElement("div");
 
-
-        pill.className =
-            "ng-pill";
-
+        pill.className = "ng-pill";
 
         pill.innerHTML = `
 
@@ -2082,19 +1671,14 @@ function renderUnitNGSummary(
 
         `;
 
-
-        container.appendChild(
-            pill
-        );
+        container.appendChild(pill);
 
     });
 
 }
 
 
-/* =========================================
-   UNIT TEST TABS
-========================================= */
+/* TEST TABS */
 
 function renderTestTabs(
     containerID,
@@ -2103,30 +1687,22 @@ function renderTestTabs(
 ) {
 
     const container =
-        document.getElementById(
-            containerID
-        );
-
+        document.getElementById(containerID);
 
     container.innerHTML = "";
-
 
     let groupKeys =
         Object.keys(groups);
 
-
     if (
         activeTest !== "ALL"
         &&
-        !groupKeys.includes(
-            activeTest
-        )
+        !groupKeys.includes(activeTest)
     ) {
 
         activeTest = "ALL";
 
     }
-
 
     createTestButton(
         container,
@@ -2134,7 +1710,6 @@ function renderTestTabs(
         "ALL",
         callback
     );
-
 
     groupKeys.forEach(group => {
 
@@ -2158,158 +1733,106 @@ function createTestButton(
 ) {
 
     const button =
-        document.createElement(
-            "button"
-        );
+        document.createElement("button");
 
+    button.className = "test-tab";
 
-    button.className =
-        "test-tab";
+    if (activeTest === test) {
 
-
-    if (
-        activeTest === test
-    ) {
-
-        button.classList.add(
-            "active"
-        );
+        button.classList.add("active");
 
     }
 
+    button.textContent = label;
 
-    button.textContent =
-        label;
+    button.onclick = function() {
 
+        activeTest = test;
 
-    button.onclick =
-        function() {
+        callback();
 
-            activeTest = test;
+    };
 
-            callback();
-
-        };
-
-
-    container.appendChild(
-        button
-    );
+    container.appendChild(button);
 
 }
 
 
-/* =========================================
-   UNIT GRAPHS
-========================================= */
+/* UNIT GRAPHS */
 
-function renderUnitGraphs(
-    groups
-) {
+function renderUnitGraphs(groups) {
 
     const container =
-        document.getElementById(
-            "unitGraphs"
-        );
-
+        document.getElementById("unitGraphs");
 
     container.innerHTML = "";
-
 
     let groupKeys =
         Object.keys(groups);
 
-
-    if (
-        activeTest !== "ALL"
-    ) {
+    if (activeTest !== "ALL") {
 
         groupKeys =
             groupKeys.filter(
-                group =>
-                    group === activeTest
+                group => group === activeTest
             );
 
     }
 
+    groupKeys.forEach((group, index) => {
 
-    groupKeys.forEach(
-        (group, index) => {
+        const card =
+            document.createElement("div");
 
-            const card =
-                document.createElement(
-                    "div"
-                );
+        card.className = "graph-card";
 
+        if (activeTest !== "ALL") {
 
-            card.className =
-                "graph-card";
-
-
-            if (
-                activeTest !== "ALL"
-            ) {
-
-                card.classList.add(
-                    "expanded"
-                );
-
-            }
-
-
-            card.innerHTML = `
-
-                <div class="graph-title">
-                    ${formatGroupName(group)}
-                </div>
-
-                <div class="canvas-wrapper">
-
-                    <canvas
-                        id="unitChart_${index}">
-                    </canvas>
-
-                </div>
-
-            `;
-
-
-            container.appendChild(
-                card
-            );
-
-
-            createUnitChart(
-                document.getElementById(
-                    `unitChart_${index}`
-                ),
-                groups[group]
-            );
+            card.classList.add("expanded");
 
         }
-    );
+
+        card.innerHTML = `
+
+            <div class="graph-title">
+                ${formatGroupName(group)}
+            </div>
+
+            <div class="canvas-wrapper">
+
+                <canvas
+                    id="unitChart_${index}">
+                </canvas>
+
+            </div>
+
+        `;
+
+        container.appendChild(card);
+
+        createUnitChart(
+            document.getElementById(
+                `unitChart_${index}`
+            ),
+            groups[group]
+        );
+
+    });
 
 }
 
 
-/* =========================================
-   STATION VIEW
-========================================= */
+/* STATION VIEW */
 
 function renderStationView() {
 
     destroyCharts();
 
-
     const container =
-        document.getElementById(
-            "stationView"
-        );
-
+        document.getElementById("stationView");
 
     const rows =
-        getStationSummaryRows();
-
+        filteredRows;
 
     if (rows.length === 0) {
 
@@ -2322,16 +1845,13 @@ function renderStationView() {
 
     }
 
-
     const stationName =
         activeStation === "ALL"
         ? "ALL STATIONS"
         : activeStation;
 
-
     const total =
         rows.length;
-
 
     const good =
         rows.filter(
@@ -2339,16 +1859,11 @@ function renderStationView() {
                 row._analysis.result === "PASS"
         ).length;
 
-
     const ng =
         total - good;
 
-
     const groupSummary =
-        calculateGroupSummary(
-            rows
-        );
-
+        calculateGroupSummary(rows);
 
     container.innerHTML = `
 
@@ -2359,7 +1874,8 @@ function renderStationView() {
                 <div>
 
                     <div class="station-summary-title">
-                        STATION SUMMARY: ${escapeHTML(stationName)}
+                        STATION SUMMARY:
+                        ${escapeHTML(stationName)}
                     </div>
 
                     <div class="station-summary-subtitle">
@@ -2369,7 +1885,6 @@ function renderStationView() {
                 </div>
 
             </div>
-
 
             <div class="summary-stats">
 
@@ -2384,7 +1899,6 @@ function renderStationView() {
                     </div>
 
                 </div>
-
 
                 <div class="summary-stat">
 
@@ -2401,7 +1915,6 @@ function renderStationView() {
                     </div>
 
                 </div>
-
 
                 <div class="summary-stat">
 
@@ -2421,14 +1934,12 @@ function renderStationView() {
 
             </div>
 
-
             <div
                 class="test-ng-summary"
                 id="stationNGSummary">
             </div>
 
         </div>
-
 
         <div class="test-filter-section">
 
@@ -2443,30 +1954,17 @@ function renderStationView() {
 
         </div>
 
-
         <div
             class="graphs"
             id="stationGraphs">
         </div>
 
-
-        <div class="footer-note">
-            <span>●</span>
-            Red dots indicate NG measurements.
-            Each measurement line represents one DUT.
-        </div>
-
     `;
 
-
-    renderStationNGSummary(
-        groupSummary
-    );
-
+    renderStationNGSummary(groupSummary);
 
     const allGroups =
         getAllGroups(rows);
-
 
     renderStationTestTabs(
         allGroups,
@@ -2477,7 +1975,6 @@ function renderStationView() {
         }
     );
 
-
     renderStationGraphs(
         rows,
         allGroups
@@ -2486,27 +1983,11 @@ function renderStationView() {
 }
 
 
-/* =========================================
-   STATION ROWS
-========================================= */
+/* GROUP SUMMARY */
 
-function getStationSummaryRows() {
-
-    return filteredRows;
-
-}
-
-
-/* =========================================
-   GROUP SUMMARY
-========================================= */
-
-function calculateGroupSummary(
-    rows
-) {
+function calculateGroupSummary(rows) {
 
     const summary = {};
-
 
     rows.forEach(row => {
 
@@ -2521,7 +2002,6 @@ function calculateGroupSummary(
 
             }
 
-
             summary[group] +=
                 row
                 ._analysis
@@ -2532,38 +2012,25 @@ function calculateGroupSummary(
 
     });
 
-
     return summary;
 
 }
 
 
-/* =========================================
-   STATION NG SUMMARY
-========================================= */
+/* STATION NG SUMMARY */
 
-function renderStationNGSummary(
-    summary
-) {
+function renderStationNGSummary(summary) {
 
     const container =
-        document.getElementById(
-            "stationNGSummary"
-        );
-
+        document.getElementById("stationNGSummary");
 
     Object.keys(summary)
     .forEach(group => {
 
         const item =
-            document.createElement(
-                "div"
-            );
+            document.createElement("div");
 
-
-        item.className =
-            "test-ng-item";
-
+        item.className = "test-ng-item";
 
         item.innerHTML = `
 
@@ -2575,27 +2042,18 @@ function renderStationNGSummary(
 
         `;
 
-
-        container.appendChild(
-            item
-        );
+        container.appendChild(item);
 
     });
 
 }
 
 
-/* =========================================
-   GET ALL GROUPS
-========================================= */
+/* GET ALL GROUPS */
 
-function getAllGroups(
-    rows
-) {
+function getAllGroups(rows) {
 
-    const groups =
-        new Set();
-
+    const groups = new Set();
 
     rows.forEach(row => {
 
@@ -2608,15 +2066,12 @@ function getAllGroups(
 
     });
 
-
     return [...groups];
 
 }
 
 
-/* =========================================
-   STATION TEST TABS
-========================================= */
+/* STATION TEST TABS */
 
 function renderStationTestTabs(
     groups,
@@ -2624,26 +2079,19 @@ function renderStationTestTabs(
 ) {
 
     const container =
-        document.getElementById(
-            "stationTestTabs"
-        );
-
+        document.getElementById("stationTestTabs");
 
     container.innerHTML = "";
-
 
     if (
         activeTest !== "ALL"
         &&
-        !groups.includes(
-            activeTest
-        )
+        !groups.includes(activeTest)
     ) {
 
         activeTest = "ALL";
 
     }
-
 
     createTestButton(
         container,
@@ -2651,7 +2099,6 @@ function renderStationTestTabs(
         "ALL",
         callback
     );
-
 
     groups.forEach(group => {
 
@@ -2667,9 +2114,7 @@ function renderStationTestTabs(
 }
 
 
-/* =========================================
-   STATION GRAPHS
-========================================= */
+/* STATION GRAPHS */
 
 function renderStationGraphs(
     rows,
@@ -2677,97 +2122,70 @@ function renderStationGraphs(
 ) {
 
     const container =
-        document.getElementById(
-            "stationGraphs"
-        );
-
+        document.getElementById("stationGraphs");
 
     container.innerHTML = "";
 
+    let groupKeys = allGroups;
 
-    let groupKeys =
-        allGroups;
-
-
-    if (
-        activeTest !== "ALL"
-    ) {
+    if (activeTest !== "ALL") {
 
         groupKeys =
             groupKeys.filter(
-                group =>
-                    group === activeTest
+                group => group === activeTest
             );
 
     }
 
+    groupKeys.forEach((group, index) => {
 
-    groupKeys.forEach(
-        (group, index) => {
+        const card =
+            document.createElement("div");
 
-            const card =
-                document.createElement(
-                    "div"
-                );
+        card.className = "graph-card";
 
+        if (activeTest !== "ALL") {
 
-            card.className =
-                "graph-card";
-
-
-            if (
-                activeTest !== "ALL"
-            ) {
-
-                card.classList.add(
-                    "expanded"
-                );
-
-            }
-
-
-            card.innerHTML = `
-
-                <div class="graph-title">
-
-                    ${formatGroupName(group)}
-                    — COMPILED STATION DATA
-
-                </div>
-
-                <div class="canvas-wrapper">
-
-                    <canvas
-                        id="stationChart_${index}">
-                    </canvas>
-
-                </div>
-
-            `;
-
-
-            container.appendChild(
-                card
-            );
-
-
-            createStationChart(
-                document.getElementById(
-                    `stationChart_${index}`
-                ),
-                rows,
-                group
-            );
+            card.classList.add("expanded");
 
         }
-    );
+
+        card.innerHTML = `
+
+            <div class="graph-title">
+
+                ${formatGroupName(group)}
+                — COMPILED STATION DATA
+
+            </div>
+
+            <div class="canvas-wrapper">
+
+                <canvas
+                    id="stationChart_${index}">
+                </canvas>
+
+            </div>
+
+        `;
+
+        container.appendChild(card);
+
+        createStationChart(
+            document.getElementById(
+                `stationChart_${index}`
+            ),
+            rows,
+            group
+        );
+
+    });
 
 }
 
 
-/* =========================================
-   UNIT CHART
-========================================= */
+/* UNIT CHART
+   NO NG DOTS */
 
 function createUnitChart(
     canvas,
@@ -2776,43 +2194,19 @@ function createUnitChart(
 
     const labels =
         items.map(item =>
-
             item.frequency !== 0
             ? item.frequency
-            : formatSingleLabel(
-                item.header
-            )
-
+            : formatSingleLabel(item.header)
         );
-
 
     const values =
-        items.map(
-            item => item.value
-        );
-
+        items.map(item => item.value);
 
     const upper =
-        items.map(
-            item => item.upper
-        );
-
+        items.map(item => item.upper);
 
     const lower =
-        items.map(
-            item => item.lower
-        );
-
-
-    const ngPoints =
-        items.map(item =>
-
-            isNG(item)
-            ? item.value
-            : null
-
-        );
-
+        items.map(item => item.lower);
 
     const chart =
         new Chart(
@@ -2829,101 +2223,55 @@ function createUnitChart(
 
                         {
 
-                            label:
-                                "Measurement",
+                            label: "Measurement",
 
-                            data:
-                                values,
+                            data: values,
 
-                            borderColor:
-                                "#2563eb",
+                            borderColor: "#2563eb",
 
-                            borderWidth:
-                                2,
+                            borderWidth: 2,
 
-                            pointRadius:
-                                0,
+                            pointRadius: 0,
 
-                            tension:
-                                0.15,
+                            tension: 0.15,
 
-                            spanGaps:
-                                true
+                            spanGaps: true
 
                         },
 
                         {
 
-                            label:
-                                "Upper Limit",
+                            label: "Upper Limit",
 
-                            data:
-                                upper,
+                            data: upper,
 
-                            borderColor:
-                                "#dc2626",
+                            borderColor: "#dc2626",
 
-                            borderWidth:
-                                1.5,
+                            borderWidth: 1.5,
 
-                            pointRadius:
-                                0,
+                            pointRadius: 0,
 
-                            tension:
-                                0,
+                            tension: 0,
 
-                            spanGaps:
-                                true
+                            spanGaps: true
 
                         },
 
                         {
 
-                            label:
-                                "Lower Limit",
+                            label: "Lower Limit",
 
-                            data:
-                                lower,
+                            data: lower,
 
-                            borderColor:
-                                "#dc2626",
+                            borderColor: "#dc2626",
 
-                            borderWidth:
-                                1.5,
+                            borderWidth: 1.5,
 
-                            pointRadius:
-                                0,
+                            pointRadius: 0,
 
-                            tension:
-                                0,
+                            tension: 0,
 
-                            spanGaps:
-                                true
-
-                        },
-
-                        {
-
-                            label:
-                                "NG",
-
-                            data:
-                                ngPoints,
-
-                            showLine:
-                                false,
-
-                            pointRadius:
-                                4,
-
-                            pointBackgroundColor:
-                                "#dc2626",
-
-                            pointBorderColor:
-                                "#ffffff",
-
-                            pointBorderWidth:
-                                1
+                            spanGaps: true
 
                         }
 
@@ -2938,15 +2286,13 @@ function createUnitChart(
 
         );
 
-
     charts.push(chart);
 
 }
 
 
-/* =========================================
-   STATION COMPILED CHART
-========================================= */
+/* STATION COMPILED CHART
+   NO NG DOTS */
 
 function createStationChart(
     canvas,
@@ -2956,51 +2302,33 @@ function createStationChart(
 
     const firstRow =
         rows.find(row =>
-            row
-            ._analysis
-            .groups[group]
+            row._analysis.groups[group]
         );
-
 
     if (!firstRow) return;
 
-
     const firstItems =
-        firstRow
-        ._analysis
-        .groups[group];
-
+        firstRow._analysis.groups[group];
 
     const labels =
         firstItems.map(item =>
-
             item.frequency !== 0
             ? item.frequency
-            : formatSingleLabel(
-                item.header
-            )
-
+            : formatSingleLabel(item.header)
         );
-
 
     const datasets = [];
 
 
-    /*
-       ONE MEASUREMENT LINE
-       FOR EACH DUT
-    */
+    /* ONE BLUE MEASUREMENT LINE
+       FOR EACH DUT */
 
     rows.forEach((row, index) => {
 
         const items =
-            row
-            ._analysis
-            .groups[group];
-
+            row._analysis.groups[group];
 
         if (!items) return;
-
 
         datasets.push({
 
@@ -3015,169 +2343,63 @@ function createStationChart(
             borderColor:
                 "rgba(37,99,235,0.18)",
 
-            borderWidth:
-                1,
+            borderWidth: 1,
 
-            pointRadius:
-                0,
+            pointRadius: 0,
 
-            tension:
-                0.1,
+            tension: 0.1,
 
-            spanGaps:
-                true
+            spanGaps: true
 
         });
 
     });
 
 
-    /*
-       UL
-    */
+    /* UPPER LIMIT */
 
     datasets.push({
 
-        label:
-            "Upper Limit",
+        label: "Upper Limit",
 
         data:
             firstItems.map(
                 item => item.upper
             ),
 
-        borderColor:
-            "#dc2626",
+        borderColor: "#dc2626",
 
-        borderWidth:
-            2,
+        borderWidth: 2,
 
-        pointRadius:
-            0,
+        pointRadius: 0,
 
-        tension:
-            0,
+        tension: 0,
 
-        spanGaps:
-            true
+        spanGaps: true
 
     });
 
 
-    /*
-       LL
-    */
+    /* LOWER LIMIT */
 
     datasets.push({
 
-        label:
-            "Lower Limit",
+        label: "Lower Limit",
 
         data:
             firstItems.map(
                 item => item.lower
             ),
 
-        borderColor:
-            "#dc2626",
+        borderColor: "#dc2626",
 
-        borderWidth:
-            2,
+        borderWidth: 2,
 
-        pointRadius:
-            0,
+        pointRadius: 0,
 
-        tension:
-            0,
+        tension: 0,
 
-        spanGaps:
-            true
-
-    });
-
-
-    /*
-       COMPILE ALL NG POINTS
-    */
-
-    const ngDataset = {
-
-        label:
-            "NG Points",
-
-        data:
-            [],
-
-        showLine:
-            false,
-
-        pointRadius:
-            4,
-
-        pointBackgroundColor:
-            "#dc2626",
-
-        pointBorderColor:
-            "#ffffff",
-
-        pointBorderWidth:
-            1
-
-    };
-
-
-    /*
-       Chart.js normally expects
-       same number of labels.
-
-       Therefore NG points are
-       separated per DUT dataset.
-    */
-
-    rows.forEach((row, index) => {
-
-        const items =
-            row
-            ._analysis
-            .groups[group];
-
-
-        if (!items) return;
-
-
-        datasets.push({
-
-            label:
-                `NG DUT ${index + 1}`,
-
-            data:
-                items.map(item =>
-
-                    isNG(item)
-                    ? item.value
-                    : null
-
-                ),
-
-            showLine:
-                false,
-
-            pointRadius:
-                4,
-
-            pointHoverRadius:
-                6,
-
-            pointBackgroundColor:
-                "#dc2626",
-
-            pointBorderColor:
-                "#ffffff",
-
-            pointBorderWidth:
-                1
-
-        });
+        spanGaps: true
 
     });
 
@@ -3204,35 +2426,26 @@ function createStationChart(
 
         );
 
-
     charts.push(chart);
 
 }
 
 
-/* =========================================
-   CHART OPTIONS
-========================================= */
+/* CHART OPTIONS */
 
-function chartOptions(
-    isStation = false
-) {
+function chartOptions(isStation = false) {
 
     return {
 
-        responsive:
-            true,
+        responsive: true,
 
-        maintainAspectRatio:
-            false,
+        maintainAspectRatio: false,
 
         interaction: {
 
-            mode:
-                "index",
+            mode: "index",
 
-            intersect:
-                false
+            intersect: false
 
         },
 
@@ -3240,8 +2453,7 @@ function chartOptions(
 
             legend: {
 
-                position:
-                    "top",
+                position: "top",
 
                 labels: {
 
@@ -3249,40 +2461,23 @@ function chartOptions(
                         size: 9
                     },
 
-                    boxWidth:
-                        18,
+                    boxWidth: 18,
 
-                    filter:
-                        function(item) {
+                    filter: function(item) {
 
-                            /*
-                               Hide individual
-                               DUT lines from legend
-                               in station view
-                            */
+                        if (
+                            isStation
+                            &&
+                            item.text.startsWith("DUT ")
+                        ) {
 
-                            if (
-                                isStation
-                                &&
-                                (
-                                    item.text.startsWith(
-                                        "DUT "
-                                    )
-                                    ||
-                                    item.text.startsWith(
-                                        "NG DUT"
-                                    )
-                                )
-                            ) {
-
-                                return false;
-
-                            }
-
-
-                            return true;
+                            return false;
 
                         }
+
+                        return true;
+
+                    }
 
                 }
 
@@ -3292,27 +2487,25 @@ function chartOptions(
 
                 callbacks: {
 
-                    label:
-                        function(context) {
+                    label: function(context) {
 
-                            if (
-                                context.raw === null
-                            ) {
+                        if (
+                            context.raw === null
+                        ) {
 
-                                return null;
-
-                            }
-
-
-                            return (
-                                context.dataset.label
-                                +
-                                ": "
-                                +
-                                context.raw
-                            );
+                            return null;
 
                         }
+
+                        return (
+                            context.dataset.label
+                            +
+                            ": "
+                            +
+                            context.raw
+                        );
+
+                    }
 
                 }
 
@@ -3333,27 +2526,21 @@ function chartOptions(
 
                 title: {
 
-                    display:
-                        true,
+                    display: true,
 
-                    text:
-                        "Frequency"
+                    text: "Frequency"
 
                 },
 
                 ticks: {
 
-                    maxRotation:
-                        45,
+                    maxRotation: 45,
 
-                    minRotation:
-                        45,
+                    minRotation: 45,
 
-                    autoSkip:
-                        true,
+                    autoSkip: true,
 
-                    maxTicksLimit:
-                        18,
+                    maxTicksLimit: 18,
 
                     font: {
                         size: 9
@@ -3374,11 +2561,9 @@ function chartOptions(
 
                 title: {
 
-                    display:
-                        true,
+                    display: true,
 
-                    text:
-                        "Measurement"
+                    text: "Measurement"
 
                 },
 
@@ -3399,9 +2584,7 @@ function chartOptions(
 }
 
 
-/* =========================================
-   DESTROY CHARTS
-========================================= */
+/* DESTROY CHARTS */
 
 function destroyCharts() {
 
@@ -3411,15 +2594,12 @@ function destroyCharts() {
 
     });
 
-
     charts = [];
 
 }
 
 
-/* =========================================
-   FORMAT
-========================================= */
+/* FORMAT */
 
 function formatGroupName(name) {
 
@@ -3438,9 +2618,7 @@ function formatSingleLabel(header) {
 }
 
 
-/* =========================================
-   NUMBER
-========================================= */
+/* NUMBER */
 
 function toNumber(value) {
 
@@ -3454,11 +2632,9 @@ function toNumber(value) {
 
     }
 
-
     const text =
         String(value)
         .trim();
-
 
     if (
         text === ""
@@ -3472,12 +2648,10 @@ function toNumber(value) {
 
     }
 
-
     const number =
         Number(
             text.replace(/,/g, "")
         );
-
 
     return Number.isNaN(number)
         ? null
@@ -3486,9 +2660,7 @@ function toNumber(value) {
 }
 
 
-/* =========================================
-   ESCAPE
-========================================= */
+/* ESCAPE HTML */
 
 function escapeHTML(value) {
 
