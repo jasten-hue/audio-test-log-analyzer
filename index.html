@@ -68,6 +68,20 @@ header {
     display: none;
 }
 
+.back-upload-button {
+    border: 1px solid var(--border);
+    background: white;
+    border-radius: 7px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-right: 8px;
+}
+
+.back-upload-button:hover {
+    background: #f1f5f9;
+}
+
 #startScreen {
     min-height: calc(100vh - 68px);
     display: flex;
@@ -667,10 +681,21 @@ header {
     <p>Audio SPC CSV • Station Comparison • Unit & Station Summary</p>
 </div>
 
-<label class="upload-button">
-    ⇧ Upload New CSV
-    <input type="file" id="fileInput" accept=".csv">
-</label>
+<div style="display:flex;align-items:center;">
+
+    <button
+        type="button"
+        class="back-upload-button"
+        onclick="returnToUploadPage()">
+        ← Back
+    </button>
+
+    <label class="upload-button">
+        ⇧ Upload New CSV
+        <input type="file" id="fileInput" accept=".csv">
+    </label>
+
+</div>
 
 </header>
 
@@ -841,45 +866,6 @@ let stationColumn = -1;
 let charts = [];
 
 let selectedModel = "";
-
-/* =========================================================
-   GRAPH FILTER
-   Only these six audio tests are displayed as graphs.
-========================================================= */
-
-const ALLOWED_GRAPH_GROUPS = [
-    "MIC_FR",
-    "MIC_SEAL",
-    "MIC_THD",
-    "SPK_FR",
-    "SPK_RB",
-    "SPK_THD"
-];
-
-function isAllowedGraphGroup(group) {
-    if (!group) return false;
-
-    const normalized = String(group)
-        .replace(/^F_MB_/, "")
-        .replace(/^F_MB\s+/i, "")
-        .replace(/_/g, " ")
-        .trim()
-        .toUpperCase();
-
-    return ALLOWED_GRAPH_GROUPS.some(name => {
-        const allowed = name
-            .replace(/_/g, " ")
-            .trim()
-            .toUpperCase();
-
-        return normalized === allowed;
-    });
-}
-
-function getAllowedGraphGroups(groups) {
-    return groups.filter(group => isAllowedGraphGroup(group));
-}
-
 
 
 /* =========================================================
@@ -1112,6 +1098,71 @@ function initializeModelSpecs() {
 }
 
 initializeModelSpecs();
+
+
+/* =========================================================
+   RETURN TO UPLOAD / PRODUCT SELECTION PAGE
+========================================================= */
+
+function returnToUploadPage() {
+
+    const confirmed = confirm(
+        "Return to the CSV upload and product selection page?\n\n" +
+        "The current CSV data and selected unit will be cleared."
+    );
+
+    if (!confirmed) return;
+
+    // Remove existing Chart.js instances first.
+    destroyCharts();
+
+    // Clear all loaded data.
+    csvData = [];
+    headers = [];
+    lowerRow = null;
+    upperRow = null;
+    dutRows = [];
+    filteredRows = [];
+
+    // Reset selections / view state.
+    selectedDutIndex = 0;
+    activeTest = "ALL";
+    activeStatus = "ALL";
+    activeStation = "ALL";
+    activeView = "UNIT";
+    selectedModel = "";
+    stationColumn = -1;
+
+    // Clear the file input so the same CSV can be selected again.
+    const fileInput = document.getElementById("fileInput");
+    if (fileInput) fileInput.value = "";
+
+    // Reset product model selection.
+    const modelSelect = document.getElementById("modelSelect");
+    if (modelSelect) modelSelect.value = "";
+
+    // Clear rendered pages.
+    const unitView = document.getElementById("unitView");
+    const stationView = document.getElementById("stationView");
+    const snList = document.getElementById("snList");
+
+    if (unitView) unitView.innerHTML = "";
+    if (stationView) stationView.innerHTML = "";
+    if (snList) snList.innerHTML = "";
+
+    // Return to the initial upload + product selection screen.
+    document.getElementById("app").style.display = "none";
+    document.getElementById("startScreen").style.display = "flex";
+
+    // Restore the initial view button state.
+    document.querySelectorAll(".view-mode-button").forEach(button => {
+        button.classList.toggle(
+            "active",
+            button.dataset.view === "UNIT"
+        );
+    });
+
+}
 
 
 /* =========================================================
@@ -2679,8 +2730,8 @@ function renderTestTabs(
     container.innerHTML = "";
 
     let groupKeys =
-        getAllowedGraphGroups(
-            getGroupsWithData(groups)
+        getGroupsWithData(
+            groups
         );
 
     if (
@@ -2777,8 +2828,8 @@ function renderUnitGraphs(
     container.innerHTML = "";
 
     let groupKeys =
-        getAllowedGraphGroups(
-            getGroupsWithData(groups)
+        getGroupsWithData(
+            groups
         );
 
     if (
@@ -2947,9 +2998,7 @@ function renderStationView() {
         calculateGroupSummary(rows);
 
     const allGroups =
-        getAllowedGraphGroups(
-            getAllGroupsWithData(rows)
-        );
+        getAllGroupsWithData(rows);
 
     if (
         activeTest !== "ALL"
@@ -3222,7 +3271,7 @@ function renderStationTestTabs(
         callback
     );
 
-    getAllowedGraphGroups(groups).forEach(group => {
+    groups.forEach(group => {
 
         createTestButton(
             container,
@@ -3253,7 +3302,7 @@ function renderStationGraphs(
     container.innerHTML = "";
 
     let groupKeys =
-        getAllowedGraphGroups(allGroups);
+        allGroups;
 
     if (
         activeTest !== "ALL"
