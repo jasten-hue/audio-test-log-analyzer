@@ -817,7 +817,7 @@ let stationColumn = -1;
 let charts = [];
 
 
-/* FILE */
+/* FILE UPLOAD */
 
 document
 .getElementById("fileInput")
@@ -1030,7 +1030,7 @@ function analyzeDUT(row) {
 }
 
 
-/* DETECT MEASUREMENTS */
+/* DETECT MEASUREMENT GROUPS */
 
 function detectMeasurementGroups(row) {
 
@@ -1078,6 +1078,12 @@ function detectMeasurementGroups(row) {
             toNumber(
                 upperRow?.[i]
             );
+
+        /*
+            MIC SEAL:
+            Apply the first LL and UL
+            to all MIC SEAL points.
+        */
 
         if (
             info.group
@@ -1265,7 +1271,7 @@ function parseMeasurementHeader(header) {
 }
 
 
-/* NG CHECK */
+/* CHECK NG */
 
 function isNG(item) {
 
@@ -1298,6 +1304,51 @@ function isNG(item) {
     }
 
     return false;
+
+}
+
+
+/* CHECK IF GROUP HAS ACTUAL MEASUREMENT DATA */
+
+function hasMeasurementData(items) {
+
+    if (
+        !items
+        ||
+        items.length === 0
+    ) {
+
+        return false;
+
+    }
+
+    return items.some(item => {
+
+        return (
+            item.value !== null
+            &&
+            item.value !== undefined
+            &&
+            Number.isFinite(
+                Number(item.value)
+            )
+        );
+
+    });
+
+}
+
+
+/* GET ONLY GROUPS WITH DATA */
+
+function getGroupsWithData(groups) {
+
+    return Object.keys(groups)
+    .filter(group =>
+        hasMeasurementData(
+            groups[group]
+        )
+    );
 
 }
 
@@ -1400,7 +1451,7 @@ document
 });
 
 
-/* MULTIPLE SEARCH */
+/* MULTIPLE SN SEARCH */
 
 document
 .getElementById(
@@ -1536,6 +1587,26 @@ function applyFilters() {
         ) {
 
             renderUnitView();
+
+        }
+
+    }
+
+    else {
+
+        if (
+            activeView === "UNIT"
+        ) {
+
+            document
+            .getElementById(
+                "unitView"
+            )
+            .innerHTML = `
+                <div class="no-graph">
+                    No units found.
+                </div>
+            `;
 
         }
 
@@ -1710,6 +1781,9 @@ document
 
             activeView =
                 this.dataset.view;
+
+            activeTest =
+                "ALL";
 
             document
             .querySelectorAll(
@@ -1929,10 +2003,23 @@ function renderUnitNGSummary(
             "unitNGSummary"
         );
 
-    Object.keys(
-        analysis.summary
-    )
-    .forEach(group => {
+    const groups =
+        getGroupsWithData(
+            analysis.groups
+        );
+
+    if (
+        groups.length === 0
+    ) {
+
+        container.innerHTML =
+            "No measurement data.";
+
+        return;
+
+    }
+
+    groups.forEach(group => {
 
         const data =
             analysis.summary[group];
@@ -1980,7 +2067,9 @@ function renderTestTabs(
     container.innerHTML = "";
 
     let groupKeys =
-        Object.keys(groups);
+        getGroupsWithData(
+            groups
+        );
 
     if (
         activeTest !== "ALL"
@@ -2014,6 +2103,8 @@ function renderTestTabs(
 
 }
 
+
+/* CREATE TEST BUTTON */
 
 function createTestButton(
     container,
@@ -2074,7 +2165,9 @@ function renderUnitGraphs(
     container.innerHTML = "";
 
     let groupKeys =
-        Object.keys(groups);
+        getGroupsWithData(
+            groups
+        );
 
     if (
         activeTest !== "ALL"
@@ -2085,6 +2178,20 @@ function renderUnitGraphs(
                 group =>
                     group === activeTest
             );
+
+    }
+
+    if (
+        groupKeys.length === 0
+    ) {
+
+        container.innerHTML = `
+            <div class="no-graph">
+                No measurement data available.
+            </div>
+        `;
+
+        return;
 
     }
 
@@ -2241,6 +2348,23 @@ function renderStationView() {
             rows
         );
 
+    const allGroups =
+        getAllGroupsWithData(
+            rows
+        );
+
+    if (
+        activeTest !== "ALL"
+        &&
+        !allGroups.includes(
+            activeTest
+        )
+    ) {
+
+        activeTest = "ALL";
+
+    }
+
     container.innerHTML = `
 
         <div class="station-summary">
@@ -2361,11 +2485,9 @@ function renderStationView() {
     `;
 
     renderStationNGSummary(
-        groupSummary
+        groupSummary,
+        allGroups
     );
-
-    const allGroups =
-        getAllGroups(rows);
 
     renderStationTestTabs(
         allGroups,
@@ -2399,6 +2521,14 @@ function calculateGroupSummary(
         )
         .forEach(group => {
 
+            if (
+                !hasMeasurementData(
+                    row._analysis.groups[group]
+                )
+            ) {
+                return;
+            }
+
             if (!summary[group]) {
 
                 summary[group] = 0;
@@ -2424,7 +2554,8 @@ function calculateGroupSummary(
 /* STATION NG SUMMARY */
 
 function renderStationNGSummary(
-    summary
+    summary,
+    groupsWithData
 ) {
 
     const container =
@@ -2432,8 +2563,9 @@ function renderStationNGSummary(
             "stationNGSummary"
         );
 
-    Object.keys(summary)
-    .forEach(group => {
+    container.innerHTML = "";
+
+    groupsWithData.forEach(group => {
 
         const item =
             document.createElement(
@@ -2448,7 +2580,7 @@ function renderStationNGSummary(
             ${formatGroupName(group)}
 
             <b>
-                NG: ${summary[group]}
+                NG: ${summary[group] || 0}
             </b>
 
         `;
@@ -2462,9 +2594,9 @@ function renderStationNGSummary(
 }
 
 
-/* GET ALL GROUPS */
+/* GET ALL GROUPS WITH DATA */
 
-function getAllGroups(
+function getAllGroupsWithData(
     rows
 ) {
 
@@ -2476,9 +2608,19 @@ function getAllGroups(
         Object.keys(
             row._analysis.groups
         )
-        .forEach(group =>
-            groups.add(group)
-        );
+        .forEach(group => {
+
+            if (
+                hasMeasurementData(
+                    row._analysis.groups[group]
+                )
+            ) {
+
+                groups.add(group);
+
+            }
+
+        });
 
     });
 
@@ -2500,18 +2642,6 @@ function renderStationTestTabs(
         );
 
     container.innerHTML = "";
-
-    if (
-        activeTest !== "ALL"
-        &&
-        !groups.includes(
-            activeTest
-        )
-    ) {
-
-        activeTest = "ALL";
-
-    }
 
     createTestButton(
         container,
@@ -2563,6 +2693,45 @@ function renderStationGraphs(
 
     }
 
+    /*
+        DOUBLE CHECK:
+        CREATE GRAPH ONLY IF
+        AT LEAST ONE DUT HAS
+        ACTUAL MEASUREMENT DATA.
+    */
+
+    groupKeys =
+        groupKeys.filter(group => {
+
+            return rows.some(row => {
+
+                const items =
+                    row
+                    ._analysis
+                    .groups[group];
+
+                return hasMeasurementData(
+                    items
+                );
+
+            });
+
+        });
+
+    if (
+        groupKeys.length === 0
+    ) {
+
+        container.innerHTML = `
+            <div class="no-graph">
+                No measurement data available for the selected test.
+            </div>
+        `;
+
+        return;
+
+    }
+
     groupKeys.forEach(
         (group, index) => {
 
@@ -2593,6 +2762,7 @@ function renderStationGraphs(
                         ${formatGroupName(
                             group
                         )}
+
                         — COMPILED STATION DATA
 
                     </div>
@@ -2668,12 +2838,20 @@ function renderStationGraphs(
 }
 
 
-/* UNIT CHART */
+/* CREATE UNIT CHART */
 
 function createUnitChart(
     canvas,
     items
 ) {
+
+    if (
+        !hasMeasurementData(items)
+    ) {
+
+        return;
+
+    }
 
     const labels =
         items.map(
@@ -2735,6 +2913,9 @@ function createUnitChart(
                             pointRadius:
                                 0,
 
+                            pointHoverRadius:
+                                3,
+
                             tension:
                                 0.15,
 
@@ -2758,6 +2939,9 @@ function createUnitChart(
                                 1.5,
 
                             pointRadius:
+                                0,
+
+                            pointHoverRadius:
                                 0,
 
                             tension:
@@ -2785,6 +2969,9 @@ function createUnitChart(
                             pointRadius:
                                 0,
 
+                            pointHoverRadius:
+                                0,
+
                             tension:
                                 0,
 
@@ -2809,7 +2996,7 @@ function createUnitChart(
 }
 
 
-/* STATION COMPILED CHART */
+/* CREATE STATION COMPILED CHART */
 
 function createStationChart(
     canvas,
@@ -2817,15 +3004,30 @@ function createStationChart(
     group
 ) {
 
+    /*
+        Find a DUT that has actual
+        measurement data for this test.
+    */
+
     const firstRow =
-        rows.find(
-            row =>
+        rows.find(row => {
+
+            const items =
                 row
                 ._analysis
-                .groups[group]
-        );
+                .groups[group];
 
-    if (!firstRow) return;
+            return hasMeasurementData(
+                items
+            );
+
+        });
+
+    if (!firstRow) {
+
+        return;
+
+    }
 
     const firstItems =
         firstRow
@@ -2846,10 +3048,10 @@ function createStationChart(
 
 
     /*
-        COMPILED MEASUREMENT LINES
+        COMPILED DUT MEASUREMENT LINES
 
-        All DUT lines use the same
-        uniform color.
+        All DUT lines use
+        the same uniform color.
     */
 
     rows.forEach(
@@ -2860,7 +3062,15 @@ function createStationChart(
                 ._analysis
                 .groups[group];
 
-            if (!items) return;
+            if (
+                !hasMeasurementData(
+                    items
+                )
+            ) {
+
+                return;
+
+            }
 
             datasets.push({
 
@@ -3007,15 +3217,6 @@ function chartOptions(
 
         maintainAspectRatio: false,
 
-        /*
-            The interaction only finds
-            the nearest point.
-
-            This prevents the tooltip
-            from showing every DUT/SN
-            at the same time.
-        */
-
         interaction: {
 
             mode: "nearest",
@@ -3040,16 +3241,6 @@ function chartOptions(
 
                     boxWidth: 18,
 
-                    /*
-                        Hide DUT lines from
-                        the legend in Station
-                        Summary.
-
-                        Only Measurement /
-                        Upper Limit /
-                        Lower Limit remain.
-                    */
-
                     filter:
                         function(item) {
 
@@ -3073,14 +3264,62 @@ function chartOptions(
 
             },
 
+            tooltip: {
+
+                enabled: true,
+
+                filter:
+                    function(context) {
+
+                        if (
+                            isStation
+                            &&
+                            context.dataset.label
+                            .startsWith(
+                                "DUT "
+                            )
+                        ) {
+
+                            return false;
+
+                        }
+
+                        return true;
+
+                    },
+
+                callbacks: {
+
+                    label:
+                        function(context) {
+
+                            if (
+                                context.raw === null
+                            ) {
+
+                                return null;
+
+                            }
+
+                            return (
+                                context.dataset.label
+                                +
+                                ": "
+                                +
+                                context.raw
+                            );
+
+                        }
+
+                }
+
+            },
 
             /*
                 Y-AXIS ONLY ZOOM
 
-                The X-axis remains fixed.
-
-                All frequency/data points
-                remain visible.
+                X-axis always keeps
+                the complete data range.
             */
 
             zoom: {
@@ -3125,68 +3364,6 @@ function chartOptions(
 
                 }
 
-            },
-
-
-            tooltip: {
-
-                enabled: true,
-
-                /*
-                    Prevent showing
-                    floating DUT/SN data
-                    in Station Summary.
-                */
-
-                filter:
-                    function(context) {
-
-                        if (
-                            isStation
-                            &&
-                            context.dataset.label
-                            .startsWith("DUT ")
-                        ) {
-
-                            return false;
-
-                        }
-
-                        return true;
-
-                    },
-
-                callbacks: {
-
-                    label:
-                        function(context) {
-
-                            if (
-                                context.raw
-                                === null
-                            ) {
-
-                                return null;
-
-                            }
-
-                            return (
-
-                                context.dataset.label
-                                +
-
-                                ": "
-
-                                +
-
-                                context.raw
-
-                            );
-
-                        }
-
-                }
-
             }
 
         },
@@ -3194,16 +3371,6 @@ function chartOptions(
         scales: {
 
             x: {
-
-                /*
-                    X AXIS IS LOCKED
-                    TO THE ORIGINAL
-                    FULL DATA RANGE.
-                */
-
-                min: undefined,
-
-                max: undefined,
 
                 grid: {
 
@@ -3287,15 +3454,7 @@ function getChartByCanvasID(
 }
 
 
-/*
-    ZOOM BUTTON
-
-    Only the Y-axis changes.
-
-    X-axis remains fixed so the
-    complete frequency range
-    always stays visible.
-*/
+/* ZOOM GRAPH - Y AXIS ONLY */
 
 function zoomGraph(
     canvasID,
@@ -3318,7 +3477,7 @@ function zoomGraph(
 }
 
 
-/* RESET ZOOM */
+/* RESET GRAPH */
 
 function resetGraph(
     canvasID
@@ -3336,7 +3495,7 @@ function resetGraph(
 }
 
 
-/* DESTROY CHARTS */
+/* DESTROY OLD CHARTS */
 
 function destroyCharts() {
 
@@ -3350,7 +3509,7 @@ function destroyCharts() {
 }
 
 
-/* FORMAT */
+/* FORMAT GROUP NAME */
 
 function formatGroupName(
     name
@@ -3371,6 +3530,8 @@ function formatGroupName(
 }
 
 
+/* FORMAT SINGLE LABEL */
+
 function formatSingleLabel(
     header
 ) {
@@ -3383,7 +3544,7 @@ function formatSingleLabel(
 }
 
 
-/* NUMBER */
+/* CONVERT TO NUMBER */
 
 function toNumber(
     value
