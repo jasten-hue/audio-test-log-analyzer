@@ -17,9 +17,7 @@
 
 :root {
     --blue: #2563eb;
-    --blue-dark: #1d4ed8;
     --red: #dc2626;
-    --red-light: rgba(220,38,38,.72);
     --green: #16a34a;
     --bg: #f3f6fa;
     --card: #ffffff;
@@ -52,7 +50,6 @@ header {
 .header-title h1 {
     margin: 0;
     font-size: 21px;
-    letter-spacing: .3px;
 }
 
 .header-title p {
@@ -64,15 +61,10 @@ header {
 .upload-button {
     border: 1px solid var(--border);
     background: white;
-    border-radius: 8px;
+    border-radius: 7px;
     padding: 10px 16px;
     cursor: pointer;
     font-weight: bold;
-    color: #374151;
-}
-
-.upload-button:hover {
-    background: #f8fafc;
 }
 
 #fileInput {
@@ -112,9 +104,9 @@ header {
 
 .upload-main-button {
     margin-top: 15px;
-    padding: 12px 20px;
+    padding: 12px 22px;
     border: none;
-    border-radius: 8px;
+    border-radius: 7px;
     background: var(--blue);
     color: white;
     cursor: pointer;
@@ -122,7 +114,7 @@ header {
 }
 
 /* =========================
-   MAIN APP
+   APP
 ========================= */
 
 #app {
@@ -132,7 +124,7 @@ header {
 
 .app-layout {
     display: grid;
-    grid-template-columns: 460px 1fr;
+    grid-template-columns: 440px 1fr;
     height: 100%;
 }
 
@@ -149,7 +141,7 @@ header {
 }
 
 .sidebar-header {
-    padding: 18px 18px 10px;
+    padding: 15px;
     border-bottom: 1px solid var(--border);
 }
 
@@ -165,42 +157,87 @@ header {
 }
 
 .total-count {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--muted);
 }
 
-.search-box {
-    position: relative;
-    margin-top: 14px;
+/* =========================
+   FILTERS
+========================= */
+
+.filter-label {
+    display: block;
+    margin-top: 12px;
+    margin-bottom: 6px;
+    font-size: 9px;
+    font-weight: bold;
+    color: var(--muted);
 }
 
-.search-box input {
+.station-select {
     width: 100%;
-    padding: 10px 38px 10px 12px;
+    padding: 9px 10px;
     border: 1px solid var(--border);
-    border-radius: 7px;
+    border-radius: 6px;
+    background: white;
+}
+
+.status-filters {
+    display: flex;
+    gap: 6px;
+}
+
+.status-filter {
+    flex: 1;
+    border: 1px solid var(--border);
+    background: #f8fafc;
+    padding: 8px 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.status-filter.active {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: white;
+}
+
+.search-box textarea {
+    width: 100%;
+    min-height: 75px;
+    resize: vertical;
+    padding: 9px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 11px;
     outline: none;
 }
 
-.search-icon {
-    position: absolute;
-    right: 12px;
-    top: 9px;
-    color: var(--muted);
-}
-
-/* TABLE */
+/* =========================
+   TABLE
+========================= */
 
 .sn-table-header,
 .sn-row {
     display: grid;
-    grid-template-columns: 35px 1.25fr 1fr 1.05fr 72px 1.7fr 24px;
+    grid-template-columns:
+        28px
+        1.2fr
+        1fr
+        62px
+        1.2fr
+        18px;
+
+    gap: 4px;
     align-items: center;
 }
 
 .sn-table-header {
-    padding: 12px 10px;
-    font-size: 10px;
+    padding: 10px 8px;
+    font-size: 8px;
     color: var(--muted);
     font-weight: bold;
     border-bottom: 1px solid var(--border);
@@ -214,9 +251,9 @@ header {
 
 .sn-row {
     min-height: 58px;
-    padding: 7px 10px;
+    padding: 7px 8px;
     border-bottom: 1px solid #edf0f3;
-    font-size: 10px;
+    font-size: 9px;
     cursor: pointer;
 }
 
@@ -235,23 +272,22 @@ header {
 
 .sn-pcba {
     font-weight: bold;
-    font-size: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.sn-work {
-    font-size: 10px;
-}
-
-.sn-time {
-    font-size: 9px;
+.sn-station {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #475569;
 }
 
 .status-badge {
     display: inline-block;
-    width: fit-content;
-    padding: 5px 7px;
+    padding: 5px 6px;
     border-radius: 4px;
-    font-size: 9px;
+    font-size: 8px;
     font-weight: bold;
     color: white;
 }
@@ -265,41 +301,15 @@ header {
 }
 
 .ng-details {
-    font-size: 9px;
-    color: #475569;
-    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #475569;
 }
 
 .arrow {
-    font-size: 18px;
     color: var(--blue);
-    text-align: right;
-}
-
-.pagination {
-    border-top: 1px solid var(--border);
-    padding: 12px;
-    display: flex;
-    justify-content: center;
-    gap: 5px;
-}
-
-.page-button {
-    min-width: 28px;
-    height: 28px;
-    border: 1px solid var(--border);
-    background: white;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 11px;
-}
-
-.page-button.active {
-    background: var(--blue);
-    color: white;
-    border-color: var(--blue);
+    font-size: 16px;
 }
 
 /* =========================
@@ -308,49 +318,66 @@ header {
 
 .content {
     overflow-y: auto;
-    padding: 12px 18px 24px;
+    padding: 14px 18px 25px;
 }
 
-/* INFO BAR */
+/* =========================
+   VIEW MODE
+========================= */
+
+.view-mode-section {
+    display: flex;
+    gap: 7px;
+    margin-bottom: 12px;
+}
+
+.view-mode-button {
+    border: 1px solid var(--border);
+    background: white;
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.view-mode-button.active {
+    background: var(--blue);
+    color: white;
+    border-color: var(--blue);
+}
+
+/* =========================
+   INFO BAR
+========================= */
 
 .info-bar {
     background: white;
     border: 1px solid var(--border);
-    border-radius: 10px;
-    min-height: 92px;
+    border-radius: 9px;
     display: flex;
     align-items: stretch;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
     overflow: hidden;
+    flex-wrap: wrap;
 }
 
 .info-item {
-    padding: 18px 20px;
-    min-width: 155px;
+    padding: 15px 18px;
+    min-width: 145px;
     border-right: 1px solid #e9edf2;
 }
 
 .info-label {
     font-size: 9px;
     color: var(--muted);
-    text-transform: uppercase;
     font-weight: bold;
-    margin-bottom: 8px;
+    margin-bottom: 7px;
 }
 
 .info-value {
-    font-size: 15px;
+    font-size: 13px;
     font-weight: bold;
-    white-space: nowrap;
-}
-
-.selected-label {
-    display: inline-block;
-    background: #e8f0ff;
-    color: var(--blue-dark);
-    padding: 4px 7px;
-    border-radius: 3px;
-    font-size: 9px;
 }
 
 .result-pass {
@@ -361,34 +388,29 @@ header {
     color: var(--red);
 }
 
-/* NG SUMMARY */
-
 .ng-summary {
     flex: 1;
-    padding: 16px 20px;
+    padding: 14px 18px;
 }
 
 .ng-summary-title {
     font-size: 9px;
     color: var(--muted);
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .ng-pills {
     display: flex;
     flex-wrap: wrap;
-    gap: 7px;
+    gap: 6px;
 }
 
 .ng-pill {
-    padding: 7px 9px;
     background: #f8fafc;
     border-radius: 4px;
+    padding: 6px 8px;
     font-size: 9px;
-    color: #475569;
-    min-width: 70px;
-    text-align: center;
 }
 
 .ng-pill span {
@@ -398,46 +420,118 @@ header {
 }
 
 /* =========================
-   CATEGORY TABS
+   STATION SUMMARY
 ========================= */
 
-.category-tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 10px;
+.station-summary {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 16px;
+    margin-bottom: 12px;
 }
 
-.category-tab {
-    border: 1px solid var(--border);
-    background: #eef2f6;
-    padding: 9px 28px;
-    border-radius: 18px;
-    cursor: pointer;
-    font-size: 11px;
+.station-summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.station-summary-title {
+    font-size: 14px;
     font-weight: bold;
 }
 
-.category-tab.active {
-    background: var(--blue);
-    color: white;
-    border-color: var(--blue);
+.station-summary-subtitle {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 4px;
 }
 
-/* TEST TABS */
+.summary-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.summary-stat {
+    min-width: 100px;
+    background: #f8fafc;
+    border-radius: 6px;
+    padding: 11px;
+}
+
+.summary-stat-label {
+    font-size: 8px;
+    color: var(--muted);
+    font-weight: bold;
+}
+
+.summary-stat-value {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.summary-good {
+    color: var(--green);
+}
+
+.summary-ng {
+    color: var(--red);
+}
+
+.test-ng-summary {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.test-ng-item {
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-size: 10px;
+    background: white;
+}
+
+.test-ng-item b {
+    color: var(--red);
+    margin-left: 5px;
+}
+
+/* =========================
+   TEST FILTER
+========================= */
+
+.test-filter-section {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.test-filter-title {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: bold;
+    margin-bottom: 9px;
+}
 
 .test-tabs {
     display: flex;
-    gap: 8px;
-    margin-bottom: 14px;
     flex-wrap: wrap;
+    gap: 7px;
 }
 
 .test-tab {
     border: 1px solid var(--border);
-    background: #eef2f6;
-    min-width: 105px;
+    background: #f1f5f9;
     padding: 8px 15px;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: pointer;
     font-size: 10px;
     font-weight: bold;
@@ -445,8 +539,8 @@ header {
 
 .test-tab.active {
     background: var(--blue);
-    color: white;
     border-color: var(--blue);
+    color: white;
 }
 
 /* =========================
@@ -456,7 +550,7 @@ header {
 .graphs {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    gap: 14px;
 }
 
 .graph-card {
@@ -464,56 +558,61 @@ header {
     border: 1px solid var(--border);
     border-radius: 9px;
     padding: 14px;
-    min-height: 360px;
+    min-height: 350px;
 }
 
-.graph-card.single {
+.graph-card.expanded {
     grid-column: 1 / -1;
+    min-height: calc(100vh - 310px);
 }
 
 .graph-title {
     font-size: 13px;
     font-weight: bold;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .canvas-wrapper {
-    height: 300px;
+    height: 290px;
     position: relative;
+}
+
+.graph-card.expanded .canvas-wrapper {
+    height: calc(100vh - 390px);
+    min-height: 450px;
+}
+
+.no-graph {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 70px;
+    text-align: center;
+    color: var(--muted);
 }
 
 .footer-note {
     text-align: center;
-    color: var(--muted);
     font-size: 10px;
+    color: var(--muted);
     margin-top: 12px;
 }
 
 .footer-note span {
     color: var(--red);
-    font-weight: bold;
 }
 
-.no-graph {
-    padding: 50px;
-    text-align: center;
-    color: var(--muted);
-}
+/* =========================
+   RESPONSIVE
+========================= */
 
-@media (max-width: 1250px) {
-
+@media (max-width: 1150px) {
     .app-layout {
         grid-template-columns: 390px 1fr;
     }
-
-    .sn-table-header,
-    .sn-row {
-        grid-template-columns: 30px 1.25fr .9fr 1fr 62px 1.4fr 20px;
-    }
-
 }
 
-@media (max-width: 950px) {
+@media (max-width: 850px) {
 
     #app {
         height: auto;
@@ -524,21 +623,13 @@ header {
     }
 
     .sidebar {
-        height: 500px;
+        height: 600px;
         border-right: none;
         border-bottom: 1px solid var(--border);
     }
 
     .graphs {
         grid-template-columns: 1fr;
-    }
-
-    .graph-card.single {
-        grid-column: auto;
-    }
-
-    .info-bar {
-        flex-wrap: wrap;
     }
 
 }
@@ -552,18 +643,16 @@ header {
 
     <div class="header-title">
         <h1>AUDIO TEST LOG ANALYZER</h1>
-        <p>Audio SPC CSV • UL/LL Detection • NG Highlighting</p>
+        <p>Audio SPC CSV • Station Comparison • Unit & Station Summary</p>
     </div>
 
     <label class="upload-button">
-        ⇧ &nbsp; Upload New CSV
+        ⇧ Upload New CSV
         <input type="file" id="fileInput" accept=".csv">
     </label>
 
 </header>
 
-
-<!-- START SCREEN -->
 
 <div id="startScreen">
 
@@ -572,11 +661,11 @@ header {
         <h2>Upload Audio SPC CSV</h2>
 
         <p>
-            Select your Audio SPC data file to view all DUTs,
-            PASS/NG status, failed measurements, and graphs.
+            Upload your Audio SPC CSV containing DUT measurements and StationIP.
         </p>
 
-        <button class="upload-main-button"
+        <button
+            class="upload-main-button"
             onclick="document.getElementById('fileInput').click()">
 
             Choose CSV File
@@ -588,195 +677,146 @@ header {
 </div>
 
 
-<!-- MAIN APP -->
-
 <div id="app">
 
-    <div class="app-layout">
+<div class="app-layout">
 
-        <!-- ================= SIDEBAR ================= -->
 
-        <aside class="sidebar">
+<!-- =========================
+     SIDEBAR
+========================= -->
 
-            <div class="sidebar-header">
+<aside class="sidebar">
 
-                <div class="sidebar-title-row">
+    <div class="sidebar-header">
 
-                    <div class="sidebar-title">
-                        ▌ ALL SN / DUT LIST
-                    </div>
+        <div class="sidebar-title-row">
 
-                    <div class="total-count" id="totalCount">
-                        Total: 0
-                    </div>
-
-                </div>
-
-                <div class="search-box">
-
-                    <input
-                        type="text"
-                        id="searchInput"
-                        placeholder="Search SN / PCBA..."
-                    >
-
-                    <span class="search-icon">
-                        ⌕
-                    </span>
-
-                </div>
-
+            <div class="sidebar-title">
+                ▌ ALL SN / DUT LIST
             </div>
 
-
-            <div class="sn-table-header">
-
-                <div>#</div>
-                <div>PCBA / SN</div>
-                <div>WORK NO</div>
-                <div>TIME</div>
-                <div>STATUS</div>
-                <div>NG DETAILS</div>
-                <div></div>
-
+            <div class="total-count" id="totalCount">
+                Total: 0
             </div>
 
-
-            <div class="sn-list" id="snList"></div>
-
-
-            <div class="pagination" id="pagination"></div>
-
-        </aside>
+        </div>
 
 
-        <!-- ================= CONTENT ================= -->
+        <label class="filter-label">
+            STATION IP
+        </label>
 
-        <main class="content">
+        <select
+            id="stationFilter"
+            class="station-select">
 
-            <!-- INFO -->
-
-            <div class="info-bar">
-
-                <div class="info-item">
-
-                    <div class="info-label">
-                        SELECTED DUT / PCBA
-                    </div>
-
-                    <div class="selected-label"
-                        id="selectedPCBA">
-                        -
-                    </div>
-
-                    <div class="info-value"
-                        id="selectedPCBAMain">
-                        -
-                    </div>
-
-                </div>
+        </select>
 
 
-                <div class="info-item">
+        <label class="filter-label">
+            STATUS
+        </label>
 
-                    <div class="info-label">
-                        WORK NO
-                    </div>
+        <div class="status-filters">
 
-                    <div class="info-value"
-                        id="selectedWork">
-                        -
-                    </div>
+            <button
+                class="status-filter active"
+                data-status="ALL">
 
-                </div>
+                ALL
 
+            </button>
 
-                <div class="info-item">
+            <button
+                class="status-filter"
+                data-status="PASS">
 
-                    <div class="info-label">
-                        TIMESTAMP
-                    </div>
+                GOOD
 
-                    <div class="info-value"
-                        id="selectedTime">
-                        -
-                    </div>
+            </button>
 
-                </div>
+            <button
+                class="status-filter"
+                data-status="NG">
 
+                NG
 
-                <div class="info-item">
+            </button>
 
-                    <div class="info-label">
-                        OVERALL RESULT
-                    </div>
-
-                    <div class="info-value"
-                        id="selectedResult">
-                        -
-                    </div>
-
-                </div>
+        </div>
 
 
-                <div class="ng-summary">
+        <label class="filter-label">
+            SEARCH SN / PCBA
+        </label>
 
-                    <div class="ng-summary-title">
-                        NG SUMMARY (BY TEST)
-                    </div>
+        <div class="search-box">
 
-                    <div class="ng-pills"
-                        id="ngSummary">
-                    </div>
+            <textarea
+                id="searchInput"
+                placeholder="Paste one or multiple SN here...
+Comma, space, semicolon or new line supported"></textarea>
 
-                </div>
-
-            </div>
-
-
-            <!-- CATEGORY -->
-
-            <div class="category-tabs">
-
-                <button
-                    class="category-tab active"
-                    data-category="MIC"
-                >
-                    MICROPHONE
-                </button>
-
-                <button
-                    class="category-tab"
-                    data-category="SPK"
-                >
-                    SPEAKER
-                </button>
-
-            </div>
-
-
-            <!-- TEST TABS -->
-
-            <div class="test-tabs"
-                id="testTabs">
-            </div>
-
-
-            <!-- GRAPHS -->
-
-            <div class="graphs"
-                id="graphs">
-            </div>
-
-
-            <div class="footer-note">
-                <span>●</span>
-                NG points are highlighted in red.
-            </div>
-
-        </main>
+        </div>
 
     </div>
+
+
+    <div class="sn-table-header">
+
+        <div>#</div>
+        <div>PCBA / SN</div>
+        <div>STATION IP</div>
+        <div>STATUS</div>
+        <div>NG DETAILS</div>
+        <div></div>
+
+    </div>
+
+
+    <div class="sn-list" id="snList"></div>
+
+</aside>
+
+
+
+<!-- =========================
+     MAIN CONTENT
+========================= -->
+
+<main class="content">
+
+
+<div class="view-mode-section">
+
+    <button
+        class="view-mode-button active"
+        data-view="UNIT">
+
+        UNIT VIEW
+
+    </button>
+
+    <button
+        class="view-mode-button"
+        data-view="STATION">
+
+        STATION SUMMARY
+
+    </button>
+
+</div>
+
+
+<div id="unitView"></div>
+
+<div id="stationView" style="display:none;"></div>
+
+
+</main>
+
+</div>
 
 </div>
 
@@ -784,7 +824,7 @@ header {
 <script>
 
 /* =========================================
-   GLOBAL VARIABLES
+   GLOBAL
 ========================================= */
 
 let csvData = [];
@@ -798,18 +838,18 @@ let filteredRows = [];
 
 let selectedDutIndex = 0;
 
-let currentPage = 1;
-const rowsPerPage = 15;
+let activeTest = "ALL";
+let activeStatus = "ALL";
+let activeStation = "ALL";
+let activeView = "UNIT";
 
-let currentCategory = "MIC";
-
-let activeTest = null;
+let stationColumn = -1;
 
 let charts = [];
 
 
 /* =========================================
-   FILE UPLOAD
+   FILE
 ========================================= */
 
 document
@@ -827,7 +867,6 @@ function handleFile(event) {
     Papa.parse(file, {
 
         header: false,
-
         skipEmptyLines: true,
 
         complete: function(results) {
@@ -844,14 +883,14 @@ function handleFile(event) {
 
 
 /* =========================================
-   PROCESS CSV
+   PROCESS
 ========================================= */
 
 function processCSV() {
 
-    if (!csvData || csvData.length < 3) {
+    if (csvData.length < 3) {
 
-        alert("Invalid CSV file.");
+        alert("Invalid CSV.");
 
         return;
 
@@ -862,14 +901,22 @@ function processCSV() {
 
 
     lowerRow = findRow("Lower");
-
     upperRow = findRow("Upper");
 
 
-    if (!lowerRow || !upperRow) {
+    stationColumn =
+        headers.findIndex(header =>
+            String(header || "")
+            .trim()
+            .toLowerCase()
+            === "stationip"
+        );
+
+
+    if (stationColumn === -1) {
 
         alert(
-            "Could not find the Lower and Upper limit rows."
+            "StationIP column was not found."
         );
 
         return;
@@ -877,39 +924,39 @@ function processCSV() {
     }
 
 
-    dutRows = csvData
-    .slice(1)
-    .filter(row => {
+    dutRows =
+        csvData
+        .slice(1)
+        .filter(row => {
 
-        const value =
-            String(row[0] || "").trim();
-
-        if (!value) return false;
-
-
-        const excluded = [
-
-            "Lower",
-            "Upper",
-            "MIN",
-            "MAX",
-            "Mean",
-            "Sigma",
-            "CpL",
-            "CpU",
-            "Cpk"
-
-        ];
+            const first =
+                String(row[0] || "")
+                .trim()
+                .toLowerCase();
 
 
-        return !excluded.some(item =>
-            item.toLowerCase() === value.toLowerCase()
-        );
-
-    });
+            if (!first) return false;
 
 
-    /* Analyze every DUT once */
+            const excluded = [
+
+                "lower",
+                "upper",
+                "min",
+                "max",
+                "mean",
+                "sigma",
+                "cpl",
+                "cpu",
+                "cpk"
+
+            ];
+
+
+            return !excluded.includes(first);
+
+        });
+
 
     dutRows.forEach(row => {
 
@@ -919,7 +966,9 @@ function processCSV() {
     });
 
 
-    filteredRows = [...dutRows];
+    populateStationFilter();
+
+    applyFilters();
 
 
     document
@@ -932,12 +981,6 @@ function processCSV() {
     .style.display = "block";
 
 
-    currentPage = 1;
-
-
-    renderSidebar();
-
-
     if (dutRows.length > 0) {
 
         selectDUT(0);
@@ -948,20 +991,17 @@ function processCSV() {
 
 
 /* =========================================
-   FIND SPECIAL ROW
+   FIND ROW
 ========================================= */
 
 function findRow(name) {
 
-    return csvData.find(row => {
-
-        return String(row[0] || "")
-            .trim()
-            .toLowerCase()
-            ===
-            name.toLowerCase();
-
-    });
+    return csvData.find(row =>
+        String(row[0] || "")
+        .trim()
+        .toLowerCase()
+        === name.toLowerCase()
+    );
 
 }
 
@@ -978,21 +1018,16 @@ function analyzeDUT(row) {
 
     const summary = {};
 
-
     let totalNG = 0;
 
 
     Object.keys(groups)
-    .forEach(groupName => {
-
-        const items =
-            groups[groupName];
-
+    .forEach(group => {
 
         let ngCount = 0;
 
 
-        items.forEach(item => {
+        groups[group].forEach(item => {
 
             if (isNG(item)) {
 
@@ -1004,9 +1039,9 @@ function analyzeDUT(row) {
         });
 
 
-        summary[groupName] = {
+        summary[group] = {
 
-            ngCount: ngCount,
+            ngCount,
 
             status:
                 ngCount > 0
@@ -1020,20 +1055,18 @@ function analyzeDUT(row) {
 
     const failedTests =
         Object.keys(summary)
-        .filter(key =>
-            summary[key].ngCount > 0
+        .filter(
+            group =>
+                summary[group].ngCount > 0
         );
 
 
     return {
 
-        groups: groups,
-
-        summary: summary,
-
-        totalNG: totalNG,
-
-        failedTests: failedTests,
+        groups,
+        summary,
+        totalNG,
+        failedTests,
 
         result:
             totalNG > 0
@@ -1046,7 +1079,7 @@ function analyzeDUT(row) {
 
 
 /* =========================================
-   DETECT GROUPS
+   MEASUREMENT GROUPS
 ========================================= */
 
 function detectMeasurementGroups(row) {
@@ -1061,7 +1094,8 @@ function detectMeasurementGroups(row) {
     ) {
 
         const header =
-            String(headers[i] || "").trim();
+            String(headers[i] || "")
+            .trim();
 
 
         if (!header) continue;
@@ -1082,57 +1116,51 @@ function detectMeasurementGroups(row) {
         }
 
 
-        const groupInfo =
+        const info =
             parseMeasurementHeader(
                 upperHeader
             );
 
 
-        if (!groupInfo) continue;
+        if (!info) continue;
 
 
-        const value =
+        let value =
             toNumber(row[i]);
 
 
         let lower =
-            toNumber(lowerRow[i]);
+            toNumber(lowerRow?.[i]);
 
 
         let upper =
-            toNumber(upperRow[i]);
+            toNumber(upperRow?.[i]);
 
-
-        /*
-            SPECIAL RULE FOR MIC SEAL
-
-            Your actual CSV only places the UL/LL
-            in the first MIC SEAL column.
-
-            Apply the first valid MIC SEAL Lower/Upper
-            limit to ALL MIC SEAL frequencies.
-        */
 
         if (
-            groupInfo.group === "F_MB_MIC_SEAL"
+            info.group === "F_MB_MIC_SEAL"
         ) {
 
-            const sealLimits =
+            const limits =
                 getMicSealLimits();
 
 
-            if (sealLimits.lower !== null) {
+            if (
+                limits.lower !== null
+            ) {
 
                 lower =
-                    sealLimits.lower;
+                    limits.lower;
 
             }
 
 
-            if (sealLimits.upper !== null) {
+            if (
+                limits.upper !== null
+            ) {
 
                 upper =
-                    sealLimits.upper;
+                    limits.upper;
 
             }
 
@@ -1152,27 +1180,22 @@ function detectMeasurementGroups(row) {
         }
 
 
-        if (!groups[groupInfo.group]) {
+        if (!groups[info.group]) {
 
-            groups[groupInfo.group] = [];
+            groups[info.group] = [];
 
         }
 
 
-        groups[groupInfo.group].push({
+        groups[info.group].push({
 
             column: i,
-
-            header: header,
-
+            header,
             frequency:
-                groupInfo.frequency,
-
-            value: value,
-
-            lower: lower,
-
-            upper: upper
+                info.frequency,
+            value,
+            lower,
+            upper
 
         });
 
@@ -1182,11 +1205,10 @@ function detectMeasurementGroups(row) {
     Object.values(groups)
     .forEach(items => {
 
-        items.sort((a, b) => {
-
-            return a.frequency - b.frequency;
-
-        });
+        items.sort(
+            (a, b) =>
+                a.frequency - b.frequency
+        );
 
     });
 
@@ -1197,7 +1219,7 @@ function detectMeasurementGroups(row) {
 
 
 /* =========================================
-   GET MIC SEAL LIMITS
+   MIC SEAL LIMITS
 ========================================= */
 
 function getMicSealLimits() {
@@ -1228,43 +1250,32 @@ function getMicSealLimits() {
         }
 
 
-        if (firstLower === null) {
-
-            const value =
-                toNumber(lowerRow[i]);
+        const lower =
+            toNumber(lowerRow?.[i]);
 
 
-            if (value !== null) {
-
-                firstLower = value;
-
-            }
-
-        }
+        const upper =
+            toNumber(upperRow?.[i]);
 
 
-        if (firstUpper === null) {
+        if (
+            firstLower === null
+            &&
+            lower !== null
+        ) {
 
-            const value =
-                toNumber(upperRow[i]);
-
-
-            if (value !== null) {
-
-                firstUpper = value;
-
-            }
+            firstLower = lower;
 
         }
 
 
         if (
-            firstLower !== null
+            firstUpper === null
             &&
-            firstUpper !== null
+            upper !== null
         ) {
 
-            break;
+            firstUpper = upper;
 
         }
 
@@ -1274,7 +1285,6 @@ function getMicSealLimits() {
     return {
 
         lower: firstLower,
-
         upper: firstUpper
 
     };
@@ -1283,25 +1293,26 @@ function getMicSealLimits() {
 
 
 /* =========================================
-   PARSE MEASUREMENT HEADER
+   PARSE HEADER
 ========================================= */
 
 function parseMeasurementHeader(header) {
 
-    const frequencyMatch =
+    const match =
         header.match(
             /_(\d+(?:\.\d+)?)$/
         );
 
 
     let group = header;
+
     let frequency = 0;
 
 
-    if (frequencyMatch) {
+    if (match) {
 
         frequency =
-            Number(frequencyMatch[1]);
+            Number(match[1]);
 
 
         group =
@@ -1315,9 +1326,8 @@ function parseMeasurementHeader(header) {
 
     return {
 
-        group: group,
-
-        frequency: frequency
+        group,
+        frequency
 
     };
 
@@ -1325,12 +1335,14 @@ function parseMeasurementHeader(header) {
 
 
 /* =========================================
-   NG CHECK
+   NG
 ========================================= */
 
 function isNG(item) {
 
-    if (item.value === null) {
+    if (
+        item.value === null
+    ) {
 
         return false;
 
@@ -1365,6 +1377,277 @@ function isNG(item) {
 
 
 /* =========================================
+   STATION FILTER
+========================================= */
+
+function populateStationFilter() {
+
+    const select =
+        document.getElementById(
+            "stationFilter"
+        );
+
+
+    const stations =
+        [...new Set(
+            dutRows
+            .map(row =>
+                String(
+                    row[stationColumn] || ""
+                ).trim()
+            )
+            .filter(Boolean)
+        )]
+        .sort();
+
+
+    select.innerHTML =
+        `<option value="ALL">
+            ALL STATIONS
+        </option>`;
+
+
+    stations.forEach(station => {
+
+        const option =
+            document.createElement("option");
+
+
+        option.value =
+            station;
+
+
+        option.textContent =
+            station;
+
+
+        select.appendChild(option);
+
+    });
+
+
+    select.onchange =
+        function() {
+
+            activeStation =
+                this.value;
+
+            applyFilters();
+
+        };
+
+}
+
+
+/* =========================================
+   STATUS FILTER
+========================================= */
+
+document
+.querySelectorAll(".status-filter")
+.forEach(button => {
+
+    button.addEventListener(
+        "click",
+        function() {
+
+            activeStatus =
+                this.dataset.status;
+
+
+            document
+            .querySelectorAll(
+                ".status-filter"
+            )
+            .forEach(btn =>
+                btn.classList.remove(
+                    "active"
+                )
+            );
+
+
+            this.classList.add(
+                "active"
+            );
+
+
+            applyFilters();
+
+        }
+    );
+
+});
+
+
+/* =========================================
+   MULTIPLE SEARCH
+========================================= */
+
+document
+.getElementById("searchInput")
+.addEventListener(
+    "input",
+    function() {
+
+        applyFilters();
+
+    }
+);
+
+
+/* =========================================
+   APPLY FILTERS
+========================================= */
+
+function applyFilters() {
+
+    const searchText =
+        document
+        .getElementById(
+            "searchInput"
+        )
+        .value
+        .trim()
+        .toLowerCase();
+
+
+    const searchTerms =
+        searchText
+        ? searchText
+            .split(
+                /[\s,;]+/
+            )
+            .filter(Boolean)
+        : [];
+
+
+    filteredRows =
+        dutRows.filter(row => {
+
+            const analysis =
+                row._analysis;
+
+
+            const station =
+                String(
+                    row[stationColumn] || ""
+                ).trim();
+
+
+            const sn =
+                String(
+                    row[0] || ""
+                )
+                .toLowerCase();
+
+
+            const work =
+                String(
+                    row[1] || ""
+                )
+                .toLowerCase();
+
+
+            if (
+                activeStation !== "ALL"
+                &&
+                station !== activeStation
+            ) {
+
+                return false;
+
+            }
+
+
+            if (
+                activeStatus !== "ALL"
+                &&
+                analysis.result !== activeStatus
+            ) {
+
+                return false;
+
+            }
+
+
+            if (
+                searchTerms.length > 0
+            ) {
+
+                const found =
+                    searchTerms.some(term =>
+
+                        sn.includes(term)
+                        ||
+                        work.includes(term)
+
+                    );
+
+
+                if (!found) {
+
+                    return false;
+
+                }
+
+            }
+
+
+            return true;
+
+        });
+
+
+    renderSidebar();
+
+
+    if (
+        filteredRows.length > 0
+    ) {
+
+        const selected =
+            dutRows[
+                selectedDutIndex
+            ];
+
+
+        if (
+            !filteredRows.includes(
+                selected
+            )
+        ) {
+
+            selectedDutIndex =
+                dutRows.indexOf(
+                    filteredRows[0]
+                );
+
+        }
+
+
+        if (
+            activeView === "UNIT"
+        ) {
+
+            renderUnitView();
+
+        }
+
+    }
+
+
+    if (
+        activeView === "STATION"
+    ) {
+
+        renderStationView();
+
+    }
+
+}
+
+
+/* =========================================
    SIDEBAR
 ========================================= */
 
@@ -1377,26 +1660,15 @@ function renderSidebar() {
 
 
     const list =
-        document.getElementById("snList");
+        document.getElementById(
+            "snList"
+        );
 
 
     list.innerHTML = "";
 
 
-    const start =
-        (currentPage - 1)
-        * rowsPerPage;
-
-
-    const end =
-        start + rowsPerPage;
-
-
-    const pageRows =
-        filteredRows.slice(start, end);
-
-
-    pageRows.forEach((row, localIndex) => {
+    filteredRows.forEach(row => {
 
         const actualIndex =
             dutRows.indexOf(row);
@@ -1404,10 +1676,6 @@ function renderSidebar() {
 
         const analysis =
             row._analysis;
-
-
-        const originalIndex =
-            actualIndex + 1;
 
 
         const item =
@@ -1431,36 +1699,26 @@ function renderSidebar() {
 
         const failedNames =
             analysis.failedTests
-            .map(formatGroupName)
+            .map(
+                formatGroupName
+            )
             .join(", ");
-
-
-        const timestamp =
-            String(row[2] || "");
-
-
-        const shortTime =
-            timestamp
-            .replace("2026/", "")
-            .replace("2025/", "");
 
 
         item.innerHTML = `
 
             <div class="sn-number">
-                ${originalIndex}
+                ${actualIndex + 1}
             </div>
 
             <div class="sn-pcba">
                 ${escapeHTML(row[0] || "-")}
             </div>
 
-            <div class="sn-work">
-                ${escapeHTML(row[1] || "-")}
-            </div>
-
-            <div class="sn-time">
-                ${escapeHTML(shortTime)}
+            <div class="sn-station">
+                ${escapeHTML(
+                    row[stationColumn] || "-"
+                )}
             </div>
 
             <div>
@@ -1476,7 +1734,7 @@ function renderSidebar() {
 
                     ${
                         analysis.result === "PASS"
-                        ? "PASS"
+                        ? "GOOD"
                         : `NG (${analysis.totalNG})`
                     }
 
@@ -1488,7 +1746,9 @@ function renderSidebar() {
 
                 ${
                     failedNames
-                    ? escapeHTML(failedNames)
+                    ? escapeHTML(
+                        failedNames
+                    )
                     : "-"
                 }
 
@@ -1501,189 +1761,19 @@ function renderSidebar() {
         `;
 
 
-        item.addEventListener(
-            "click",
+        item.onclick =
             function() {
 
                 selectDUT(
                     actualIndex
                 );
 
-            }
-        );
+            };
 
 
         list.appendChild(item);
 
     });
-
-
-    renderPagination();
-
-}
-
-
-/* =========================================
-   PAGINATION
-========================================= */
-
-function renderPagination() {
-
-    const container =
-        document.getElementById(
-            "pagination"
-        );
-
-
-    container.innerHTML = "";
-
-
-    const totalPages =
-        Math.max(
-            1,
-            Math.ceil(
-                filteredRows.length
-                / rowsPerPage
-            )
-        );
-
-
-    createPageButton(
-        "«",
-        currentPage > 1,
-        function() {
-
-            currentPage--;
-
-            renderSidebar();
-
-        }
-    );
-
-
-    const maxVisible = 5;
-
-
-    let startPage =
-        Math.max(
-            1,
-            currentPage - 2
-        );
-
-
-    let endPage =
-        Math.min(
-            totalPages,
-            startPage + maxVisible - 1
-        );
-
-
-    if (
-        endPage - startPage
-        < maxVisible - 1
-    ) {
-
-        startPage =
-            Math.max(
-                1,
-                endPage - maxVisible + 1
-            );
-
-    }
-
-
-    for (
-        let page = startPage;
-        page <= endPage;
-        page++
-    ) {
-
-        const button =
-            document.createElement("button");
-
-
-        button.className =
-            "page-button";
-
-
-        if (
-            page === currentPage
-        ) {
-
-            button.classList.add(
-                "active"
-            );
-
-        }
-
-
-        button.textContent = page;
-
-
-        button.onclick = function() {
-
-            currentPage = page;
-
-            renderSidebar();
-
-        };
-
-
-        container.appendChild(button);
-
-    }
-
-
-    createPageButton(
-        "»",
-        currentPage < totalPages,
-        function() {
-
-            currentPage++;
-
-            renderSidebar();
-
-        }
-    );
-
-}
-
-
-function createPageButton(
-    text,
-    enabled,
-    callback
-) {
-
-    const container =
-        document.getElementById(
-            "pagination"
-        );
-
-
-    const button =
-        document.createElement("button");
-
-
-    button.className =
-        "page-button";
-
-
-    button.textContent = text;
-
-
-    button.disabled = !enabled;
-
-
-    if (enabled) {
-
-        button.onclick =
-            callback;
-
-    }
-
-
-    container.appendChild(button);
 
 }
 
@@ -1697,86 +1787,13 @@ function selectDUT(index) {
     selectedDutIndex = index;
 
 
-    const row =
-        dutRows[index];
-
-
-    const analysis =
-        row._analysis;
-
-
-    document
-    .getElementById("selectedPCBA")
-    .textContent =
-        "SELECTED DUT / PCBA";
-
-
-    document
-    .getElementById("selectedPCBAMain")
-    .textContent =
-        row[0] || "-";
-
-
-    document
-    .getElementById("selectedWork")
-    .textContent =
-        row[1] || "-";
-
-
-    document
-    .getElementById("selectedTime")
-    .textContent =
-        row[2] || "-";
-
-
-    const resultElement =
-        document
-        .getElementById(
-            "selectedResult"
-        );
-
-
     if (
-        analysis.result === "PASS"
+        activeView === "UNIT"
     ) {
 
-        resultElement.textContent =
-            "PASS";
-
-
-        resultElement.className =
-            "info-value result-pass";
+        renderUnitView();
 
     }
-
-    else {
-
-        resultElement.textContent =
-            `NG (${analysis.totalNG})`;
-
-
-        resultElement.className =
-            "info-value result-ng";
-
-    }
-
-
-    renderNGSummary(
-        analysis
-    );
-
-
-    renderCategoryTabs();
-
-
-    renderTestTabs(
-        analysis.groups
-    );
-
-
-    renderGraphs(
-        analysis.groups
-    );
 
 
     renderSidebar();
@@ -1785,304 +1802,309 @@ function selectDUT(index) {
 
 
 /* =========================================
-   NG SUMMARY
+   VIEW MODE
 ========================================= */
 
-function renderNGSummary(analysis) {
+document
+.querySelectorAll(
+    ".view-mode-button"
+)
+.forEach(button => {
 
-    const container =
-        document.getElementById(
-            "ngSummary"
-        );
+    button.addEventListener(
+        "click",
+        function() {
 
-
-    container.innerHTML = "";
-
-
-    const order = [
-
-        "F_MB_MIC_SEAL",
-        "F_MB_MIC_SENS_NAN",
-        "F_MB_MIC_THD",
-        "F_MB_MIC_FR",
-        "F_MB_SPK_RB",
-        "F_MB_SPK_THD",
-        "F_MB_SPK_FR"
-
-    ];
+            activeView =
+                this.dataset.view;
 
 
-    order.forEach(key => {
-
-        if (
-            !analysis.summary[key]
-        ) {
-
-            return;
-
-        }
-
-
-        const item =
-            document.createElement("div");
+            document
+            .querySelectorAll(
+                ".view-mode-button"
+            )
+            .forEach(btn =>
+                btn.classList.remove(
+                    "active"
+                )
+            );
 
 
-        item.className =
-            "ng-pill";
-
-
-        item.innerHTML = `
-
-            ${formatGroupName(key)}
-
-            <span>
-                ${analysis.summary[key].ngCount}
-            </span>
-
-        `;
-
-
-        container.appendChild(item);
-
-    });
-
-}
-
-
-/* =========================================
-   CATEGORY TABS
-========================================= */
-
-function renderCategoryTabs() {
-
-    const tabs =
-        document.querySelectorAll(
-            ".category-tab"
-        );
-
-
-    tabs.forEach(tab => {
-
-        if (
-            tab.dataset.category
-            ===
-            currentCategory
-        ) {
-
-            tab.classList.add(
+            this.classList.add(
                 "active"
             );
 
-        }
-
-        else {
-
-            tab.classList.remove(
-                "active"
-            );
-
-        }
-
-
-        tab.onclick = function() {
-
-            currentCategory =
-                this.dataset.category;
-
-
-            activeTest = null;
-
-
-            const analysis =
-                dutRows[
-                    selectedDutIndex
-                ]._analysis;
-
-
-            renderCategoryTabs();
-
-            renderTestTabs(
-                analysis.groups
-            );
-
-            renderGraphs(
-                analysis.groups
-            );
-
-        };
-
-    });
-
-}
-
-
-/* =========================================
-   TEST TABS
-========================================= */
-
-function renderTestTabs(groups) {
-
-    const container =
-        document.getElementById(
-            "testTabs"
-        );
-
-
-    container.innerHTML = "";
-
-
-    const categoryGroups =
-        Object.keys(groups)
-        .filter(group => {
 
             if (
-                currentCategory === "MIC"
+                activeView === "UNIT"
             ) {
 
-                return group.includes(
-                    "_MIC_"
-                );
+                document
+                .getElementById(
+                    "unitView"
+                )
+                .style.display =
+                    "block";
+
+
+                document
+                .getElementById(
+                    "stationView"
+                )
+                .style.display =
+                    "none";
+
+
+                renderUnitView();
 
             }
 
+            else {
 
-            return group.includes(
-                "_SPK_"
-            );
-
-        });
-
-
-    if (
-        !activeTest
-        ||
-        !categoryGroups.includes(
-            activeTest
-        )
-    ) {
-
-        activeTest =
-            "ALL";
-
-    }
+                document
+                .getElementById(
+                    "unitView"
+                )
+                .style.display =
+                    "none";
 
 
-    const allButton =
-        document.createElement("button");
+                document
+                .getElementById(
+                    "stationView"
+                )
+                .style.display =
+                    "block";
 
 
-    allButton.className =
-        "test-tab";
+                renderStationView();
 
-
-    if (
-        activeTest === "ALL"
-    ) {
-
-        allButton.classList.add(
-            "active"
-        );
-
-    }
-
-
-    allButton.textContent =
-        "ALL TESTS";
-
-
-    allButton.onclick = function() {
-
-        activeTest = "ALL";
-
-
-        const analysis =
-            dutRows[
-                selectedDutIndex
-            ]._analysis;
-
-
-        renderTestTabs(
-            analysis.groups
-        );
-
-        renderGraphs(
-            analysis.groups
-        );
-
-    };
-
-
-    container.appendChild(
-        allButton
-    );
-
-
-    categoryGroups.forEach(group => {
-
-        const button =
-            document.createElement("button");
-
-
-        button.className =
-            "test-tab";
-
-
-        if (
-            activeTest === group
-        ) {
-
-            button.classList.add(
-                "active"
-            );
+            }
 
         }
+    );
 
-
-        button.textContent =
-            formatGroupName(group);
-
-
-        button.onclick = function() {
-
-            activeTest = group;
-
-
-            const analysis =
-                dutRows[
-                    selectedDutIndex
-                ]._analysis;
-
-
-            renderTestTabs(
-                analysis.groups
-            );
-
-            renderGraphs(
-                analysis.groups
-            );
-
-        };
-
-
-        container.appendChild(button);
-
-    });
-
-}
+});
 
 
 /* =========================================
-   RENDER GRAPHS
+   UNIT VIEW
 ========================================= */
 
-function renderGraphs(groups) {
+function renderUnitView() {
 
     destroyCharts();
 
 
     const container =
         document.getElementById(
-            "graphs"
+            "unitView"
+        );
+
+
+    const row =
+        dutRows[
+            selectedDutIndex
+        ];
+
+
+    if (!row) {
+
+        container.innerHTML =
+            `<div class="no-graph">
+                No DUT selected.
+            </div>`;
+
+        return;
+
+    }
+
+
+    const analysis =
+        row._analysis;
+
+
+    container.innerHTML = `
+
+        <div class="info-bar">
+
+            <div class="info-item">
+
+                <div class="info-label">
+                    PCBA / SN
+                </div>
+
+                <div class="info-value">
+                    ${escapeHTML(row[0] || "-")}
+                </div>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <div class="info-label">
+                    STATION IP
+                </div>
+
+                <div class="info-value">
+                    ${escapeHTML(
+                        row[stationColumn] || "-"
+                    )}
+                </div>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <div class="info-label">
+                    OVERALL RESULT
+                </div>
+
+                <div class="
+                    info-value
+                    ${
+                        analysis.result === "PASS"
+                        ? "result-pass"
+                        : "result-ng"
+                    }
+                ">
+
+                    ${
+                        analysis.result === "PASS"
+                        ? "GOOD"
+                        : `NG (${analysis.totalNG})`
+                    }
+
+                </div>
+
+            </div>
+
+
+            <div class="ng-summary">
+
+                <div class="ng-summary-title">
+                    NG SUMMARY
+                </div>
+
+                <div class="ng-pills" id="unitNGSummary"></div>
+
+            </div>
+
+        </div>
+
+
+        <div class="test-filter-section">
+
+            <div class="test-filter-title">
+                SELECT TEST TO DISPLAY
+            </div>
+
+            <div class="test-tabs" id="unitTestTabs"></div>
+
+        </div>
+
+
+        <div class="graphs" id="unitGraphs"></div>
+
+        <div class="footer-note">
+            <span>●</span>
+            NG points are highlighted in red.
+        </div>
+
+    `;
+
+
+    renderUnitNGSummary(
+        analysis
+    );
+
+
+    renderTestTabs(
+        "unitTestTabs",
+        analysis.groups,
+        function() {
+
+            renderUnitView();
+
+        }
+    );
+
+
+    renderUnitGraphs(
+        analysis.groups
+    );
+
+}
+
+
+/* =========================================
+   UNIT NG SUMMARY
+========================================= */
+
+function renderUnitNGSummary(
+    analysis
+) {
+
+    const container =
+        document.getElementById(
+            "unitNGSummary"
+        );
+
+
+    Object.keys(
+        analysis.summary
+    )
+    .forEach(group => {
+
+        const data =
+            analysis.summary[group];
+
+
+        const pill =
+            document.createElement(
+                "div"
+            );
+
+
+        pill.className =
+            "ng-pill";
+
+
+        pill.innerHTML = `
+
+            ${formatGroupName(group)}
+
+            <span>
+                ${data.ngCount}
+            </span>
+
+        `;
+
+
+        container.appendChild(
+            pill
+        );
+
+    });
+
+}
+
+
+/* =========================================
+   UNIT TEST TABS
+========================================= */
+
+function renderTestTabs(
+    containerID,
+    groups,
+    callback
+) {
+
+    const container =
+        document.getElementById(
+            containerID
         );
 
 
@@ -2090,25 +2112,112 @@ function renderGraphs(groups) {
 
 
     let groupKeys =
-        Object.keys(groups)
-        .filter(group => {
-
-            if (
-                currentCategory === "MIC"
-            ) {
-
-                return group.includes(
-                    "_MIC_"
-                );
-
-            }
+        Object.keys(groups);
 
 
-            return group.includes(
-                "_SPK_"
-            );
+    if (
+        activeTest !== "ALL"
+        &&
+        !groupKeys.includes(
+            activeTest
+        )
+    ) {
 
-        });
+        activeTest = "ALL";
+
+    }
+
+
+    createTestButton(
+        container,
+        "ALL TESTS",
+        "ALL",
+        callback
+    );
+
+
+    groupKeys.forEach(group => {
+
+        createTestButton(
+            container,
+            formatGroupName(group),
+            group,
+            callback
+        );
+
+    });
+
+}
+
+
+function createTestButton(
+    container,
+    label,
+    test,
+    callback
+) {
+
+    const button =
+        document.createElement(
+            "button"
+        );
+
+
+    button.className =
+        "test-tab";
+
+
+    if (
+        activeTest === test
+    ) {
+
+        button.classList.add(
+            "active"
+        );
+
+    }
+
+
+    button.textContent =
+        label;
+
+
+    button.onclick =
+        function() {
+
+            activeTest = test;
+
+            callback();
+
+        };
+
+
+    container.appendChild(
+        button
+    );
+
+}
+
+
+/* =========================================
+   UNIT GRAPHS
+========================================= */
+
+function renderUnitGraphs(
+    groups
+) {
+
+    const container =
+        document.getElementById(
+            "unitGraphs"
+        );
+
+
+    container.innerHTML = "";
+
+
+    let groupKeys =
+        Object.keys(groups);
 
 
     if (
@@ -2124,27 +2233,13 @@ function renderGraphs(groups) {
     }
 
 
-    if (
-        groupKeys.length === 0
-    ) {
-
-        container.innerHTML =
-            `
-            <div class="no-graph">
-                No measurement data found.
-            </div>
-            `;
-
-        return;
-
-    }
-
-
     groupKeys.forEach(
         (group, index) => {
 
             const card =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
 
             card.className =
@@ -2156,55 +2251,27 @@ function renderGraphs(groups) {
             ) {
 
                 card.classList.add(
-                    "single"
+                    "expanded"
                 );
 
             }
 
 
-            const title =
-                document.createElement("div");
+            card.innerHTML = `
 
+                <div class="graph-title">
+                    ${formatGroupName(group)}
+                </div>
 
-            title.className =
-                "graph-title";
+                <div class="canvas-wrapper">
 
+                    <canvas
+                        id="unitChart_${index}">
+                    </canvas>
 
-            title.textContent =
-                formatGroupName(group);
+                </div>
 
-
-            const wrapper =
-                document.createElement("div");
-
-
-            wrapper.className =
-                "canvas-wrapper";
-
-
-            const canvas =
-                document.createElement(
-                    "canvas"
-                );
-
-
-            canvas.id =
-                `chart_${group}_${index}`;
-
-
-            wrapper.appendChild(
-                canvas
-            );
-
-
-            card.appendChild(
-                title
-            );
-
-
-            card.appendChild(
-                wrapper
-            );
+            `;
 
 
             container.appendChild(
@@ -2212,10 +2279,11 @@ function renderGraphs(groups) {
             );
 
 
-            createChart(
-                canvas,
-                groups[group],
-                formatGroupName(group)
+            createUnitChart(
+                document.getElementById(
+                    `unitChart_${index}`
+                ),
+                groups[group]
             );
 
         }
@@ -2225,32 +2293,497 @@ function renderGraphs(groups) {
 
 
 /* =========================================
-   CREATE CHART
+   STATION VIEW
 ========================================= */
 
-function createChart(
-    canvas,
-    items,
-    title
+function renderStationView() {
+
+    destroyCharts();
+
+
+    const container =
+        document.getElementById(
+            "stationView"
+        );
+
+
+    const rows =
+        getStationSummaryRows();
+
+
+    if (rows.length === 0) {
+
+        container.innerHTML =
+            `<div class="no-graph">
+                No units available for the selected filters.
+            </div>`;
+
+        return;
+
+    }
+
+
+    const stationName =
+        activeStation === "ALL"
+        ? "ALL STATIONS"
+        : activeStation;
+
+
+    const total =
+        rows.length;
+
+
+    const good =
+        rows.filter(
+            row =>
+                row._analysis.result === "PASS"
+        ).length;
+
+
+    const ng =
+        total - good;
+
+
+    const groupSummary =
+        calculateGroupSummary(
+            rows
+        );
+
+
+    container.innerHTML = `
+
+        <div class="station-summary">
+
+            <div class="station-summary-header">
+
+                <div>
+
+                    <div class="station-summary-title">
+                        STATION SUMMARY: ${escapeHTML(stationName)}
+                    </div>
+
+                    <div class="station-summary-subtitle">
+                        Compiled from ${total} filtered unit(s)
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="summary-stats">
+
+                <div class="summary-stat">
+
+                    <div class="summary-stat-label">
+                        TOTAL UNITS
+                    </div>
+
+                    <div class="summary-stat-value">
+                        ${total}
+                    </div>
+
+                </div>
+
+
+                <div class="summary-stat">
+
+                    <div class="summary-stat-label">
+                        GOOD
+                    </div>
+
+                    <div class="
+                        summary-stat-value
+                        summary-good">
+
+                        ${good}
+
+                    </div>
+
+                </div>
+
+
+                <div class="summary-stat">
+
+                    <div class="summary-stat-label">
+                        NG
+                    </div>
+
+                    <div class="
+                        summary-stat-value
+                        summary-ng">
+
+                        ${ng}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="test-ng-summary"
+                id="stationNGSummary">
+            </div>
+
+        </div>
+
+
+        <div class="test-filter-section">
+
+            <div class="test-filter-title">
+                SELECT COMPILED TEST GRAPH
+            </div>
+
+            <div
+                class="test-tabs"
+                id="stationTestTabs">
+            </div>
+
+        </div>
+
+
+        <div
+            class="graphs"
+            id="stationGraphs">
+        </div>
+
+
+        <div class="footer-note">
+            <span>●</span>
+            Red dots indicate NG measurements.
+            Each measurement line represents one DUT.
+        </div>
+
+    `;
+
+
+    renderStationNGSummary(
+        groupSummary
+    );
+
+
+    const allGroups =
+        getAllGroups(rows);
+
+
+    renderStationTestTabs(
+        allGroups,
+        function() {
+
+            renderStationView();
+
+        }
+    );
+
+
+    renderStationGraphs(
+        rows,
+        allGroups
+    );
+
+}
+
+
+/* =========================================
+   STATION ROWS
+========================================= */
+
+function getStationSummaryRows() {
+
+    return filteredRows;
+
+}
+
+
+/* =========================================
+   GROUP SUMMARY
+========================================= */
+
+function calculateGroupSummary(
+    rows
 ) {
 
-    const labels =
-        items.map(item => {
+    const summary = {};
+
+
+    rows.forEach(row => {
+
+        Object.keys(
+            row._analysis.summary
+        )
+        .forEach(group => {
+
+            if (!summary[group]) {
+
+                summary[group] = 0;
+
+            }
+
+
+            summary[group] +=
+                row
+                ._analysis
+                .summary[group]
+                .ngCount;
+
+        });
+
+    });
+
+
+    return summary;
+
+}
+
+
+/* =========================================
+   STATION NG SUMMARY
+========================================= */
+
+function renderStationNGSummary(
+    summary
+) {
+
+    const container =
+        document.getElementById(
+            "stationNGSummary"
+        );
+
+
+    Object.keys(summary)
+    .forEach(group => {
+
+        const item =
+            document.createElement(
+                "div"
+            );
+
+
+        item.className =
+            "test-ng-item";
+
+
+        item.innerHTML = `
+
+            ${formatGroupName(group)}
+
+            <b>
+                NG: ${summary[group]}
+            </b>
+
+        `;
+
+
+        container.appendChild(
+            item
+        );
+
+    });
+
+}
+
+
+/* =========================================
+   GET ALL GROUPS
+========================================= */
+
+function getAllGroups(
+    rows
+) {
+
+    const groups =
+        new Set();
+
+
+    rows.forEach(row => {
+
+        Object.keys(
+            row._analysis.groups
+        )
+        .forEach(group =>
+            groups.add(group)
+        );
+
+    });
+
+
+    return [...groups];
+
+}
+
+
+/* =========================================
+   STATION TEST TABS
+========================================= */
+
+function renderStationTestTabs(
+    groups,
+    callback
+) {
+
+    const container =
+        document.getElementById(
+            "stationTestTabs"
+        );
+
+
+    container.innerHTML = "";
+
+
+    if (
+        activeTest !== "ALL"
+        &&
+        !groups.includes(
+            activeTest
+        )
+    ) {
+
+        activeTest = "ALL";
+
+    }
+
+
+    createTestButton(
+        container,
+        "ALL TESTS",
+        "ALL",
+        callback
+    );
+
+
+    groups.forEach(group => {
+
+        createTestButton(
+            container,
+            formatGroupName(group),
+            group,
+            callback
+        );
+
+    });
+
+}
+
+
+/* =========================================
+   STATION GRAPHS
+========================================= */
+
+function renderStationGraphs(
+    rows,
+    allGroups
+) {
+
+    const container =
+        document.getElementById(
+            "stationGraphs"
+        );
+
+
+    container.innerHTML = "";
+
+
+    let groupKeys =
+        allGroups;
+
+
+    if (
+        activeTest !== "ALL"
+    ) {
+
+        groupKeys =
+            groupKeys.filter(
+                group =>
+                    group === activeTest
+            );
+
+    }
+
+
+    groupKeys.forEach(
+        (group, index) => {
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+
+            card.className =
+                "graph-card";
+
 
             if (
-                item.frequency === 0
+                activeTest !== "ALL"
             ) {
 
-                return formatSingleLabel(
-                    item.header
+                card.classList.add(
+                    "expanded"
                 );
 
             }
 
 
-            return item.frequency;
+            card.innerHTML = `
 
-        });
+                <div class="graph-title">
+
+                    ${formatGroupName(group)}
+                    — COMPILED STATION DATA
+
+                </div>
+
+                <div class="canvas-wrapper">
+
+                    <canvas
+                        id="stationChart_${index}">
+                    </canvas>
+
+                </div>
+
+            `;
+
+
+            container.appendChild(
+                card
+            );
+
+
+            createStationChart(
+                document.getElementById(
+                    `stationChart_${index}`
+                ),
+                rows,
+                group
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================
+   UNIT CHART
+========================================= */
+
+function createUnitChart(
+    canvas,
+    items
+) {
+
+    const labels =
+        items.map(item =>
+
+            item.frequency !== 0
+            ? item.frequency
+            : formatSingleLabel(
+                item.header
+            )
+
+        );
 
 
     const values =
@@ -2272,13 +2805,13 @@ function createChart(
 
 
     const ngPoints =
-        items.map(item => {
+        items.map(item =>
 
-            return isNG(item)
-                ? item.value
-                : null;
+            isNG(item)
+            ? item.value
+            : null
 
-        });
+        );
 
 
     const chart =
@@ -2290,11 +2823,9 @@ function createChart(
 
                 data: {
 
-                    labels: labels,
+                    labels,
 
                     datasets: [
-
-                        /* MEASUREMENT */
 
                         {
 
@@ -2307,17 +2838,11 @@ function createChart(
                             borderColor:
                                 "#2563eb",
 
-                            backgroundColor:
-                                "transparent",
-
                             borderWidth:
                                 2,
 
                             pointRadius:
                                 0,
-
-                            pointHoverRadius:
-                                4,
 
                             tension:
                                 0.15,
@@ -2326,9 +2851,6 @@ function createChart(
                                 true
 
                         },
-
-
-                        /* UL - SOLID RED */
 
                         {
 
@@ -2339,21 +2861,12 @@ function createChart(
                                 upper,
 
                             borderColor:
-                                "rgba(220,38,38,0.72)",
-
-                            backgroundColor:
-                                "transparent",
+                                "#dc2626",
 
                             borderWidth:
                                 1.5,
 
-                            borderDash:
-                                [],
-
                             pointRadius:
-                                0,
-
-                            pointHoverRadius:
                                 0,
 
                             tension:
@@ -2363,9 +2876,6 @@ function createChart(
                                 true
 
                         },
-
-
-                        /* LL - SOLID RED */
 
                         {
 
@@ -2376,21 +2886,12 @@ function createChart(
                                 lower,
 
                             borderColor:
-                                "rgba(220,38,38,0.72)",
-
-                            backgroundColor:
-                                "transparent",
+                                "#dc2626",
 
                             borderWidth:
                                 1.5,
 
-                            borderDash:
-                                [],
-
                             pointRadius:
-                                0,
-
-                            pointHoverRadius:
                                 0,
 
                             tension:
@@ -2400,9 +2901,6 @@ function createChart(
                                 true
 
                         },
-
-
-                        /* NG POINTS ONLY */
 
                         {
 
@@ -2417,9 +2915,6 @@ function createChart(
 
                             pointRadius:
                                 4,
-
-                            pointHoverRadius:
-                                6,
 
                             pointBackgroundColor:
                                 "#dc2626",
@@ -2436,186 +2931,8 @@ function createChart(
 
                 },
 
-
-                options: {
-
-                    responsive:
-                        true,
-
-                    maintainAspectRatio:
-                        false,
-
-
-                    interaction: {
-
-                        mode:
-                            "index",
-
-                        intersect:
-                            false
-
-                    },
-
-
-                    plugins: {
-
-                        legend: {
-
-                            display:
-                                true,
-
-                            position:
-                                "top",
-
-                            labels: {
-
-                                font: {
-
-                                    size: 9
-
-                                },
-
-                                boxWidth:
-                                    22,
-
-                                boxHeight:
-                                    2
-
-                            }
-
-                        },
-
-
-                        tooltip: {
-
-                            callbacks: {
-
-                                label:
-                                function(context) {
-
-                                    if (
-                                        context.raw === null
-                                    ) {
-
-                                        return null;
-
-                                    }
-
-
-                                    return (
-                                        context.dataset.label
-                                        +
-                                        ": "
-                                        +
-                                        context.raw
-                                    );
-
-                                }
-
-                            }
-
-                        }
-
-                    },
-
-
-                    scales: {
-
-                        x: {
-
-                            grid: {
-
-                                color:
-                                    "rgba(148,163,184,.14)"
-
-                            },
-
-
-                            title: {
-
-                                display:
-                                    true,
-
-                                text:
-                                    "Frequency (Hz)",
-
-                                font: {
-
-                                    size: 9
-
-                                }
-
-                            },
-
-
-                            ticks: {
-
-                                font: {
-
-                                    size: 8
-
-                                },
-
-
-                                maxRotation:
-                                    45,
-
-                                minRotation:
-                                    45,
-
-                                autoSkip:
-                                    true,
-
-                                maxTicksLimit:
-                                    16
-
-                            }
-
-                        },
-
-
-                        y: {
-
-                            grid: {
-
-                                color:
-                                    "rgba(148,163,184,.20)"
-
-                            },
-
-
-                            title: {
-
-                                display:
-                                    true,
-
-                                text:
-                                    "Measurement",
-
-                                font: {
-
-                                    size: 9
-
-                                }
-
-                            },
-
-
-                            ticks: {
-
-                                font: {
-
-                                    size: 9
-
-                                }
-
-                            }
-
-                        }
-
-                    }
-
-                }
+                options:
+                    chartOptions()
 
             }
 
@@ -2623,6 +2940,461 @@ function createChart(
 
 
     charts.push(chart);
+
+}
+
+
+/* =========================================
+   STATION COMPILED CHART
+========================================= */
+
+function createStationChart(
+    canvas,
+    rows,
+    group
+) {
+
+    const firstRow =
+        rows.find(row =>
+            row
+            ._analysis
+            .groups[group]
+        );
+
+
+    if (!firstRow) return;
+
+
+    const firstItems =
+        firstRow
+        ._analysis
+        .groups[group];
+
+
+    const labels =
+        firstItems.map(item =>
+
+            item.frequency !== 0
+            ? item.frequency
+            : formatSingleLabel(
+                item.header
+            )
+
+        );
+
+
+    const datasets = [];
+
+
+    /*
+       ONE MEASUREMENT LINE
+       FOR EACH DUT
+    */
+
+    rows.forEach((row, index) => {
+
+        const items =
+            row
+            ._analysis
+            .groups[group];
+
+
+        if (!items) return;
+
+
+        datasets.push({
+
+            label:
+                `DUT ${index + 1}: ${row[0] || ""}`,
+
+            data:
+                items.map(
+                    item => item.value
+                ),
+
+            borderColor:
+                "rgba(37,99,235,0.18)",
+
+            borderWidth:
+                1,
+
+            pointRadius:
+                0,
+
+            tension:
+                0.1,
+
+            spanGaps:
+                true
+
+        });
+
+    });
+
+
+    /*
+       UL
+    */
+
+    datasets.push({
+
+        label:
+            "Upper Limit",
+
+        data:
+            firstItems.map(
+                item => item.upper
+            ),
+
+        borderColor:
+            "#dc2626",
+
+        borderWidth:
+            2,
+
+        pointRadius:
+            0,
+
+        tension:
+            0,
+
+        spanGaps:
+            true
+
+    });
+
+
+    /*
+       LL
+    */
+
+    datasets.push({
+
+        label:
+            "Lower Limit",
+
+        data:
+            firstItems.map(
+                item => item.lower
+            ),
+
+        borderColor:
+            "#dc2626",
+
+        borderWidth:
+            2,
+
+        pointRadius:
+            0,
+
+        tension:
+            0,
+
+        spanGaps:
+            true
+
+    });
+
+
+    /*
+       COMPILE ALL NG POINTS
+    */
+
+    const ngDataset = {
+
+        label:
+            "NG Points",
+
+        data:
+            [],
+
+        showLine:
+            false,
+
+        pointRadius:
+            4,
+
+        pointBackgroundColor:
+            "#dc2626",
+
+        pointBorderColor:
+            "#ffffff",
+
+        pointBorderWidth:
+            1
+
+    };
+
+
+    /*
+       Chart.js normally expects
+       same number of labels.
+
+       Therefore NG points are
+       separated per DUT dataset.
+    */
+
+    rows.forEach((row, index) => {
+
+        const items =
+            row
+            ._analysis
+            .groups[group];
+
+
+        if (!items) return;
+
+
+        datasets.push({
+
+            label:
+                `NG DUT ${index + 1}`,
+
+            data:
+                items.map(item =>
+
+                    isNG(item)
+                    ? item.value
+                    : null
+
+                ),
+
+            showLine:
+                false,
+
+            pointRadius:
+                4,
+
+            pointHoverRadius:
+                6,
+
+            pointBackgroundColor:
+                "#dc2626",
+
+            pointBorderColor:
+                "#ffffff",
+
+            pointBorderWidth:
+                1
+
+        });
+
+    });
+
+
+    const chart =
+        new Chart(
+            canvas,
+            {
+
+                type: "line",
+
+                data: {
+
+                    labels,
+
+                    datasets
+
+                },
+
+                options:
+                    chartOptions(true)
+
+            }
+
+        );
+
+
+    charts.push(chart);
+
+}
+
+
+/* =========================================
+   CHART OPTIONS
+========================================= */
+
+function chartOptions(
+    isStation = false
+) {
+
+    return {
+
+        responsive:
+            true,
+
+        maintainAspectRatio:
+            false,
+
+        interaction: {
+
+            mode:
+                "index",
+
+            intersect:
+                false
+
+        },
+
+        plugins: {
+
+            legend: {
+
+                position:
+                    "top",
+
+                labels: {
+
+                    font: {
+                        size: 9
+                    },
+
+                    boxWidth:
+                        18,
+
+                    filter:
+                        function(item) {
+
+                            /*
+                               Hide individual
+                               DUT lines from legend
+                               in station view
+                            */
+
+                            if (
+                                isStation
+                                &&
+                                (
+                                    item.text.startsWith(
+                                        "DUT "
+                                    )
+                                    ||
+                                    item.text.startsWith(
+                                        "NG DUT"
+                                    )
+                                )
+                            ) {
+
+                                return false;
+
+                            }
+
+
+                            return true;
+
+                        }
+
+                }
+
+            },
+
+            tooltip: {
+
+                callbacks: {
+
+                    label:
+                        function(context) {
+
+                            if (
+                                context.raw === null
+                            ) {
+
+                                return null;
+
+                            }
+
+
+                            return (
+                                context.dataset.label
+                                +
+                                ": "
+                                +
+                                context.raw
+                            );
+
+                        }
+
+                }
+
+            }
+
+        },
+
+        scales: {
+
+            x: {
+
+                grid: {
+
+                    color:
+                        "rgba(148,163,184,.14)"
+
+                },
+
+                title: {
+
+                    display:
+                        true,
+
+                    text:
+                        "Frequency"
+
+                },
+
+                ticks: {
+
+                    maxRotation:
+                        45,
+
+                    minRotation:
+                        45,
+
+                    autoSkip:
+                        true,
+
+                    maxTicksLimit:
+                        18,
+
+                    font: {
+                        size: 9
+                    }
+
+                }
+
+            },
+
+            y: {
+
+                grid: {
+
+                    color:
+                        "rgba(148,163,184,.20)"
+
+                },
+
+                title: {
+
+                    display:
+                        true,
+
+                    text:
+                        "Measurement"
+
+                },
+
+                ticks: {
+
+                    font: {
+                        size: 9
+                    }
+
+                }
+
+            }
+
+        }
+
+    };
 
 }
 
@@ -2646,95 +3418,28 @@ function destroyCharts() {
 
 
 /* =========================================
-   SEARCH
-========================================= */
-
-document
-.getElementById("searchInput")
-.addEventListener(
-    "input",
-    function() {
-
-        const keyword =
-            this.value
-            .trim()
-            .toLowerCase();
-
-
-        filteredRows =
-            dutRows.filter(row => {
-
-                const pcba =
-                    String(row[0] || "")
-                    .toLowerCase();
-
-
-                const work =
-                    String(row[1] || "")
-                    .toLowerCase();
-
-
-                return (
-                    pcba.includes(keyword)
-                    ||
-                    work.includes(keyword)
-                );
-
-            });
-
-
-        currentPage = 1;
-
-
-        renderSidebar();
-
-    }
-);
-
-
-/* =========================================
-   FORMAT GROUP NAME
+   FORMAT
 ========================================= */
 
 function formatGroupName(name) {
 
     return name
-
-        .replace(
-            /^F_MB_/,
-            ""
-        )
-
-        .replace(
-            /_NAN$/,
-            " NAN"
-        )
-
-        .replace(
-            /_/g,
-            " "
-        );
+        .replace(/^F_MB_/, "")
+        .replace(/_/g, " ");
 
 }
 
-
-/* =========================================
-   SINGLE LABEL
-========================================= */
 
 function formatSingleLabel(header) {
 
     return header
-        .replace(
-            /^F_MB_/,
-            ""
-        );
+        .replace(/^F_MB_/, "");
 
 }
 
 
 /* =========================================
-   NUMBER CONVERSION
+   NUMBER
 ========================================= */
 
 function toNumber(value) {
@@ -2770,10 +3475,7 @@ function toNumber(value) {
 
     const number =
         Number(
-            text.replace(
-                /,/g,
-                ""
-            )
+            text.replace(/,/g, "")
         );
 
 
@@ -2785,32 +3487,18 @@ function toNumber(value) {
 
 
 /* =========================================
-   ESCAPE HTML
+   ESCAPE
 ========================================= */
 
 function escapeHTML(value) {
 
     return String(value)
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
+
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 
 }
 
