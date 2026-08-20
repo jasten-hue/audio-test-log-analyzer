@@ -874,14 +874,16 @@ let selectedModel = "";
    Any NO_DATA measurement is ignored completely.
 ========================================================= */
 
-const ALLOWED_AUDIO_GROUPS = new Set([
+const ALLOWED_AUDIO_GROUPS = [
     "F_MB_MIC_FR",
     "F_MB_MIC_SEAL",
     "F_MB_MIC_THD",
     "F_MB_SPK_FR",
     "F_MB_SPK_RB",
     "F_MB_SPK_THD"
-]);
+];
+
+const ALLOWED_AUDIO_GROUP_SET = new Set(ALLOWED_AUDIO_GROUPS);
 
 function isAllowedAudioGroup(group) {
 
@@ -894,7 +896,7 @@ function isAllowedAudioGroup(group) {
         return false;
     }
 
-    return ALLOWED_AUDIO_GROUPS.has(normalized);
+    return ALLOWED_AUDIO_GROUP_SET.has(normalized);
 }
 
 function getAllowedAudioGroups(groups) {
@@ -2772,10 +2774,10 @@ function renderTestTabs(
 
     container.innerHTML = "";
 
+    // Always show all six requested test tabs.
+    // A test with no data will show a "No measurement data" graph card.
     let groupKeys =
-        getAllowedAudioGroups(groups).filter(group =>
-            hasMeasurementData(groups[group])
-        );
+        [...ALLOWED_AUDIO_GROUPS];
 
     if (
         activeTest !== "ALL"
@@ -2870,10 +2872,10 @@ function renderUnitGraphs(
 
     container.innerHTML = "";
 
+    // Always render all six requested graph cards.
+    // Missing data is handled inside the card instead of hiding the graph.
     let groupKeys =
-        getAllowedAudioGroups(groups).filter(group =>
-            hasMeasurementData(groups[group])
-        );
+        [...ALLOWED_AUDIO_GROUPS];
 
     if (
         activeTest !== "ALL"
@@ -2972,16 +2974,18 @@ function renderUnitGraphs(
 
             container.appendChild(card);
 
-            createUnitChart(
+            const unitItems = groups[group] || [];
+            const unitCanvas = document.getElementById(`unitChart_${index}`);
 
-                document
-                .getElementById(
-                    `unitChart_${index}`
-                ),
-
-                groups[group]
-
-            );
+            if (hasMeasurementData(unitItems)) {
+                createUnitChart(unitCanvas, unitItems);
+            } else {
+                unitCanvas.parentElement.innerHTML = `
+                    <div class="no-graph" style="padding:70px 20px;">
+                        No measurement data for this unit.
+                    </div>
+                `;
+            }
 
         }
     );
@@ -3040,8 +3044,10 @@ function renderStationView() {
     const groupSummary =
         calculateGroupSummary(rows);
 
+    // Keep all six graph types available even when a filtered GOOD unit
+    // has no measurement values for one of the speaker tests.
     const allGroups =
-        getAllGroupsWithData(rows);
+        [...ALLOWED_AUDIO_GROUPS];
 
     if (
         activeTest !== "ALL"
@@ -3314,7 +3320,7 @@ function renderStationTestTabs(
         callback
     );
 
-    groups.filter(isAllowedAudioGroup).forEach(group => {
+    ALLOWED_AUDIO_GROUPS.forEach(group => {
 
         createTestButton(
             container,
@@ -3344,8 +3350,9 @@ function renderStationGraphs(
 
     container.innerHTML = "";
 
+    // Always render all six requested graph cards.
     let groupKeys =
-        allGroups.filter(isAllowedAudioGroup);
+        [...ALLOWED_AUDIO_GROUPS];
 
     if (
         activeTest !== "ALL"
@@ -3359,37 +3366,6 @@ function renderStationGraphs(
 
     }
 
-    groupKeys =
-        groupKeys.filter(group => {
-
-            return rows.some(row => {
-
-                const items =
-                    row
-                    ._analysis
-                    .groups[group];
-
-                return hasMeasurementData(
-                    items
-                );
-
-            });
-
-        });
-
-    if (
-        groupKeys.length === 0
-    ) {
-
-        container.innerHTML = `
-            <div class="no-graph">
-                No measurement data available for the selected test.
-            </div>
-        `;
-
-        return;
-
-    }
 
     groupKeys.forEach(
         (group, index) => {
@@ -3466,17 +3442,20 @@ function renderStationGraphs(
 
             container.appendChild(card);
 
-            createStationChart(
-
-                document
-                .getElementById(
-                    `stationChart_${index}`
-                ),
-
-                rows,
-                group
-
+            const stationCanvas = document.getElementById(`stationChart_${index}`);
+            const stationHasData = rows.some(row =>
+                hasMeasurementData(row._analysis.groups[group])
             );
+
+            if (stationHasData) {
+                createStationChart(stationCanvas, rows, group);
+            } else {
+                stationCanvas.parentElement.innerHTML = `
+                    <div class="no-graph" style="padding:70px 20px;">
+                        No measurement data in the selected GOOD units.
+                    </div>
+                `;
+            }
 
         }
     );
