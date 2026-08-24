@@ -185,28 +185,43 @@ function getSpecAtFrequency(model, frequency) {
     if (!specs || frequency === null || frequency === undefined) return null;
     const exact = Object.keys(specs).find(key => Math.abs(Number(key) - Number(frequency)) < 0.000001);
     return exact === undefined ? null : specs[exact];
-}  initializeModelSpecs();   /* =========================================================    FILE UPLOAD ========================================================= */  document .getElementById("fileInput") .addEventListener("change", handleFile);   function openFileBrowser() {      selectedModel =         document         .getElementById("modelSelect")         .value;      if (!selectedModel) {          alert(             "Please select a product model first."         );          return;      }      document     .getElementById("fileInput")     .click();  }   function handleFile(event) {      const file =         event.target.files[0];      if (!file) return;      loadCSVFile(file);  }   /* =========================================================    DRAG AND DROP ========================================================= */  const dropZone =     document.getElementById("dropZone");   dropZone.addEventListener(     "dragover",     function(event) {          event.preventDefault();          dropZone         .classList         .add("dragover");      } );   dropZone.addEventListener(     "dragleave",     function() {          dropZone         .classList         .remove("dragover");      } );   dropZone.addEventListener(     "drop",     function(event) {          event.preventDefault();          dropZone         .classList         .remove("dragover");          selectedModel =             document             .getElementById("modelSelect")             .value;          if (!selectedModel) {              alert(                 "Please select a product model first."             );              return;          }          const file =             event.dataTransfer.files[0];          if (!file) return;          if (             !file.name             .toLowerCase()             .endsWith(".csv")         ) {              alert(                 "Please drop a CSV file."             );              return;          }          loadCSVFile(file);      } );   function loadCSVFile(file) {      selectedModel =         document         .getElementById("modelSelect")         .value;      if (!selectedModel) {          alert(             "Please select a product model first."         );          return;      }      Papa.parse(file, {
+}  initializeModelSpecs();   /* =========================================================    FILE UPLOAD ========================================================= */  document .getElementById("fileInput") .addEventListener("change", handleFile);   function openFileBrowser() {      selectedModel =         document         .getElementById("modelSelect")         .value;      if (!selectedModel) {          alert(             "Please select a product model first."         );          return;      }      document     .getElementById("fileInput")     .click();  }   function handleFile(event) {      const file =         event.target.files[0];      if (!file) return;      loadCSVFile(file);  }   /* =========================================================    DRAG AND DROP ========================================================= */  const dropZone =     document.getElementById("dropZone");   dropZone.addEventListener(     "dragover",     function(event) {          event.preventDefault();          dropZone         .classList         .add("dragover");      } );   dropZone.addEventListener(     "dragleave",     function() {          dropZone         .classList         .remove("dragover");      } );   dropZone.addEventListener(     "drop",     function(event) {          event.preventDefault();          dropZone         .classList         .remove("dragover");          selectedModel =             document             .getElementById("modelSelect")             .value;          if (!selectedModel) {              alert(                 "Please select a product model first."             );              return;          }          const file =             event.dataTransfer.files[0];          if (!file) return;          if (             !file.name             .toLowerCase()             .endsWith(".csv")         ) {              alert(                 "Please drop a CSV file."             );              return;          }          loadCSVFile(file);      } );   function loadCSVFile(file) {
+    selectedModel = document.getElementById("modelSelect").value;
+
+    if (!selectedModel) {
+        alert("Please select a product model first.");
+        return;
+    }
+
+    if (!file) {
+        alert("No CSV file was selected.");
+        return;
+    }
+
+    if (!file.name.toLowerCase().endsWith(".csv")) {
+        alert("Please select a CSV file.");
+        return;
+    }
+
+    Papa.parse(file, {
         header: false,
         skipEmptyLines: true,
         complete: function(results) {
-            /* PapaParse can report non-fatal warnings even when the CSV data is usable.
-               Continue whenever rows were successfully read. */
             csvData = Array.isArray(results.data) ? results.data : [];
 
             if (!csvData.length) {
-                const message = results.errors && results.errors.length
-                    ? results.errors[0].message
-                    : "No data was found in the CSV.";
-                alert("Unable to read CSV: " + message);
+                alert("Unable to read CSV: no usable data was found.");
                 return;
             }
 
             processCSV();
         },
         error: function(error) {
-            alert("Unable to read CSV: " + (error && error.message ? error.message : "Unknown error"));
+            console.error("PapaParse error:", error);
+            alert("Unable to read CSV: " + (error?.message || "Unknown error"));
         }
-    });  }   /* =========================================================    BACK / NEW ANALYSIS ========================================================= */  function resetApplication() {      destroyCharts();      csvData = [];     headers = [];     lowerRow = null;     upperRow = null;     dutRows = [];     filteredRows = [];     selectedDutIndex = 0;     activeTest = "ALL";     activeStatus = "ALL";     activeStation = "ALL";     activeView = "UNIT";     activeNGFilters = [];     stationColumn = -1;     snColumn = 0;     pcbaColumn = 1;     selectedModel = "";      document     .getElementById("modelSelect")     .value = "";      document     .getElementById("fileInput")     .value = "";      document     .getElementById("searchInput")     .value = "";      document     .getElementById("stationFilter")     .innerHTML =         `<option value="ALL">ALL STATIONS</option>`;      document     .getElementById("ngDescFilter")     .innerHTML = "";      document     .querySelectorAll(".status-filter")     .forEach(btn => {          btn.classList.toggle(              "active",             btn.dataset.status === "ALL"         );      });      document     .querySelectorAll(".view-mode-button")     .forEach(btn => {          btn.classList.toggle(              "active",             btn.dataset.view === "UNIT"         );      });      document     .getElementById("unitView")     .style.display = "block";      document     .getElementById("unitView")     .innerHTML = "";      document     .getElementById("stationView")     .style.display = "none";      document     .getElementById("stationView")     .innerHTML = "";      document     .getElementById("app")     .style.display = "none";      document     .getElementById("startScreen")     .style.display = "flex";  }   /* =========================================================
+    });
+}   /* =========================================================    BACK / NEW ANALYSIS ========================================================= */  function resetApplication() {      destroyCharts();      csvData = [];     headers = [];     lowerRow = null;     upperRow = null;     dutRows = [];     filteredRows = [];     selectedDutIndex = 0;     activeTest = "ALL";     activeStatus = "ALL";     activeStation = "ALL";     activeView = "UNIT";     activeNGFilters = [];     stationColumn = -1;     snColumn = 0;     pcbaColumn = 1;     selectedModel = "";      document     .getElementById("modelSelect")     .value = "";      document     .getElementById("fileInput")     .value = "";      document     .getElementById("searchInput")     .value = "";      document     .getElementById("stationFilter")     .innerHTML =         `<option value="ALL">ALL STATIONS</option>`;      document     .getElementById("ngDescFilter")     .innerHTML = "";      document     .querySelectorAll(".status-filter")     .forEach(btn => {          btn.classList.toggle(              "active",             btn.dataset.status === "ALL"         );      });      document     .querySelectorAll(".view-mode-button")     .forEach(btn => {          btn.classList.toggle(              "active",             btn.dataset.view === "UNIT"         );      });      document     .getElementById("unitView")     .style.display = "block";      document     .getElementById("unitView")     .innerHTML = "";      document     .getElementById("stationView")     .style.display = "none";      document     .getElementById("stationView")     .innerHTML = "";      document     .getElementById("app")     .style.display = "none";      document     .getElementById("startScreen")     .style.display = "flex";  }   /* =========================================================
    CSV HEADER HELPERS
 ========================================================= */
 function normalizeHeader(value) {
@@ -286,86 +301,72 @@ function getColumnName(index) {
 }
 
 function processCSV() {
-    const diagnostic = {
-        model: selectedModel,
-        totalRows: Array.isArray(csvData) ? csvData.length : 0,
-        headerCount: 0,
-        pcba: "Not found",
-        sn: "Not found",
-        station: "Not found",
-        lower: "Not found",
-        upper: "Not found",
-        dutRows: 0,
-        groups: {}
-    };
-
     try {
         if (!Array.isArray(csvData) || csvData.length < 2) {
-            diagnostic.reason = "The CSV has no usable data rows.";
-            showCSVDiagnostics(diagnostic, true);
+            alert("Invalid CSV: no usable rows were found.");
             return;
         }
 
         headers = (csvData[0] || []).map(v => String(v ?? "").trim());
-        diagnostic.headerCount = headers.length;
 
+        // Detect columns, but do NOT reject the file if optional columns are missing.
         pcbaColumn = findHeaderColumn(["pcba", "pcbasn"]);
         snColumn = pcbaColumn >= 0 ? pcbaColumn :
             findHeaderColumn(["sn", "serialnumber", "serial", "dut", "dutid"]);
         workColumn = findHeaderColumn(["workno", "workorder", "work"]);
         stationColumn = findHeaderColumn(["stationip", "station ip", "station_ip"]);
 
-        diagnostic.pcba = getColumnName(pcbaColumn);
-        diagnostic.sn = getColumnName(snColumn);
-        diagnostic.station = getColumnName(stationColumn);
-
         lowerRow = findRow("Lower");
         upperRow = findRow("Upper");
-        diagnostic.lower = lowerRow ? "Found" : "Not found";
-        diagnostic.upper = upperRow ? "Found" : "Not found";
-        diagnostic.groups = buildCSVGroupDiagnostics();
 
         const excluded = new Set([
-            "lower","upper","min","max","mean",
-            "sigma","cpl","cpu","cpk"
+            "lower", "upper", "min", "max", "mean",
+            "sigma", "cpl", "cpu", "cpk"
         ]);
 
-        // NO fixed DUT quantity. Every non-statistical row is kept.
+        // No fixed DUT count. Every non-statistical row is a DUT/PCBA row.
         dutRows = csvData.slice(1).filter(row => {
             const first = String(row?.[0] ?? "").trim().toLowerCase();
             return first && !excluded.has(first);
         });
 
-        diagnostic.dutRows = dutRows.length;
+        if (!dutRows.length) {
+            alert("No DUT/PCBA rows were found in this CSV.");
+            return;
+        }
 
-        // Analyze every DUT independently. Missing measurements do not reject the DUT.
+        // Analyze whatever values each DUT actually contains.
         dutRows.forEach(row => {
             try {
                 row._analysis = analyzeDUT(row);
-            } catch (dutError) {
-                console.warn("Skipping analysis error for DUT row:", dutError, row);
-                row._analysis = { groups: {}, ngCount: 0, status: "PASS", errors: [String(dutError?.message || dutError)] };
+            } catch (error) {
+                console.warn("Analysis issue for one DUT:", error);
+                row._analysis = {
+                    groups: {},
+                    summary: {},
+                    totalNG: 0,
+                    failedTests: [],
+                    result: "PASS"
+                };
             }
         });
 
         filteredRows = [...dutRows];
-        selectedDutIndex = filteredRows.length ? 0 : -1;
-
-        // Diagnostics are informational only; they do not block analysis.
-        diagnostic.reason = dutRows.length
-            ? `Loaded ${dutRows.length} DUT/PCBA row(s). The analyzer used whatever valid measurements each DUT contains.`
-            : "No DUT/PCBA rows were found.";
-
-        showCSVDiagnostics(diagnostic, dutRows.length === 0);
+        selectedDutIndex = 0;
 
         if (typeof populateStationFilter === "function") populateStationFilter();
         if (typeof populateNGDescFilter === "function") populateNGDescFilter();
+
+        // IMPORTANT: switch to the analyzer screen before rendering.
+        document.getElementById("startScreen").style.display = "none";
+        document.getElementById("app").style.display = "block";
+
         if (typeof applyFilters === "function") applyFilters();
+        if (typeof selectDUT === "function" && dutRows.length) selectDUT(0);
 
     } catch (error) {
-        diagnostic.reason = "Unexpected analysis error: " + (error?.message || String(error));
-        console.error("CSV analysis error:", error);
-        showCSVDiagnostics(diagnostic, true);
+        console.error("CSV processing error:", error);
+        alert("CSV loaded, but analysis failed: " + (error?.message || String(error)));
     }
 }   /* =========================================================    FIND LOWER / UPPER ROW ========================================================= */  function findRow(name) {      return csvData.find(         row =>             String(row[0] || "")             .trim()             .toLowerCase()             === name.toLowerCase()     );  }   /* =========================================================    ANALYZE DUT ========================================================= */  function analyzeDUT(row) {      const groups =         detectMeasurementGroups(row);      const summary = {};      let totalNG = 0;      Object.keys(groups)     .forEach(group => {          let ngCount = 0;          groups[group]         .forEach(item => {              if (isNG(item)) {                  ngCount++;                 totalNG++;              }          });          summary[group] = {              ngCount,              status:                 ngCount > 0                 ? "NG"                 : "PASS"          };      });      const failedTests =         Object.keys(summary)         .filter(             group =>                 summary[group].ngCount > 0         );      return {          groups,         summary,         totalNG,         failedTests,          result:             totalNG > 0             ? "NG"             : "PASS"      };  }   /* =========================================================    DETECT MEASUREMENT GROUPS ========================================================= */  function detectMeasurementGroups(row) {
     const groups = {};
