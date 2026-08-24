@@ -4,7 +4,29 @@
 <script src="libs/chart.js"></script>
 <script src="libs/chartjs-plugin-zoom.min.js"></script>
 <script src="libs/papaparse.min.js"></script>
-<style>  * {     box-sizing: border-box; }  :root {     --blue: #2563eb;     --red: #dc2626;     --green: #16a34a;     --bg: #f3f6fa;     --card: #ffffff;     --border: #dfe5ec;     --text: #1f2937;     --muted: #64748b; }  body {     margin: 0;     font-family: Arial, Helvetica, sans-serif;     background: var(--bg);     color: var(--text); }  header {     height: 68px;     background: white;     border-bottom: 1px solid var(--border);     display: flex;     align-items: center;     justify-content: space-between;     padding: 0 24px; }  .header-title h1 {     margin: 0;     font-size: 21px; }  .header-title p {     margin: 5px 0 0;     font-size: 12px;     color: var(--muted); }  .upload-button {     border: 1px solid var(--border);     background: white;     border-radius: 7px;     padding: 10px 16px;     cursor: pointer;     font-weight: bold; }  #fileInput {     display: none; }  #startScreen {     min-height: calc(100vh - 68px);     display: flex;     align-items: center;     justify-content: center;     padding: 30px; }  .upload-card {     width: 520px;     max-width: 100%;     background: white;     border: 2px dashed #b9c4d0;     border-radius: 14px;     padding: 40px 30px 55px;     text-align: center;     transition: .2s; }  .upload-card.dragover {     border-color: var(--blue);     background: #eff6ff; }  .upload-card h2 {     margin: 0 0 10px; }  .upload-card p {     color: var(--muted);     font-size: 14px; }  .model-section {     margin: 24px 0 18px;     text-align: left; }  .model-label {     display: block;     font-size: 10px;     font-weight: bold;     color: var(--muted);     margin-bottom: 7px; }  .model-select {     width: 100%;     padding: 11px 12px;     border: 1px solid var(--border);     border-radius: 7px;     background: white;     font-weight: bold;     font-size: 13px;     outline: none; }  .upload-main-button {     margin-top: 15px;     padding: 12px 22px;     border: none;     border-radius: 7px;     background: var(--blue);     color: white;     cursor: pointer;     font-weight: bold; }  .drop-text {     margin-top: 14px;     font-size: 11px;     color: var(--muted); }  /* APP */  #app {     display: none;     height: calc(100vh - 68px); }  .app-layout {     display: grid;     grid-template-columns: 440px 1fr;     height: 100%; }  /* SIDEBAR */  .sidebar {     background: white;     border-right: 1px solid var(--border);     display: flex;     flex-direction: column;     overflow: hidden; }  .sidebar-header {     padding: 15px;     border-bottom: 1px solid var(--border); }  .sidebar-title-row {     display: flex;     justify-content: space-between;     align-items: center; }  .sidebar-title {     font-size: 15px;     font-weight: bold; }  .total-count {     font-size: 11px;     color: var(--muted); }  .filter-label {     display: block;     margin-top: 12px;     margin-bottom: 6px;     font-size: 9px;     font-weight: bold;     color: var(--muted); }  .station-select {     width: 100%;     padding: 9px 10px;     border: 1px solid var(--border);     border-radius: 6px;     background: white; }  .status-filters {     display: flex;     gap: 6px; }  .status-filter {     flex: 1;     border: 1px solid var(--border);     background: #f8fafc;     padding: 8px 5px;     border-radius: 5px;     cursor: pointer;     font-size: 10px;     font-weight: bold; }  .status-filter.active {     background: var(--blue);     border-color: var(--blue);     color: white; }  .search-box textarea {     width: 100%;     min-height: 75px;     resize: vertical;     padding: 9px 10px;     border: 1px solid var(--border);     border-radius: 6px;     font-family: inherit;     font-size: 11px;     outline: none; }  .ng-desc-filter {     display: flex;     flex-direction: column;     gap: 5px;     max-height: 110px;     overflow-y: auto;     border: 1px solid var(--border);     border-radius: 6px;     padding: 8px 10px;     background: #f8fafc; }  .ng-desc-option {     display: flex;     align-items: center;     gap: 6px;     font-size: 10px;     cursor: pointer; }  .ng-desc-option input {     cursor: pointer;     margin: 0; }  .ng-desc-empty {     font-size: 10px;     color: var(--muted); }  /* SN TABLE */  .sn-table-header, .sn-row {     display: grid;     grid-template-columns: 28px 1.2fr 1fr 62px 1.2fr 18px;     gap: 4px;     align-items: center; }  .sn-table-header {     padding: 10px 8px;     font-size: 8px;     color: var(--muted);     font-weight: bold;     border-bottom: 1px solid var(--border);     background: #f8fafc; }  .sn-list {     flex: 1;     overflow-y: auto; }  .sn-row {     min-height: 58px;     padding: 7px 8px;     border-bottom: 1px solid #edf0f3;     font-size: 9px;     cursor: pointer; }  .sn-row:hover {     background: #f8fafc; }  .sn-row.selected {     background: #eaf2ff;     box-shadow: inset 3px 0 0 var(--blue); }  .sn-number {     color: var(--muted); }  .sn-pcba {     font-weight: bold;     overflow: hidden;     text-overflow: ellipsis; }  .sn-station {     overflow: hidden;     text-overflow: ellipsis;     white-space: nowrap;     color: #475569; }  .status-badge {     display: inline-block;     padding: 5px 6px;     border-radius: 4px;     font-size: 8px;     font-weight: bold;     color: white; }  .status-pass {     background: var(--green); }  .status-ng {     background: var(--red); }  .ng-details {     overflow: hidden;     text-overflow: ellipsis;     white-space: nowrap;     color: #475569; }  .arrow {     color: var(--blue);     font-size: 16px; }  /* MAIN */  .content {     overflow-y: auto;     padding: 14px 18px 25px; }  .view-mode-section {     display: flex;     gap: 7px;     margin-bottom: 12px; }  .view-mode-button {     border: 1px solid var(--border);     background: white;     padding: 10px 18px;     border-radius: 6px;     cursor: pointer;     font-size: 11px;     font-weight: bold; }  .view-mode-button.active {     background: var(--blue);     color: white;     border-color: var(--blue); }  /* INFO BAR */  .info-bar {     background: white;     border: 1px solid var(--border);     border-radius: 9px;     display: flex;     align-items: stretch;     margin-bottom: 12px;     overflow: hidden;     flex-wrap: wrap; }  .info-item {     padding: 15px 18px;     min-width: 145px;     border-right: 1px solid #e9edf2; }  .info-label {     font-size: 9px;     color: var(--muted);     font-weight: bold;     margin-bottom: 7px; }  .info-value {     font-size: 13px;     font-weight: bold; }  .result-pass {     color: var(--green); }  .result-ng {     color: var(--red); }  .ng-summary {     flex: 1;     padding: 14px 18px; }  .ng-summary-title {     font-size: 9px;     color: var(--muted);     font-weight: bold;     margin-bottom: 8px; }  .ng-pills {     display: flex;     flex-wrap: wrap;     gap: 6px; }  .ng-pill {     background: #f8fafc;     border-radius: 4px;     padding: 6px 8px;     font-size: 9px; }  .ng-pill span {     color: var(--red);     font-weight: bold;     margin-left: 4px; }  /* STATION SUMMARY */  .station-summary {     background: white;     border: 1px solid var(--border);     border-radius: 9px;     padding: 16px;     margin-bottom: 12px; }  .station-summary-header {     display: flex;     justify-content: space-between;     align-items: center;     margin-bottom: 14px; }  .station-summary-title {     font-size: 14px;     font-weight: bold; }  .station-summary-subtitle {     font-size: 10px;     color: var(--muted);     margin-top: 4px; }  .summary-stats {     display: flex;     flex-wrap: wrap;     gap: 10px; }  .summary-stat {     min-width: 100px;     background: #f8fafc;     border-radius: 6px;     padding: 11px; }  .summary-stat-label {     font-size: 8px;     color: var(--muted);     font-weight: bold; }  .summary-stat-value {     font-size: 18px;     font-weight: bold;     margin-top: 5px; }  .summary-good {     color: var(--green); }  .summary-ng {     color: var(--red); }  .test-ng-summary {     margin-top: 14px;     display: flex;     flex-wrap: wrap;     gap: 7px; }  .test-ng-item {     padding: 7px 10px;     border: 1px solid var(--border);     border-radius: 5px;     font-size: 10px;     background: white; }  .test-ng-item b {     color: var(--red);     margin-left: 5px; }  /* TEST FILTER */  .test-filter-section {     background: white;     border: 1px solid var(--border);     border-radius: 9px;     padding: 12px;     margin-bottom: 12px; }  .test-filter-title {     font-size: 10px;     color: var(--muted);     font-weight: bold;     margin-bottom: 9px; }  .test-tabs {     display: flex;     flex-wrap: wrap;     gap: 7px; }  .test-tab {     border: 1px solid var(--border);     background: #f1f5f9;     padding: 8px 15px;     border-radius: 5px;     cursor: pointer;     font-size: 10px;     font-weight: bold; }  .test-tab.active {     background: var(--blue);     border-color: var(--blue);     color: white; }  /* GRAPHS */  .graphs {     display: grid;     grid-template-columns: repeat(2, minmax(0, 1fr));     gap: 14px; }  .graph-card {     background: white;     border: 1px solid var(--border);     border-radius: 9px;     padding: 14px;     min-height: 350px; }  .graph-card.expanded {     grid-column: 1 / -1;     min-height: calc(100vh - 310px); }  .graph-header {     display: flex;     justify-content: space-between;     align-items: center;     gap: 10px;     margin-bottom: 10px; }  .graph-title {     font-size: 13px;     font-weight: bold; }  .graph-controls {     display: flex;     gap: 5px;     align-items: center; }  .graph-zoom-btn, .graph-reset-btn {     border: 1px solid var(--border);     background: white;     border-radius: 5px;     cursor: pointer;     font-weight: bold;     height: 28px; }  .graph-zoom-btn {     width: 30px;     font-size: 16px; }  .graph-reset-btn {     padding: 0 10px;     font-size: 10px; }  .graph-zoom-btn:hover, .graph-reset-btn:hover {     background: #f1f5f9; }  .canvas-wrapper {     height: 290px;     position: relative; }  .graph-card.expanded .canvas-wrapper {     height: calc(100vh - 390px);     min-height: 450px; }  .no-graph {     background: white;     border: 1px solid var(--border);     border-radius: 9px;     padding: 70px;     text-align: center;     color: var(--muted); }  @media (max-width: 1150px) {     .app-layout {         grid-template-columns: 390px 1fr;     } }  @media (max-width: 850px) {      #app {         height: auto;     }      .app-layout {         grid-template-columns: 1fr;     }      .sidebar {         height: 600px;         border-right: none;         border-bottom: 1px solid var(--border);     }      .graphs {         grid-template-columns: 1fr;     }  }  </style>
+<style>  * {     box-sizing: border-box; }  :root {     --blue: #2563eb;     --red: #dc2626;     --green: #16a34a;     --bg: #f3f6fa;     --card: #ffffff;     --border: #dfe5ec;     --text: #1f2937;     --muted: #64748b; }  body {     margin: 0;     font-family: Arial, Helvetica, sans-serif;     background: var(--bg);     color: var(--text); }  header {     height: 68px;     background: white;     border-bottom: 1px solid var(--border);     display: flex;     align-items: center;     justify-content: space-between;     padding: 0 24px; }  .header-title h1 {     margin: 0;     font-size: 21px; }  .header-title p {     margin: 5px 0 0;     font-size: 12px;     color: var(--muted); }  .upload-button {     border: 1px solid var(--border);     background: white;     border-radius: 7px;     padding: 10px 16px;     cursor: pointer;     font-weight: bold; }  #fileInput {     display: none; }  #startScreen {     min-height: calc(100vh - 68px);     display: flex;     align-items: center;     justify-content: center;     padding: 30px; }  .upload-card {     width: 520px;     max-width: 100%;     background: white;     border: 2px dashed #b9c4d0;     border-radius: 14px;     padding: 40px 30px 55px;     text-align: center;     transition: .2s; }  .upload-card.dragover {     border-color: var(--blue);     background: #eff6ff; }  .upload-card h2 {     margin: 0 0 10px; }  .upload-card p {     color: var(--muted);     font-size: 14px; }  .model-section {     margin: 24px 0 18px;     text-align: left; }  .model-label {     display: block;     font-size: 10px;     font-weight: bold;     color: var(--muted);     margin-bottom: 7px; }  .model-select {     width: 100%;     padding: 11px 12px;     border: 1px solid var(--border);     border-radius: 7px;     background: white;     font-weight: bold;     font-size: 13px;     outline: none; }  .upload-main-button {     margin-top: 15px;     padding: 12px 22px;     border: none;     border-radius: 7px;     background: var(--blue);     color: white;     cursor: pointer;     font-weight: bold; }  .drop-text {     margin-top: 14px;     font-size: 11px;     color: var(--muted); }  /* APP */  #app {     display: none;     height: calc(100vh - 68px); }  .app-layout {     display: grid;     grid-template-columns: 440px 1fr;     height: 100%; }  /* SIDEBAR */  .sidebar {     background: white;     border-right: 1px solid var(--border);     display: flex;     flex-direction: column;     overflow: hidden; }  .sidebar-header {     padding: 15px;     border-bottom: 1px solid var(--border); }  .sidebar-title-row {     display: flex;     justify-content: space-between;     align-items: center; }  .sidebar-title {     font-size: 15px;     font-weight: bold; }  .total-count {     font-size: 11px;     color: var(--muted); }  .filter-label {     display: block;     margin-top: 12px;     margin-bottom: 6px;     font-size: 9px;     font-weight: bold;     color: var(--muted); }  .station-select {     width: 100%;     padding: 9px 10px;     border: 1px solid var(--border);     border-radius: 6px;     background: white; }  .status-filters {     display: flex;     gap: 6px; }  .status-filter {     flex: 1;     border: 1px solid var(--border);     background: #f8fafc;     padding: 8px 5px;     border-radius: 5px;     cursor: pointer;     font-size: 10px;     font-weight: bold; }  .status-filter.active {     background: var(--blue);     border-color: var(--blue);     color: white; }  .search-box textarea {     width: 100%;     min-height: 75px;     resize: vertical;     padding: 9px 10px;     border: 1px solid var(--border);     border-radius: 6px;     font-family: inherit;     font-size: 11px;     outline: none; }  .ng-desc-filter {     display: flex;     flex-direction: column;     gap: 5px;     max-height: 110px;     overflow-y: auto;     border: 1px solid var(--border);     border-radius: 6px;     padding: 8px 10px;     background: #f8fafc; }  .ng-desc-option {     display: flex;     align-items: center;     gap: 6px;     font-size: 10px;     cursor: pointer; }  .ng-desc-option input {     cursor: pointer;     margin: 0; }  .ng-desc-empty {     font-size: 10px;     color: var(--muted); }  /* SN TABLE */  .sn-table-header, .sn-row {     display: grid;     grid-template-columns: 28px 1.2fr 1fr 62px 1.2fr 18px;     gap: 4px;     align-items: center; }  .sn-table-header {     padding: 10px 8px;     font-size: 8px;     color: var(--muted);     font-weight: bold;     border-bottom: 1px solid var(--border);     background: #f8fafc; }  .sn-list {     flex: 1;     overflow-y: auto; }  .sn-row {     min-height: 58px;     padding: 7px 8px;     border-bottom: 1px solid #edf0f3;     font-size: 9px;     cursor: pointer; }  .sn-row:hover {     background: #f8fafc; }  .sn-row.selected {     background: #eaf2ff;     box-shadow: inset 3px 0 0 var(--blue); }  .sn-number {     color: var(--muted); }  .sn-pcba {     font-weight: bold;     overflow: hidden;     text-overflow: ellipsis; }  .sn-station {     overflow: hidden;     text-overflow: ellipsis;     white-space: nowrap;     color: #475569; }  .status-badge {     display: inline-block;     padding: 5px 6px;     border-radius: 4px;     font-size: 8px;     font-weight: bold;     color: white; }  .status-pass {     background: var(--green); }  .status-ng {     background: var(--red); }  .ng-details {     overflow: hidden;     text-overflow: ellipsis;     white-space: nowrap;     color: #475569; }  .arrow {     color: var(--blue);     font-size: 16px; }  /* MAIN */  .content {     overflow-y: auto;     padding: 14px 18px 25px; }  .view-mode-section {     display: flex;     gap: 7px;     margin-bottom: 12px; }  .view-mode-button {     border: 1px solid var(--border);     background: white;     padding: 10px 18px;     border-radius: 6px;     cursor: pointer;     font-size: 11px;     font-weight: bold; }  .view-mode-button.active {     background: var(--blue);     color: white;     border-color: var(--blue); }  /* INFO BAR */  .info-bar {     background: white;     border: 1px solid var(--border);     border-radius: 9px;     display: flex;     align-items: stretch;     margin-bottom: 12px;     overflow: hidden;     flex-wrap: wrap; }  .info-item {     padding: 15px 18px;     min-width: 145px;     border-right: 1px solid #e9edf2; }  .info-label {     font-size: 9px;     color: var(--muted);     font-weight: bold;     margin-bottom: 7px; }  .info-value {     font-size: 13px;     font-weight: bold; }  .result-pass {     color: var(--green); }  .result-ng {     color: var(--red); }  .ng-summary {     flex: 1;     padding: 14px 18px; }  .ng-summary-title {     font-size: 9px;     color: var(--muted);     font-weight: bold;     margin-bottom: 8px; }  .ng-pills {     display: flex;     flex-wrap: wrap;     gap: 6px; }  .ng-pill {     background: #f8fafc;     border-radius: 4px;     padding: 6px 8px;     font-size: 9px; }  .ng-pill span {     color: var(--red);     font-weight: bold;     margin-left: 4px; }  /* STATION SUMMARY */  .station-summary {     background: white;     border: 1px solid var(--border);     border-radius: 9px;     padding: 16px;     margin-bottom: 12px; }  .station-summary-header {     display: flex;     justify-content: space-between;     align-items: center;     margin-bottom: 14px; }  .station-summary-title {     font-size: 14px;     font-weight: bold; }  .station-summary-subtitle {     font-size: 10px;     color: var(--muted);     margin-top: 4px; }  .summary-stats {     display: flex;     flex-wrap: wrap;     gap: 10px; }  .summary-stat {     min-width: 100px;     background: #f8fafc;     border-radius: 6px;     padding: 11px; }  .summary-stat-label {     font-size: 8px;     color: var(--muted);     font-weight: bold; }  .summary-stat-value {     font-size: 18px;     font-weight: bold;     margin-top: 5px; }  .summary-good {     color: var(--green); }  .summary-ng {     color: var(--red); }  .test-ng-summary {     margin-top: 14px;     display: flex;     flex-wrap: wrap;     gap: 7px; }  .test-ng-item {     padding: 7px 10px;     border: 1px solid var(--border);     border-radius: 5px;     font-size: 10px;     background: white; }  .test-ng-item b {     color: var(--red);     margin-left: 5px; }  /* TEST FILTER */  .test-filter-section {     background: white;     border: 1px solid var(--border);     border-radius: 9px;     padding: 12px;     margin-bottom: 12px; }  .test-filter-title {     font-size: 10px;     color: var(--muted);     font-weight: bold;     margin-bottom: 9px; }  .test-tabs {     display: flex;     flex-wrap: wrap;     gap: 7px; }  .test-tab {     border: 1px solid var(--border);     background: #f1f5f9;     padding: 8px 15px;     border-radius: 5px;     cursor: pointer;     font-size: 10px;     font-weight: bold; }  .test-tab.active {     background: var(--blue);     border-color: var(--blue);     color: white; }  /* GRAPHS */  .graphs {     display: grid;     grid-template-columns: repeat(2, minmax(0, 1fr));     gap: 14px; }  .graph-card {     background: white;     border: 1px solid var(--border);     border-radius: 9px;     padding: 14px;     min-height: 350px; }  .graph-card.expanded {     grid-column: 1 / -1;     min-height: calc(100vh - 310px); }  .graph-header {     display: flex;     justify-content: space-between;     align-items: center;     gap: 10px;     margin-bottom: 10px; }  .graph-title {     font-size: 13px;     font-weight: bold; }  .graph-controls {     display: flex;     gap: 5px;     align-items: center; }  .graph-zoom-btn, .graph-reset-btn {     border: 1px solid var(--border);     background: white;     border-radius: 5px;     cursor: pointer;     font-weight: bold;     height: 28px; }  .graph-zoom-btn {     width: 30px;     font-size: 16px; }  .graph-reset-btn {     padding: 0 10px;     font-size: 10px; }  .graph-zoom-btn:hover, .graph-reset-btn:hover {     background: #f1f5f9; }  .canvas-wrapper {     height: 290px;     position: relative; }  .graph-card.expanded .canvas-wrapper {     height: calc(100vh - 390px);     min-height: 450px; }  .no-graph {     background: white;     border: 1px solid var(--border);     border-radius: 9px;     padding: 70px;     text-align: center;     color: var(--muted); }  @media (max-width: 1150px) {     .app-layout {         grid-template-columns: 390px 1fr;     } }  @media (max-width: 850px) {      #app {         height: auto;     }      .app-layout {         grid-template-columns: 1fr;     }      .sidebar {         height: 600px;         border-right: none;         border-bottom: 1px solid var(--border);     }      .graphs {         grid-template-columns: 1fr;     }  }  
+/* CSV diagnostic panel */
+.csv-diagnostics {
+    margin: 16px 0;
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid #94a3b8;
+    background: rgba(148,163,184,.10);
+    font-size: 13px;
+}
+.csv-diagnostics.error {
+    border-color: #ef4444;
+    background: rgba(239,68,68,.10);
+}
+.csv-diagnostics.success {
+    border-color: #22c55e;
+    background: rgba(34,197,94,.08);
+}
+.csv-diagnostics h3 { margin: 0 0 10px; }
+.csv-diagnostics ul { margin: 8px 0 0 20px; padding: 0; }
+.csv-diagnostics li { margin: 4px 0; }
+
+</style>
 </head>
 <body>
 <header>
@@ -197,44 +219,155 @@ function findHeaderColumn(names) {
 function getSN(row) { return row?.[snColumn] ?? row?.[0] ?? ""; }
 function getPCBA(row) { return row?.[pcbaColumn] ?? row?.[1] ?? ""; }
 
-/* =========================================================    PROCESS CSV ========================================================= */  function processCSV() {
-    if (!Array.isArray(csvData) || csvData.length < 2) {
-        alert("Invalid CSV: no usable rows were found.");
-        return;
+/* =========================================================    PROCESS CSV ========================================================= */  
+function showCSVDiagnostics(diagnostic, isError = false) {
+    const old = document.getElementById("csvDiagnostics");
+    if (old) old.remove();
+
+    const panel = document.createElement("div");
+    panel.id = "csvDiagnostics";
+    panel.className = "csv-diagnostics " + (isError ? "error" : "success");
+
+    const lines = [
+        ["Model", diagnostic.model || selectedModel || "Not selected"],
+        ["Total rows", diagnostic.totalRows],
+        ["Header columns", diagnostic.headerCount],
+        ["PCBA column", diagnostic.pcba],
+        ["SN column", diagnostic.sn],
+        ["StationIP column", diagnostic.station],
+        ["Lower row", diagnostic.lower],
+        ["Upper row", diagnostic.upper],
+        ["Valid DUT rows", diagnostic.dutRows],
+        ["MIC SEAL columns", diagnostic.groups?.MIC_SEAL || 0],
+        ["MIC FR columns", diagnostic.groups?.MIC_FR || 0],
+        ["MIC THD columns", diagnostic.groups?.MIC_THD || 0],
+        ["SPK FR columns", diagnostic.groups?.SPK_FR || 0],
+        ["SPK RB columns", diagnostic.groups?.SPK_RB || 0],
+        ["SPK THD columns", diagnostic.groups?.SPK_THD || 0]
+    ];
+
+    const details = lines.map(([label, value]) =>
+        `<li><b>${escapeHTML(String(label))}:</b> ${escapeHTML(String(value ?? "Not found"))}</li>`
+    ).join("");
+
+    panel.innerHTML = `
+        <h3>${isError ? "❌ CSV ANALYSIS FAILED" : "✓ CSV DIAGNOSTICS"}</h3>
+        ${diagnostic.reason ? `<p><b>Reason:</b> ${escapeHTML(diagnostic.reason)}</p>` : ""}
+        <ul>${details}</ul>
+    `;
+
+    const target =
+        document.getElementById("startScreen") ||
+        document.querySelector(".start-screen") ||
+        document.body;
+
+    target.appendChild(panel);
+    console.log("CSV DIAGNOSTICS:", diagnostic);
+}
+
+function buildCSVGroupDiagnostics() {
+    const counts = {
+        MIC_SEAL: 0, MIC_FR: 0, MIC_THD: 0,
+        SPK_FR: 0, SPK_RB: 0, SPK_THD: 0
+    };
+
+    for (const rawHeader of headers) {
+        const h = String(rawHeader || "").toUpperCase();
+        if (h.includes("NO_DATA") || h.includes("RETRY") || h.includes("MIC_SENS")) continue;
+        for (const group of Object.keys(counts)) {
+            if (h.includes(group)) counts[group]++;
+        }
     }
+    return counts;
+}
 
-    headers = csvData[0].map(value => String(value ?? "").trim());
+function getColumnName(index) {
+    return index >= 0 && headers[index] ? headers[index] : "Not found";
+}
 
-    if (!headers.length || headers.every(header => !header)) {
-        alert("Invalid CSV: header row was not found.");
-        return;
+function processCSV() {
+    const diagnostic = {
+        model: selectedModel,
+        totalRows: Array.isArray(csvData) ? csvData.length : 0,
+        headerCount: 0,
+        pcba: "Not found",
+        sn: "Not found",
+        station: "Not found",
+        lower: "Not found",
+        upper: "Not found",
+        dutRows: 0,
+        groups: {}
+    };
+
+    try {
+        if (!Array.isArray(csvData) || csvData.length < 2) {
+            diagnostic.reason = "The CSV has no usable data rows.";
+            showCSVDiagnostics(diagnostic, true);
+            return;
+        }
+
+        headers = (csvData[0] || []).map(v => String(v ?? "").trim());
+        diagnostic.headerCount = headers.length;
+
+        pcbaColumn = findHeaderColumn(["pcba", "pcbasn"]);
+        snColumn = pcbaColumn >= 0 ? pcbaColumn :
+            findHeaderColumn(["sn", "serialnumber", "serial", "dut", "dutid"]);
+        workColumn = findHeaderColumn(["workno", "workorder", "work"]);
+        stationColumn = findHeaderColumn(["stationip", "station ip", "station_ip"]);
+
+        diagnostic.pcba = getColumnName(pcbaColumn);
+        diagnostic.sn = getColumnName(snColumn);
+        diagnostic.station = getColumnName(stationColumn);
+
+        lowerRow = findRow("Lower");
+        upperRow = findRow("Upper");
+        diagnostic.lower = lowerRow ? "Found" : "Not found";
+        diagnostic.upper = upperRow ? "Found" : "Not found";
+        diagnostic.groups = buildCSVGroupDiagnostics();
+
+        const excluded = new Set([
+            "lower","upper","min","max","mean",
+            "sigma","cpl","cpu","cpk"
+        ]);
+
+        // NO fixed DUT quantity. Every non-statistical row is kept.
+        dutRows = csvData.slice(1).filter(row => {
+            const first = String(row?.[0] ?? "").trim().toLowerCase();
+            return first && !excluded.has(first);
+        });
+
+        diagnostic.dutRows = dutRows.length;
+
+        // Analyze every DUT independently. Missing measurements do not reject the DUT.
+        dutRows.forEach(row => {
+            try {
+                row._analysis = analyzeDUT(row);
+            } catch (dutError) {
+                console.warn("Skipping analysis error for DUT row:", dutError, row);
+                row._analysis = { groups: {}, ngCount: 0, status: "PASS", errors: [String(dutError?.message || dutError)] };
+            }
+        });
+
+        filteredRows = [...dutRows];
+        selectedDutIndex = filteredRows.length ? 0 : -1;
+
+        // Diagnostics are informational only; they do not block analysis.
+        diagnostic.reason = dutRows.length
+            ? `Loaded ${dutRows.length} DUT/PCBA row(s). The analyzer used whatever valid measurements each DUT contains.`
+            : "No DUT/PCBA rows were found.";
+
+        showCSVDiagnostics(diagnostic, dutRows.length === 0);
+
+        if (typeof populateStationFilter === "function") populateStationFilter();
+        if (typeof populateNGDescFilter === "function") populateNGDescFilter();
+        if (typeof applyFilters === "function") applyFilters();
+
+    } catch (error) {
+        diagnostic.reason = "Unexpected analysis error: " + (error?.message || String(error));
+        console.error("CSV analysis error:", error);
+        showCSVDiagnostics(diagnostic, true);
     }
-
-    lowerRow = findRow("Lower");
-    upperRow = findRow("Upper");
-
-    stationColumn = headers.findIndex(header => normalizeHeader(header) === "stationip");
-    snColumn = findHeaderColumn(["pcba", "pcbasn", "sn", "serialnumber", "serial", "dut", "dutid"]);
-    pcbaColumn = findHeaderColumn(["pcba", "pcbasn", "workorder", "workno", "work", "product"]);
-
-    if (snColumn === -1) snColumn = 0;
-    if (pcbaColumn === -1 || pcbaColumn === snColumn) {
-        pcbaColumn = headers.length > 1 ? 1 : snColumn;
-    }
-
-    if (stationColumn === -1) {
-        alert("StationIP column was not found. Supported names include StationIP, Station IP, and STATION_IP.");
-        return;
-    }
-
-      dutRows =         csvData         .slice(1)         .filter(row => {              const first =                 String(row[0] || "")                 .trim()                 .toLowerCase();              if (!first) return false;              const excluded = [                 "lower",                 "upper",                 "min",                 "max",                 "mean",                 "sigma",                 "cpl",                 "cpu",                 "cpk"             ];              return !excluded.includes(first);          });
-
-      if (dutRows.length === 0) {
-          alert("No DUT data rows were found in this CSV.");
-          return;
-      }
-
-      dutRows.forEach(row => {          row._analysis =             analyzeDUT(row);      });      populateStationFilter();      populateNGDescFilter();      applyFilters();      document     .getElementById("startScreen")     .style.display = "none";      document     .getElementById("app")     .style.display = "block";      if (dutRows.length > 0) {          selectDUT(0);      }  }   /* =========================================================    FIND LOWER / UPPER ROW ========================================================= */  function findRow(name) {      return csvData.find(         row =>             String(row[0] || "")             .trim()             .toLowerCase()             === name.toLowerCase()     );  }   /* =========================================================    ANALYZE DUT ========================================================= */  function analyzeDUT(row) {      const groups =         detectMeasurementGroups(row);      const summary = {};      let totalNG = 0;      Object.keys(groups)     .forEach(group => {          let ngCount = 0;          groups[group]         .forEach(item => {              if (isNG(item)) {                  ngCount++;                 totalNG++;              }          });          summary[group] = {              ngCount,              status:                 ngCount > 0                 ? "NG"                 : "PASS"          };      });      const failedTests =         Object.keys(summary)         .filter(             group =>                 summary[group].ngCount > 0         );      return {          groups,         summary,         totalNG,         failedTests,          result:             totalNG > 0             ? "NG"             : "PASS"      };  }   /* =========================================================    DETECT MEASUREMENT GROUPS ========================================================= */  function detectMeasurementGroups(row) {
+}   /* =========================================================    FIND LOWER / UPPER ROW ========================================================= */  function findRow(name) {      return csvData.find(         row =>             String(row[0] || "")             .trim()             .toLowerCase()             === name.toLowerCase()     );  }   /* =========================================================    ANALYZE DUT ========================================================= */  function analyzeDUT(row) {      const groups =         detectMeasurementGroups(row);      const summary = {};      let totalNG = 0;      Object.keys(groups)     .forEach(group => {          let ngCount = 0;          groups[group]         .forEach(item => {              if (isNG(item)) {                  ngCount++;                 totalNG++;              }          });          summary[group] = {              ngCount,              status:                 ngCount > 0                 ? "NG"                 : "PASS"          };      });      const failedTests =         Object.keys(summary)         .filter(             group =>                 summary[group].ngCount > 0         );      return {          groups,         summary,         totalNG,         failedTests,          result:             totalNG > 0             ? "NG"             : "PASS"      };  }   /* =========================================================    DETECT MEASUREMENT GROUPS ========================================================= */  function detectMeasurementGroups(row) {
     const groups = {};
     const allowedGroups = [
         "MIC_SEAL", "MIC_FR", "MIC_THD",
